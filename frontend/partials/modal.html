@@ -1,0 +1,51 @@
+<!--------------------------------------------------------------------------->
+<!-- Modal Entrar/Cadastrar -->
+<!--------------------------------------------------------------------------->
+<div id="authModal" class="auth-modal">
+  <div class="auth-modal-content split-modal">
+
+    <span class="close-modal">&times;</span>
+
+    <!-- Lado esquerdo: imagem -->
+    <div class="modal-left">
+      <img src="img/modal.png" alt="Imagem" class="modal-image">
+    </div>
+
+    <!-- Lado direito: formulários -->
+    <div class="modal-right">
+
+      <!-- Abas -->
+      <div class="auth-tabs">
+        <button class="tab-btn active" data-tab="login">Entrar</button>
+        <button class="tab-btn" data-tab="register">Cadastrar</button>
+      </div>
+
+      <!-- Formulário Entrar -->
+      <form id="loginForm" class="modal-form active">
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Senha" required>
+        <div class="form-extra">
+          <label>
+            <input type="checkbox"> Manter conectado
+          </label>
+          <a href="#" class="recover-link">Recuperar senha?</a>
+        </div>
+        <button type="submit" class="btn-custom">Entrar</button>
+      </form>
+
+      <!-- Formulário Cadastrar -->
+      <form id="registerForm" class="modal-form">
+        <input type="text" placeholder="Nome completo" required>
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Senha" required>
+        <div class="form-extra">
+          <label>
+            <input type="checkbox"> Manter conectado
+          </label>
+        </div>
+        <button type="submit" class="btn-custom">Cadastrar</button>
+      </form>
+    </div>
+
+  </div>
+</div>
