@@ -11,3 +11,7 @@ C:/ecoLogica/
   │── .gitignore
   │── README.md
   │── docker-compose.yml
+
+Alunos:
+
+Edcarlos
