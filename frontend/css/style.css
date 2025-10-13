@@ -17,165 +17,23 @@ body {
   background-color: #fefcf0;
 }
 
-
-/* ==========================================================================
-   2. CABEÇALHO E NAVEGAÇÃO
-   ========================================================================== */
-
-/* --- Barra Superior (Bege) --- */
-.top-bar {
-  background-color: #fefcf0;
-  color: #2c5836;
-  text-align: center;
-  padding: 5px 0;
-  font-weight: 600;
-}
-
-/* --- Barra Principal (Verde Escuro) --- */
-.main-bar {
-  background-color: #2c5836;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+/* Container de Conteúdo Principal */
+.content-wrapper {
+  max-width: 1350px;
+  margin: 50px auto;
   padding: 0 50px;
-  gap: 4px;
-  height: 46px;
-  position: relative;
+  box-sizing: border-box;
+  margin-bottom: -10px;
 }
 
-/* --- Barra Secundária (Verde Claro) --- */
-.secondary-bar {
-  background-color: #488f58;
-  padding: 0 50px;
-  height: 46px;
-  z-index: 15;
-}
-
-/* --- Links da Barra Secundária --- */
-.secondary-bar .navbar-nav button {
-  display: block;
-  width: 100%;
-  margin-bottom: 5px;
-  color: #fefcf0;
-  background: none;
-  border: none;
-  text-align: left;
-  cursor: pointer;
-}
-
-.secondary-bar .navbar-nav button:hover {
-  text-decoration: underline;
-}
-
-/* Menu links como botão - cor bege */
-.navbar-nav .nav-link.btn {
-  color: #fefcf0;
-  /* cor do texto, ajuste se quiser */
-}
-
-/* Hover para dar efeito ao passar o mouse */
-.navbar-nav .nav-link.btn:hover {
-  color: #e87a00;
-}
-
-
-/* --- Barra de Pesquisa (Desktop) --- */
-.search-box {
-  width: 0;
-  height: 35px;
-  background-color: #fefcf0;
-  overflow: hidden;
-  transition: width 0.3s;
-  align-items: center;
-  margin-right: 0px;
-  border-radius: 10px;
-  display: none;
-}
-
-.search-box input {
-  border: 0px;
-  border-radius: 4px;
-  padding: 5px 10px;
-  width: 100%;
-  outline: none;
-  font-size: 14px;
-  background-color: #fefcf0;
-}
-
-/* --- Menu Hamburguer (Mobile) --- */
-.navbar-toggler {
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
-.navbar-toggler svg {
-  fill: #fefcf0;
-}
-
-/* --- Menu Lateral Offcanvas (Mobile) --- */
-.offcanvas {
-  background-color: #488f58;
-}
-
-.offcanvas-header {
-  background-color: #2c5836;
-}
-
-.offcanvas-header .btn-close {
-  filter: invert(1);
-}
-
-.offcanvas-body .nav-link {
-  color: #fefcf0;
-  font-size: 1.2rem;
-  padding: 15px 15px;
-  margin-bottom: 8px;
-  border-radius: 4px;
-  text-align: left;
-  transition: background-color 0.2s;
-}
-
-.offcanvas-body .nav-link:hover {
-  background-color: #2c5836;
-  text-decoration: none;
-}
-
-/* --- Botão de Autenticação no Offcanvas --- */
-.btn-auth-offcanvas {
-  width: 100%;
-  border-radius: 8px !important;
-  text-align: center;
-  padding: 10px 15px !important;
-  font-size: 1.1rem;
-  height: auto !important;
-  margin-bottom: 10px;
-}
-
-/* --- Formulário de Pesquisa no Offcanvas --- */
-.offcanvas-search-form {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.offcanvas-search-form .form-control {
-  flex-grow: 1;
-  border-radius: 6px;
-  padding: 8px 12px;
-}
-
-.offcanvas-search-form .offcanvas-search-btn {
-  width: 45px;
-  height: 45px;
-  padding: 0;
-  border-radius: 6px;
-  flex-shrink: 0;
+.content-wrapper h1 {
+  font-size: 29px;
+  font-weight: bold !important;
 }
 
 
 /* ==========================================================================
-   3. COMPONENTES REUTILIZÁVEIS
+   2. COMPONENTES REUTILIZÁVEIS
    ========================================================================== */
 
 /* --- Botões Customizados (Laranja) --- */
@@ -197,6 +55,23 @@ body {
 .btn-custom:hover {
   background-color: #cf6b00;
   color: #fefcf0;
+}
+
+/* --- Botão do Banner --- */
+.btn-banner {
+  background-color: #e87a00;
+  color: #fefcf0;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease-out;
+}
+
+.btn-banner:hover {
+  background-color: #cf6b00;
+  color: #fefcf0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* --- Botão Voltar ao Topo --- */
@@ -374,10 +249,157 @@ body {
 
 
 /* ==========================================================================
+   3. CABEÇALHO E NAVEGAÇÃO
+   ========================================================================== */
+
+/* --- Estrutura das Barras --- */
+.top-bar {
+  background-color: #fefcf0;
+  color: #2c5836;
+  text-align: center;
+  padding: 5px 0;
+  font-weight: 600;
+}
+
+.main-bar {
+  background-color: #2c5836;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 50px;
+  gap: 4px;
+  height: 46px;
+  position: relative;
+}
+
+.secondary-bar {
+  background-color: #488f58;
+  padding: 0 50px;
+  height: 46px;
+  z-index: 15;
+}
+
+/* --- Links de Navegação --- */
+.secondary-bar .navbar-nav button {
+  display: block;
+  width: 100%;
+  margin-bottom: 5px;
+  color: #fefcf0;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.secondary-bar .navbar-nav button:hover {
+  text-decoration: underline;
+}
+
+.navbar-nav .nav-link.btn {
+  color: #fefcf0;
+}
+
+.navbar-nav .nav-link.btn:hover {
+  color: #e87a00;
+}
+
+/* --- Barra de Pesquisa (Desktop) --- */
+.search-box {
+  width: 0;
+  height: 35px;
+  background-color: #fefcf0;
+  overflow: hidden;
+  transition: width 0.3s;
+  align-items: center;
+  margin-right: 0px;
+  border-radius: 10px;
+  display: none;
+}
+
+.search-box input {
+  border: 0px;
+  border-radius: 4px;
+  padding: 5px 10px;
+  width: 100%;
+  outline: none;
+  font-size: 14px;
+  background-color: #fefcf0;
+}
+
+/* --- Menu Mobile (Offcanvas) --- */
+.navbar-toggler {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.navbar-toggler svg {
+  fill: #fefcf0;
+}
+
+.offcanvas {
+  background-color: #488f58;
+}
+
+.offcanvas-header {
+  background-color: #2c5836;
+}
+
+.offcanvas-header .btn-close {
+  filter: invert(1);
+}
+
+.offcanvas-body .nav-link {
+  color: #fefcf0;
+  font-size: 1.2rem;
+  padding: 15px 15px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.offcanvas-body .nav-link:hover {
+  background-color: #2c5836;
+  text-decoration: none;
+}
+
+.btn-auth-offcanvas {
+  width: 100%;
+  border-radius: 8px !important;
+  text-align: center;
+  padding: 10px 15px !important;
+  font-size: 1.1rem;
+  height: auto !important;
+  margin-bottom: 10px;
+}
+
+.offcanvas-search-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.offcanvas-search-form .form-control {
+  flex-grow: 1;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.offcanvas-search-form .offcanvas-search-btn {
+  width: 45px;
+  height: 45px;
+  padding: 0;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+
+/* ==========================================================================
    4. SEÇÕES DA PÁGINA
    ========================================================================== */
 
-/* --- Banner (Carrossel) --- */
+/* --- Seção: Banner (Carrossel) --- */
 .carousel-caption {
   bottom: auto;
   top: 150px;
@@ -390,38 +412,7 @@ body {
   text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.7);
 }
 
-.btn-banner {
-  background-color: #e87a00;
-  color: #fefcf0;
-  border: none;
-  border-radius: 6px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
-  transition: all 0.2s ease-out;
-}
-
-.btn-banner:hover {
-  background-color: #cf6b00;
-  color: #fefcf0;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-/* --- Container de Conteúdo Principal --- */
-.content-wrapper {
-  max-width: 1350px;
-  margin: 50px auto;
-  padding: 0 50px;
-  box-sizing: border-box;
-  margin-bottom: -10px;
-}
-
-.content-wrapper h1 {
-  font-size: 29px;
-  font-weight: bold !important;
-
-}
-
-/* --- Seção Missão, Objetivos e Benefícios --- */
+/* --- Seção: Missão, Objetivos e Benefícios --- */
 .eco-box {
   background-color: #f4f1d2;
   padding: 10px 0;
@@ -456,7 +447,7 @@ body {
   color: #4f4f4f;
 }
 
-/* --- Seção de Campanhas --- */
+/* --- Seção: Campanhas --- */
 .campaigns-section {
   margin: 60px auto;
   max-width: 1300px;
@@ -531,7 +522,7 @@ body {
   color: #fefcf0;
 }
 
-/* --- Seção Ranking Semanal --- */
+/* --- Seção: Ranking Semanal --- */
 .ranking-section {
   width: 100%;
   background-color: #488f58;
@@ -599,17 +590,14 @@ body {
 
 .ranking-list li.rank-1 {
   border-left-color: #FFD700;
-  /* Ouro */
 }
 
 .ranking-list li.rank-2 {
   border-left-color: #C0C0C0;
-  /* Prata */
 }
 
 .ranking-list li.rank-3 {
   border-left-color: #CD7F32;
-  /* Bronze */
 }
 
 .rank-position {
@@ -665,7 +653,19 @@ body {
   font-size: 1.1rem;
 }
 
-/* --- Seções de Imagem Full-Width --- */
+/* --- Seções: Imagens Full-Width --- */
+.fullwidth-image-section {
+  width: 100%;
+  margin: 30px 0 0 0;
+  padding: 0;
+}
+
+.fullwidth-image-section img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 .fullwidth-image-section2 {
   width: 100%;
   margin: 0;
@@ -679,19 +679,7 @@ body {
   margin-bottom: 50px;
 }
 
-.fullwidth-image-section {
-  width: 100%;
-  margin: 30px 0 0 0;
-  padding: 0;
-}
-
-.fullwidth-image-section img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* --- Seção Notícias e Newsletter --- */
+/* --- Seção: Notícias e Newsletter --- */
 .news-newsletter-section {
   width: 100%;
   padding: 0 20px;
@@ -791,6 +779,88 @@ body {
   background-color: #cf6b00;
 }
 
+/* --- Seção: Parceiros --- */
+.partners-section {
+  padding: 50px 0 70px 0;
+  background-color: #fefcf0;
+}
+
+.partners-title {
+  font-size: 29px;
+  font-weight: bold !important;
+  color: #4f4f4f;
+  margin-bottom: 40px;
+}
+
+.logo-slider-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-slider {
+  overflow: hidden;
+  position: relative;
+  width: 90%;
+}
+
+.logo-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.logo-item {
+  width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-item img {
+  max-width: 150px;
+  height: 80px;
+  object-fit: contain;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.logo-item img:hover {
+  opacity: 1;
+}
+
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background-color: #2c5836;
+  color: #fefcf0;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.slider-arrow:hover {
+  background-color: #e87a00;
+}
+
+.slider-arrow.prev {
+  left: 10px;
+}
+
+.slider-arrow.next {
+  right: 10px;
+}
+
 
 /* ==========================================================================
    5. RODAPÉ
@@ -875,19 +945,36 @@ footer {
   position: relative;
 }
 
+
 /* ==========================================================================
    6. RESPONSIVIDADE (MEDIA QUERIES)
    ========================================================================== */
 
-/* --- Telas médias e pequenas (Tablets e abaixo) --- */
-@media (max-width: 991.98px) {
+/* --- Telas grandes (Desktops - 992px e acima) --- */
+@media (min-width: 992px) {
+  .search-box {
+    display: flex !important;
+  }
 
-  /* Ajusta o padding do botão de autenticação no header */
+  .secondary-bar .navbar-nav {
+    flex-direction: row;
+    gap: 20px;
+  }
+
+  .secondary-bar .navbar-nav button {
+    display: inline-block;
+    width: auto;
+    margin: 0;
+    text-align: center;
+  }
+}
+
+/* --- Telas médias e pequenas (Tablets e abaixo - até 991.98px) --- */
+@media (max-width: 991.98px) {
   .btn-custom.btn-auth {
     padding: 10px 10px;
   }
 
-  /* Empilha a seção de Ranking */
   .ranking-container {
     flex-direction: column;
     gap: 25px;
@@ -899,10 +986,9 @@ footer {
   }
 }
 
-/* --- Telas pequenas (Celulares) --- */
+/* --- Telas pequenas (Celulares - até 768px) --- */
 @media (max-width: 768px) {
-
-  /* Ajusta o layout do rodapé */
+  /* Rodapé */
   .footer-top {
     flex-direction: column;
     align-items: center;
@@ -919,7 +1005,7 @@ footer {
     align-items: center;
   }
 
-  /* Ajusta o layout do modal */
+  /* Modal de Autenticação */
   .split-modal {
     flex-direction: column;
   }
@@ -933,7 +1019,7 @@ footer {
     height: 200px;
   }
 
-  /* Ajusta o banner/carrossel */
+  /* Banner/Carrossel */
   .carousel-item {
     height: 250px;
   }
@@ -963,131 +1049,17 @@ footer {
   }
 }
 
-
-/* --- Telas grandes (Desktops) --- */
-@media (min-width: 992px) {
-
-  /* Mostra a caixa de pesquisa no desktop */
-  .search-box {
-    display: flex !important;
-  }
-
-  /* Alinha os links da barra secundária na horizontal */
-  .secondary-bar .navbar-nav {
-    flex-direction: row;
-    gap: 20px;
-  }
-
-  .secondary-bar .navbar-nav button {
-    display: inline-block;
-    width: auto;
-    margin: 0;
-    text-align: center;
-  }
-}
-
-/* ==========================================================================
-   5.1 SEÇÃO DE PARCEIROS (VERSÃO FINAL: ITEM-POR-ITEM)
-   ========================================================================== */
-.partners-section {
-  padding: 50px 0 70px 0;
-  background-color: #fefcf0;
-}
-
-.partners-title {
-  font-size: 29px;
-  font-weight: bold !important;
-  color: #4f4f4f;
-  margin-bottom: 40px;
-}
-
-.logo-slider-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.logo-slider {
-  overflow: hidden;
-  position: relative;
-  width: 90%;
-}
-
-.logo-track {
-  display: flex;
-  /* A LARGURA SERÁ CALCULADA E INSERIDA PELO JAVASCRIPT */
-  transition: transform 0.5s ease-in-out;
-}
-
-.logo-item {
-  width: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.logo-item img {
-  max-width: 150px;
-  height: 80px;
-  object-fit: contain;
-  opacity: 0.8;
-  transition: opacity 0.3s ease;
-}
-
-.logo-item img:hover {
-  opacity: 1;
-}
-
-.slider-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-  background-color: #2c5836;
-  color: #fefcf0;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-}
-
-.slider-arrow:hover {
-  background-color: #e87a00;
-}
-
-.slider-arrow.prev {
-  left: 10px;
-}
-
-.slider-arrow.next {
-  right: 10px;
-}
-
-/* Em telas de celular (até 767.98px de largura) */
+/* --- Telas extra pequenas (Parceiros - até 767.98px) --- */
 @media (max-width: 767.98px) {
-
-  /* Ajusta a "janela" do carrossel para ter a largura de 1 item */
   .logo-slider {
     width: 200px;
   }
 
-  /* --- NOVO: Aproxima as setas do logo no mobile --- */
   .slider-arrow.prev {
-    /* O valor padrão era 10px. Aumente para mover para a direita. */
-    left: 40px; 
+    left: 40px;
   }
 
   .slider-arrow.next {
-    /* O valor padrão era 10px. Aumente para mover para a esquerda. */
     right: 40px;
   }
-
 }
