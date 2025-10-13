@@ -29,7 +29,7 @@ public class UsuarioService {
     public void deletar(Long id) {
         usuarioRepository.deleteById(id);
     }
-    
+
     public UsuarioResponse converterParaResponse(Usuario usuario) {
         UsuarioResponse response = new UsuarioResponse();
         response.setId(usuario.getId());

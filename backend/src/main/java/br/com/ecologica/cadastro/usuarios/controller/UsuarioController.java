@@ -18,11 +18,6 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @PostMapping
-    public Usuario criarUsuario(@RequestBody Usuario usuario) {
-        return usuarioService.salvar(usuario);
-    }
-
     @GetMapping
     public List<Usuario> listarUsuarios() {
         return usuarioService.listarTodos();
