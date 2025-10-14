@@ -144,6 +144,7 @@ body {
   justify-content: center;
   gap: 15px;
   position: relative;
+  transition: height 0.3s ease-in-out;
 }
 
 .close-modal {
@@ -183,6 +184,7 @@ body {
   display: none;
   flex-direction: column;
   gap: 15px;
+  
 }
 
 .modal-form.active {
@@ -246,6 +248,39 @@ body {
 .recover-link:hover {
   text-decoration: underline;
 }
+
+/* --- NOVO: Estilos para o formulário de recuperação de senha --- */
+
+.modal-right .form-title {
+    font-size: 1.5rem; /* 24px */
+    color: #4f4f4f;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.modal-right .form-description {
+    font-size: 0.9rem; /* 14.4px */
+    color: #6c757d;
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.modal-right .back-to-login-link {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    color: #488f58; /* Verde do seu site */
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.modal-right .back-to-login-link:hover {
+    text-decoration: underline;
+}
+
+
 
 
 /* ==========================================================================

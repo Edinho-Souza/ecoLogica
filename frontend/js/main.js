@@ -32,19 +32,51 @@ document.addEventListener("DOMContentLoaded", function () {
     const authModal = document.getElementById('authModal');
     const openModalBtns = document.querySelectorAll('.btn-custom.btn-auth, .btn-custom.btn-auth-offcanvas');
     const closeModalBtn = document.querySelector('.close-modal');
+
     if (authModal && openModalBtns.length > 0 && closeModalBtn) {
-      const tabButtons = document.querySelectorAll('.tab-btn');
-      const forms = document.querySelectorAll('.modal-form');
+      // --- Seletores originais e novos ---
+      const tabButtons = authModal.querySelectorAll('.tab-btn');
+      const forms = authModal.querySelectorAll('.modal-form');
+      const tabsContainer = authModal.querySelector('.auth-tabs');
+      const recoverForm = authModal.querySelector('#recoverForm');
+      const recoverLink = authModal.querySelector('.recover-link');
+      const backToLoginLink = authModal.querySelector('.back-to-login-link');
+
+      // --- Lógica para ABRIR e FECHAR o modal ---
       openModalBtns.forEach(btn => btn.addEventListener('click', () => { authModal.style.display = 'flex'; }));
       closeModalBtn.addEventListener('click', () => { authModal.style.display = 'none'; });
       window.addEventListener('click', (e) => { if (e.target === authModal) authModal.style.display = 'none'; });
+
+      // --- Lógica para trocar as ABAS ---
       tabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
           tabButtons.forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           forms.forEach(f => f.classList.remove('active'));
           document.getElementById(btn.dataset.tab + 'Form').classList.add('active');
+          recoverForm.classList.remove('active');
+          tabsContainer.style.display = 'flex';
         });
+      });
+
+      // --- Lógica para o link "Recuperar Senha" ---
+      recoverLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        forms.forEach(f => f.classList.remove('active'));
+        tabsContainer.style.display = 'none';
+        recoverForm.classList.add('active');
+      });
+
+      // --- Lógica para o link "Voltar para o login" ---
+      backToLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        recoverForm.classList.remove('active');
+        tabsContainer.style.display = 'flex';
+
+        // Ativa a aba e o formulário de login
+        document.getElementById('loginForm').classList.add('active');
+        authModal.querySelector('.tab-btn[data-tab="login"]').classList.add('active');
+        authModal.querySelector('.tab-btn[data-tab="register"]').classList.remove('active');
       });
     }
 
@@ -61,8 +93,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- Ativa o Menu Offcanvas do Bootstrap (Mobile) ---
     const offcanvasElement = document.getElementById('offcanvasMenu');
     if (offcanvasElement) {
-      // Esta linha "apresenta" o menu que acabamos de carregar
-      // ao JavaScript do Bootstrap, ativando suas funcionalidades.
       new bootstrap.Offcanvas(offcanvasElement);
     }
   };
@@ -83,7 +113,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Espera TODAS as partes serem carregadas
   Promise.all(todasAsPartes).then(() => {
-    // Quando a "casa" estiver construída, chamamos a "equipe de montagem"
     inicializarComponentes();
   });
 });
@@ -98,10 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const nextBtn = wrapper.querySelector('#logo-next-btn');
   let originalItems = Array.from(track.children);
 
-  if (originalItems.length === 0) return; // Não faz nada se não houver logos
+  if (originalItems.length === 0) return;
 
-  const itemWidth = 200; // Largura de cada logo (deve ser a mesma do CSS)
-  const itemsToClone = Math.ceil(wrapper.offsetWidth / itemWidth); // Clona a quantidade de itens visíveis
+  const itemWidth = 200;
+  const itemsToClone = Math.ceil(wrapper.offsetWidth / itemWidth);
 
   // 1. Clonar itens para criar o efeito infinito
   // Clona os últimos itens e coloca no começo
@@ -120,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let allItems = Array.from(track.children);
   track.style.width = `${allItems.length * itemWidth}px`;
 
-  let currentIndex = itemsToClone; // Começa nos primeiros itens "reais"
+  let currentIndex = itemsToClone;
   let isTransitioning = false;
 
   function setPosition(instant = false) {
