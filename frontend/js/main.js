@@ -175,6 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
     carregarHTML("placeholder-menu", "partials/menuOffcanvas.html"),
     carregarHTML("placeholder-redesocial", "partials/redesocial.html")
   ];
+  
 
   // Espera TODAS as partes serem carregadas e SÓ ENTÃO inicializa tudo
   Promise.all(todasAsPartes).then(() => {
