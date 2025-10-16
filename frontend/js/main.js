@@ -16,7 +16,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 2. Função que "ativa" TODOS os componentes depois que a página está montada
   const inicializarComponentes = () => {
-    console.log("Página montada! Ativando componentes...");
+    console.log("Página montada! Ativando TODOS os componentes...");
+
+    // --- Ativa o Carrossel (Banner) ---
+    const bannerCarouselEl = document.getElementById('bannerCarousel');
+    if (bannerCarouselEl) {
+      new bootstrap.Carousel(bannerCarouselEl, {
+        interval: 5000, // Tempo em milissegundos (5 segundos)
+        ride: 'carousel'
+      });
+    }
 
     // --- Ativa a Barra de Pesquisa ---
     const searchBtn = document.getElementById('searchBtn');
@@ -33,8 +42,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const openModalBtns = document.querySelectorAll('.btn-custom.btn-auth, .btn-custom.btn-auth-offcanvas');
     const closeModalBtn = document.querySelector('.close-modal');
     if (authModal && openModalBtns.length > 0 && closeModalBtn) {
-      const tabButtons = document.querySelectorAll('.tab-btn');
-      const forms = document.querySelectorAll('.modal-form');
+      const tabButtons = authModal.querySelectorAll('.tab-btn');
+      const forms = authModal.querySelectorAll('.modal-form');
+      const tabsContainer = authModal.querySelector('.auth-tabs');
+      const recoverForm = authModal.querySelector('#recoverForm');
+      const recoverLink = authModal.querySelector('.recover-link');
+      const backToLoginLink = authModal.querySelector('.back-to-login-link');
       openModalBtns.forEach(btn => btn.addEventListener('click', () => { authModal.style.display = 'flex'; }));
       closeModalBtn.addEventListener('click', () => { authModal.style.display = 'none'; });
       window.addEventListener('click', (e) => { if (e.target === authModal) authModal.style.display = 'none'; });
@@ -44,7 +57,23 @@ document.addEventListener("DOMContentLoaded", function () {
           btn.classList.add('active');
           forms.forEach(f => f.classList.remove('active'));
           document.getElementById(btn.dataset.tab + 'Form').classList.add('active');
+          recoverForm.classList.remove('active');
+          tabsContainer.style.display = 'flex';
         });
+      });
+      recoverLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        forms.forEach(f => f.classList.remove('active'));
+        tabsContainer.style.display = 'none';
+        recoverForm.classList.add('active');
+      });
+      backToLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        recoverForm.classList.remove('active');
+        tabsContainer.style.display = 'flex';
+        document.getElementById('loginForm').classList.add('active');
+        authModal.querySelector('.tab-btn[data-tab="login"]').classList.add('active');
+        authModal.querySelector('.tab-btn[data-tab="register"]').classList.remove('active');
       });
     }
 
@@ -61,11 +90,76 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- Ativa o Menu Offcanvas do Bootstrap (Mobile) ---
     const offcanvasElement = document.getElementById('offcanvasMenu');
     if (offcanvasElement) {
-      // Esta linha "apresenta" o menu que acabamos de carregar
-      // ao JavaScript do Bootstrap, ativando suas funcionalidades.
       new bootstrap.Offcanvas(offcanvasElement);
     }
-  };
+    
+    // --- LÓGICA DO RODAPÉ COLAPSÁVEL ---
+    const footerToggles = document.querySelectorAll('.footer-toggle');
+    footerToggles.forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        toggle.classList.toggle('active');
+        const linksList = toggle.nextElementSibling;
+        if (linksList && linksList.classList.contains('footer-links-list')) {
+          linksList.classList.toggle('active');
+        }
+      });
+    });
+
+    // --- LÓGICA DO CARROSSEL DE PARCEIROS ---
+    const wrapper = document.querySelector('.logo-slider-wrapper');
+    if (wrapper) {
+      const track = wrapper.querySelector('.logo-track');
+      const prevBtn = wrapper.querySelector('#logo-prev-btn');
+      const nextBtn = wrapper.querySelector('#logo-next-btn');
+      let originalItems = Array.from(track.children);
+
+      if (originalItems.length > 0) {
+        const itemWidth = 200;
+        const itemsToClone = Math.ceil(wrapper.offsetWidth / itemWidth);
+
+        for (let i = 0; i < itemsToClone; i++) {
+          const index = (originalItems.length - 1 - i + originalItems.length) % originalItems.length;
+          track.insertBefore(originalItems[index].cloneNode(true), track.firstChild);
+        }
+        for (let i = 0; i < itemsToClone; i++) {
+          track.appendChild(originalItems[i].cloneNode(true));
+        }
+
+        track.style.width = `${Array.from(track.children).length * itemWidth}px`;
+        let currentIndex = itemsToClone;
+        let isTransitioning = false;
+
+        const setPosition = (instant = false) => {
+          track.style.transition = instant ? 'none' : 'transform 0.5s ease-in-out';
+          track.style.transform = `translateX(${-currentIndex * itemWidth}px)`;
+        };
+
+        setPosition(true);
+
+        const move = (direction) => {
+          if (isTransitioning) return;
+          isTransitioning = true;
+          direction === 'next' ? currentIndex++ : currentIndex--;
+          setPosition();
+        };
+
+        nextBtn.addEventListener('click', () => move('next'));
+        prevBtn.addEventListener('click', () => move('prev'));
+
+        track.addEventListener('transitionend', () => {
+          if (currentIndex >= originalItems.length + itemsToClone) {
+            currentIndex = itemsToClone;
+            setPosition(true);
+          }
+          if (currentIndex < itemsToClone) {
+            currentIndex = originalItems.length + itemsToClone - 1;
+            setPosition(true);
+          }
+          isTransitioning = false;
+        });
+      }
+    }
+  }; // Fim da função inicializarComponentes
 
   // 3. Ordem de montagem
   const todasAsPartes = [
@@ -78,88 +172,131 @@ document.addEventListener("DOMContentLoaded", function () {
     carregarHTML("placeholder-imagem-rodape", "partials/imagemRodape.html"),
     carregarHTML("placeholder-modal", "partials/modal.html"),
     carregarHTML("placeholder-botao-topo", "partials/botaoVoltarTopo.html"),
-    carregarHTML("placeholder-menu", "partials/menuOffcanvas.html")
+    carregarHTML("placeholder-menu", "partials/menuOffcanvas.html"),
+    carregarHTML("placeholder-redesocial", "partials/redesocial.html")
   ];
 
-  // Espera TODAS as partes serem carregadas
+  // Espera TODAS as partes serem carregadas e SÓ ENTÃO inicializa tudo
   Promise.all(todasAsPartes).then(() => {
-    // Quando a "casa" estiver construída, chamamos a "equipe de montagem"
     inicializarComponentes();
   });
 });
 
-// --- LÓGICA DO CARROSSEL DE PARCEIROS ITEM-POR-ITEM E INFINITO ---
-document.addEventListener('DOMContentLoaded', () => {
-  const wrapper = document.querySelector('.logo-slider-wrapper');
-  if (!wrapper) return;
+// Mapa
 
-  const track = wrapper.querySelector('.logo-track');
-  const prevBtn = wrapper.querySelector('#logo-prev-btn');
-  const nextBtn = wrapper.querySelector('#logo-next-btn');
-  let originalItems = Array.from(track.children);
+// Espera o conteúdo da página carregar completamente antes de executar o script
+document.addEventListener('DOMContentLoaded', function() {
 
-  if (originalItems.length === 0) return; // Não faz nada se não houver logos
+    // ===================================================================
+    // 1. DADOS FICTÍCIOS (MOCK DATA) - A "base de dados" do frontend
+    // ===================================================================
+    const pontosDeColeta = [
+        // Blumenau
+        { lat: -26.9184, lng: -49.0621, nome: "EcoPonto Centro", tipo: "geral", cidade: "blumenau" },
+        { lat: -26.9250, lng: -49.0795, nome: "Recicla Eletrônicos Velha", tipo: "eletronicos", cidade: "blumenau" },
+        { lat: -26.8910, lng: -49.0850, nome: "Coleta de Óleo Itoupava", tipo: "oleo", cidade: "blumenau" },
+        // Timbó
+        { lat: -26.8205, lng: -49.2750, nome: "Ponto Verde Timbó", tipo: "papel_vidro", cidade: "timbo" },
+        { lat: -26.8280, lng: -49.2650, nome: "Descarte de Plástico Nações", tipo: "plastico_metal", cidade: "timbo" },
+        // Indaial
+        { lat: -26.8995, lng: -49.2301, nome: "Central de Reciclagem Indaial", tipo: "geral", cidade: "indaial" },
+        { lat: -26.9030, lng: -49.2390, nome: "Coleta Seletiva Tapajós", tipo: "papel_vidro", cidade: "indaial" },
+        // Pomerode
+        { lat: -26.7411, lng: -49.1764, nome: "Pomerode Limpa", tipo: "plastico_metal", cidade: "pomerode" },
+        // Gaspar
+        { lat: -26.9317, lng: -48.9558, nome: "Recicla Gaspar Centro", tipo: "eletronicos", cidade: "gaspar" }
+    ];
 
-  const itemWidth = 200; // Largura de cada logo (deve ser a mesma do CSS)
-  const itemsToClone = Math.ceil(wrapper.offsetWidth / itemWidth); // Clona a quantidade de itens visíveis
+    // Mapeia o 'tipo' do ponto de coleta para a cor da legenda
+    const cores = {
+        eletronicos: '#007bff',
+        plastico_metal: '#dc3545',
+        papel_vidro: '#28a745',
+        oleo: '#ffc107',
+        geral: '#6c757d'
+    };
 
-  // 1. Clonar itens para criar o efeito infinito
-  // Clona os últimos itens e coloca no começo
-  for (let i = 0; i < itemsToClone; i++) {
-    const index = (originalItems.length - 1 - i + originalItems.length) % originalItems.length;
-    const clone = originalItems[index].cloneNode(true);
-    track.insertBefore(clone, track.firstChild);
-  }
-  // Clona os primeiros itens e coloca no final
-  for (let i = 0; i < itemsToClone; i++) {
-    const clone = originalItems[i].cloneNode(true);
-    track.appendChild(clone);
-  }
+    // ===================================================================
+    // 2. CONFIGURAÇÃO DO MAPA
+    // ===================================================================
+    const cidadesCoordenadas = {
+        blumenau: { lat: -26.9194, lng: -49.0661, zoom: 13 },
+        gaspar:   { lat: -26.9317, lng: -48.9558, zoom: 13 },
+        indaial:  { lat: -26.8975, lng: -49.2319, zoom: 13 },
+        pomerode: { lat: -26.7411, lng: -49.1764, zoom: 13 },
+        timbo:    { lat: -26.8239, lng: -49.2714, zoom: 13 }
+    };
+    const vistaPadrao = { lat: -26.85, lng: -49.15, zoom: 11 };
 
-  // 2. Atualizar a lista de itens e definir a posição inicial
-  let allItems = Array.from(track.children);
-  track.style.width = `${allItems.length * itemWidth}px`;
+    const map = L.map('mapa').setView([vistaPadrao.lat, vistaPadrao.lng], vistaPadrao.zoom);
 
-  let currentIndex = itemsToClone; // Começa nos primeiros itens "reais"
-  let isTransitioning = false;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-  function setPosition(instant = false) {
-    if (instant) {
-      track.style.transition = 'none';
-    } else {
-      track.style.transition = 'transform 0.5s ease-in-out';
-    }
-    const offset = -currentIndex * itemWidth;
-    track.style.transform = `translateX(${offset}px)`;
-  }
+// ===================================================================
+// 3. LÓGICA DOS PINOS (MARCADORES)
+// ===================================================================
+let marcadores = L.layerGroup().addTo(map); // Camada para guardar os pinos
 
-  // Posição inicial (invisível para o usuário)
-  setPosition(true);
+// Função para criar um ícone de pino SVG com uma cor específica
+function criarIcone(cor) {
+    const svgPath = "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"; // Caminho de um pino de localização do Material Design
 
-  // 3. Funções dos botões
-  function move(direction) {
-    if (isTransitioning) return;
-    isTransitioning = true;
+    return L.divIcon({
+        className: 'custom-map-pin', // Nova classe para estilização
+        html: `<svg class="map-pin-svg" style="fill: ${cor}; stroke: #fff;" viewBox="0 0 24 24">
+                   <path d="${svgPath}"></path>
+               </svg>`,
+        iconSize: [36, 36], // Tamanho do ícone
+        iconAnchor: [18, 36], // Ponto de ancoragem (base do pino)
+        popupAnchor: [0, -30] // Ponto onde o popup irá aparecer
+    });
+}
 
-    direction === 'next' ? currentIndex++ : currentIndex--;
-    setPosition();
-  }
+// Função que limpa os pinos antigos e adiciona os novos com base no filtro
+function adicionarPinos(cidadeFiltro) {
+    marcadores.clearLayers();
 
-  nextBtn.addEventListener('click', () => move('next'));
-  prevBtn.addEventListener('click', () => move('prev'));
+    const pontosFiltrados = pontosDeColeta.filter(ponto => {
+        return !cidadeFiltro || ponto.cidade === cidadeFiltro;
+    });
 
-  // 4. A Mágica do Loop
-  track.addEventListener('transitionend', () => {
-    // Se chegamos nos clones do final, salta de volta para o começo
-    if (currentIndex >= originalItems.length + itemsToClone) {
-      currentIndex = itemsToClone;
-      setPosition(true);
-    }
-    // Se chegamos nos clones do começo, salta de volta para o final
-    if (currentIndex < itemsToClone) {
-      currentIndex = originalItems.length + itemsToClone - 1;
-      setPosition(true);
-    }
-    isTransitioning = false;
-  });
+    pontosFiltrados.forEach(ponto => {
+        const cor = cores[ponto.tipo];
+        const icone = criarIcone(cor); // Chama a nova função criarIcone
+        const marcador = L.marker([ponto.lat, ponto.lng], { icon: icone });
+        
+        // Adiciona um popup mais detalhado ao clicar no pino
+        marcador.bindPopup(`
+            <b>${ponto.nome}</b><br>
+            Tipo: ${ponto.tipo.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+        `);
+        marcadores.addLayer(marcador);
+    });
+}
+
+    // ===================================================================
+    // 4. INTERATIVIDADE DO FILTRO
+    // ===================================================================
+    const cidadeSelect = document.getElementById('cidade-select');
+
+    cidadeSelect.addEventListener('change', function() {
+        const cidadeSelecionada = this.value;
+
+        // Move o mapa para a cidade
+        if (cidadeSelecionada) {
+            const coords = cidadesCoordenadas[cidadeSelecionada];
+            map.flyTo([coords.lat, coords.lng], coords.zoom);
+        } else {
+            map.flyTo([vistaPadrao.lat, vistaPadrao.lng], vistaPadrao.zoom);
+        }
+
+        // Adiciona os pinos correspondentes à cidade selecionada
+        adicionarPinos(cidadeSelecionada);
+    });
+    
+    // Adiciona todos os pinos ao mapa na primeira vez que a página carrega
+    adicionarPinos("");
+
 });
