@@ -176,6 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
     carregarHTML("placeholder-redesocial", "partials/redesocial.html")
   ];
 
+
   // Espera TODAS as partes serem carregadas e SÓ ENTÃO inicializa tudo
   Promise.all(todasAsPartes).then(() => {
     inicializarComponentes();
@@ -184,7 +185,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Mapa
 
-// Espera o conteúdo da página carregar completamente antes de executar o script
 document.addEventListener('DOMContentLoaded', function() {
 
     // ===================================================================
@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ===================================================================
 // 3. LÓGICA DOS PINOS (MARCADORES)
 // ===================================================================
-let marcadores = L.layerGroup().addTo(map); // Camada para guardar os pinos
+let marcadores = L.layerGroup().addTo(map);
 
 // Função para criar um ícone de pino SVG com uma cor específica
 function criarIcone(cor) {
@@ -248,9 +248,9 @@ function criarIcone(cor) {
         html: `<svg class="map-pin-svg" style="fill: ${cor}; stroke: #fff;" viewBox="0 0 24 24">
                    <path d="${svgPath}"></path>
                </svg>`,
-        iconSize: [36, 36], // Tamanho do ícone
-        iconAnchor: [18, 36], // Ponto de ancoragem (base do pino)
-        popupAnchor: [0, -30] // Ponto onde o popup irá aparecer
+        iconSize: [36, 36],
+        iconAnchor: [18, 36],
+        popupAnchor: [0, -30] 
     });
 }
 
