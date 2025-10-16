@@ -108,7 +108,8 @@ document.addEventListener("DOMContentLoaded", function () {
     carregarHTML("placeholder-imagem-rodape", "partials/imagemRodape.html"),
     carregarHTML("placeholder-modal", "partials/modal.html"),
     carregarHTML("placeholder-botao-topo", "partials/botaoVoltarTopo.html"),
-    carregarHTML("placeholder-menu", "partials/menuOffcanvas.html")
+    carregarHTML("placeholder-menu", "partials/menuOffcanvas.html"),
+    carregarHTML("placeholder-redesocial", "partials/redesocial.html")
   ];
 
   // Espera TODAS as partes serem carregadas
@@ -192,3 +193,4 @@ document.addEventListener('DOMContentLoaded', () => {
     isTransitioning = false;
   });
 });
+
