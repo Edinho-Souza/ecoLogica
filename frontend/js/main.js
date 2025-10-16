@@ -16,7 +16,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 2. Função que "ativa" TODOS os componentes depois que a página está montada
   const inicializarComponentes = () => {
-    console.log("Página montada! Ativando componentes...");
+    console.log("Página montada! Ativando TODOS os componentes...");
+
+    // --- Ativa o Carrossel (Banner) ---
+    const bannerCarouselEl = document.getElementById('bannerCarousel');
+    if (bannerCarouselEl) {
+      new bootstrap.Carousel(bannerCarouselEl, {
+        interval: 5000, // Tempo em milissegundos (5 segundos)
+        ride: 'carousel'
+      });
+    }
 
     // --- Ativa a Barra de Pesquisa ---
     const searchBtn = document.getElementById('searchBtn');
@@ -33,8 +42,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const openModalBtns = document.querySelectorAll('.btn-custom.btn-auth, .btn-custom.btn-auth-offcanvas');
     const closeModalBtn = document.querySelector('.close-modal');
     if (authModal && openModalBtns.length > 0 && closeModalBtn) {
-      const tabButtons = document.querySelectorAll('.tab-btn');
-      const forms = document.querySelectorAll('.modal-form');
+      const tabButtons = authModal.querySelectorAll('.tab-btn');
+      const forms = authModal.querySelectorAll('.modal-form');
+      const tabsContainer = authModal.querySelector('.auth-tabs');
+      const recoverForm = authModal.querySelector('#recoverForm');
+      const recoverLink = authModal.querySelector('.recover-link');
+      const backToLoginLink = authModal.querySelector('.back-to-login-link');
       openModalBtns.forEach(btn => btn.addEventListener('click', () => { authModal.style.display = 'flex'; }));
       closeModalBtn.addEventListener('click', () => { authModal.style.display = 'none'; });
       window.addEventListener('click', (e) => { if (e.target === authModal) authModal.style.display = 'none'; });
@@ -44,7 +57,23 @@ document.addEventListener("DOMContentLoaded", function () {
           btn.classList.add('active');
           forms.forEach(f => f.classList.remove('active'));
           document.getElementById(btn.dataset.tab + 'Form').classList.add('active');
+          recoverForm.classList.remove('active');
+          tabsContainer.style.display = 'flex';
         });
+      });
+      recoverLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        forms.forEach(f => f.classList.remove('active'));
+        tabsContainer.style.display = 'none';
+        recoverForm.classList.add('active');
+      });
+      backToLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        recoverForm.classList.remove('active');
+        tabsContainer.style.display = 'flex';
+        document.getElementById('loginForm').classList.add('active');
+        authModal.querySelector('.tab-btn[data-tab="login"]').classList.add('active');
+        authModal.querySelector('.tab-btn[data-tab="register"]').classList.remove('active');
       });
     }
 
@@ -61,11 +90,76 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- Ativa o Menu Offcanvas do Bootstrap (Mobile) ---
     const offcanvasElement = document.getElementById('offcanvasMenu');
     if (offcanvasElement) {
-      // Esta linha "apresenta" o menu que acabamos de carregar
-      // ao JavaScript do Bootstrap, ativando suas funcionalidades.
       new bootstrap.Offcanvas(offcanvasElement);
     }
-  };
+    
+    // --- LÓGICA DO RODAPÉ COLAPSÁVEL ---
+    const footerToggles = document.querySelectorAll('.footer-toggle');
+    footerToggles.forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        toggle.classList.toggle('active');
+        const linksList = toggle.nextElementSibling;
+        if (linksList && linksList.classList.contains('footer-links-list')) {
+          linksList.classList.toggle('active');
+        }
+      });
+    });
+
+    // --- LÓGICA DO CARROSSEL DE PARCEIROS ---
+    const wrapper = document.querySelector('.logo-slider-wrapper');
+    if (wrapper) {
+      const track = wrapper.querySelector('.logo-track');
+      const prevBtn = wrapper.querySelector('#logo-prev-btn');
+      const nextBtn = wrapper.querySelector('#logo-next-btn');
+      let originalItems = Array.from(track.children);
+
+      if (originalItems.length > 0) {
+        const itemWidth = 200;
+        const itemsToClone = Math.ceil(wrapper.offsetWidth / itemWidth);
+
+        for (let i = 0; i < itemsToClone; i++) {
+          const index = (originalItems.length - 1 - i + originalItems.length) % originalItems.length;
+          track.insertBefore(originalItems[index].cloneNode(true), track.firstChild);
+        }
+        for (let i = 0; i < itemsToClone; i++) {
+          track.appendChild(originalItems[i].cloneNode(true));
+        }
+
+        track.style.width = `${Array.from(track.children).length * itemWidth}px`;
+        let currentIndex = itemsToClone;
+        let isTransitioning = false;
+
+        const setPosition = (instant = false) => {
+          track.style.transition = instant ? 'none' : 'transform 0.5s ease-in-out';
+          track.style.transform = `translateX(${-currentIndex * itemWidth}px)`;
+        };
+
+        setPosition(true);
+
+        const move = (direction) => {
+          if (isTransitioning) return;
+          isTransitioning = true;
+          direction === 'next' ? currentIndex++ : currentIndex--;
+          setPosition();
+        };
+
+        nextBtn.addEventListener('click', () => move('next'));
+        prevBtn.addEventListener('click', () => move('prev'));
+
+        track.addEventListener('transitionend', () => {
+          if (currentIndex >= originalItems.length + itemsToClone) {
+            currentIndex = itemsToClone;
+            setPosition(true);
+          }
+          if (currentIndex < itemsToClone) {
+            currentIndex = originalItems.length + itemsToClone - 1;
+            setPosition(true);
+          }
+          isTransitioning = false;
+        });
+      }
+    }
+  }; // Fim da função inicializarComponentes
 
   // 3. Ordem de montagem
   const todasAsPartes = [
@@ -78,88 +172,12 @@ document.addEventListener("DOMContentLoaded", function () {
     carregarHTML("placeholder-imagem-rodape", "partials/imagemRodape.html"),
     carregarHTML("placeholder-modal", "partials/modal.html"),
     carregarHTML("placeholder-botao-topo", "partials/botaoVoltarTopo.html"),
-    carregarHTML("placeholder-menu", "partials/menuOffcanvas.html")
+    carregarHTML("placeholder-menu", "partials/menuOffcanvas.html"),
+    carregarHTML("placeholder-redesocial", "partials/redesocial.html")
   ];
 
-  // Espera TODAS as partes serem carregadas
+  // Espera TODAS as partes serem carregadas e SÓ ENTÃO inicializa tudo
   Promise.all(todasAsPartes).then(() => {
-    // Quando a "casa" estiver construída, chamamos a "equipe de montagem"
     inicializarComponentes();
-  });
-});
-
-// --- LÓGICA DO CARROSSEL DE PARCEIROS ITEM-POR-ITEM E INFINITO ---
-document.addEventListener('DOMContentLoaded', () => {
-  const wrapper = document.querySelector('.logo-slider-wrapper');
-  if (!wrapper) return;
-
-  const track = wrapper.querySelector('.logo-track');
-  const prevBtn = wrapper.querySelector('#logo-prev-btn');
-  const nextBtn = wrapper.querySelector('#logo-next-btn');
-  let originalItems = Array.from(track.children);
-
-  if (originalItems.length === 0) return; // Não faz nada se não houver logos
-
-  const itemWidth = 200; // Largura de cada logo (deve ser a mesma do CSS)
-  const itemsToClone = Math.ceil(wrapper.offsetWidth / itemWidth); // Clona a quantidade de itens visíveis
-
-  // 1. Clonar itens para criar o efeito infinito
-  // Clona os últimos itens e coloca no começo
-  for (let i = 0; i < itemsToClone; i++) {
-    const index = (originalItems.length - 1 - i + originalItems.length) % originalItems.length;
-    const clone = originalItems[index].cloneNode(true);
-    track.insertBefore(clone, track.firstChild);
-  }
-  // Clona os primeiros itens e coloca no final
-  for (let i = 0; i < itemsToClone; i++) {
-    const clone = originalItems[i].cloneNode(true);
-    track.appendChild(clone);
-  }
-
-  // 2. Atualizar a lista de itens e definir a posição inicial
-  let allItems = Array.from(track.children);
-  track.style.width = `${allItems.length * itemWidth}px`;
-
-  let currentIndex = itemsToClone; // Começa nos primeiros itens "reais"
-  let isTransitioning = false;
-
-  function setPosition(instant = false) {
-    if (instant) {
-      track.style.transition = 'none';
-    } else {
-      track.style.transition = 'transform 0.5s ease-in-out';
-    }
-    const offset = -currentIndex * itemWidth;
-    track.style.transform = `translateX(${offset}px)`;
-  }
-
-  // Posição inicial (invisível para o usuário)
-  setPosition(true);
-
-  // 3. Funções dos botões
-  function move(direction) {
-    if (isTransitioning) return;
-    isTransitioning = true;
-
-    direction === 'next' ? currentIndex++ : currentIndex--;
-    setPosition();
-  }
-
-  nextBtn.addEventListener('click', () => move('next'));
-  prevBtn.addEventListener('click', () => move('prev'));
-
-  // 4. A Mágica do Loop
-  track.addEventListener('transitionend', () => {
-    // Se chegamos nos clones do final, salta de volta para o começo
-    if (currentIndex >= originalItems.length + itemsToClone) {
-      currentIndex = itemsToClone;
-      setPosition(true);
-    }
-    // Se chegamos nos clones do começo, salta de volta para o final
-    if (currentIndex < itemsToClone) {
-      currentIndex = originalItems.length + itemsToClone - 1;
-      setPosition(true);
-    }
-    isTransitioning = false;
   });
 });
