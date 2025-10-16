@@ -1105,30 +1105,37 @@ footer {
 }
 
 
+/* ==========================================================================
+   5.1 RODAPÉ - RESPONSIVIDADE E MENU COLAPSÁVEL (VERSÃO CORRIGIDA)
+   ========================================================================== */
+
 /* A mágica acontece aqui (para telas de até 768px, como celulares) */
 @media (max-width: 768px) {
   .footer-container {
-    flex-direction: column;   /* Empilha os itens verticalmente */
-    align-items: flex-start;  /* Alinha todos à esquerda */
+    flex-direction: column;
+    align-items: flex-start;
     text-align: left;
+    gap: 1.5rem;
   }
 
   .footer-logo {
-    align-self: center; /* Centraliza apenas a logo */
-    margin-bottom: 2rem;
+    align-self: center;
+    margin-bottom: 1rem;
   }
   
   .footer-column, .footer-contact {
-    width: 100%; /* Faz cada seção ocupar a largura total */
+    width: 100%;
+    align-items: flex-start !important;
+    text-align: left !important;
   }
 
   .footer-toggle {
     cursor: pointer;
-    padding-bottom: 0.5rem; /* Adiciona um espaço abaixo do título */
+    padding-bottom: 0.5rem;
   }
 
   .footer-arrow {
-    display: inline-block; /* Mostra a seta em telas pequenas */
+    display: inline-block;
     font-size: 0.8rem;
     transition: transform 0.3s ease;
   }
@@ -1137,13 +1144,16 @@ footer {
   .footer-links-list {
     overflow: hidden;
     max-height: 0;
-    transition: max-height 0.4s ease-out;
+    transition: max-height 0.4s ease-out; /* Animação para fechar */
+    padding-left: 0;
   }
   
   /* Estado quando clicado (visível) */
   .footer-links-list.active {
-    max-height: 200px; /* Um valor alto o suficiente para caber os links */
-    transition: max-height 0.4s ease-in;
+    /* A CORREÇÃO ESTÁ AQUI */
+    max-height: 100px; /* <<< AJUSTE AQUI: Um valor mais justo que 200px */
+    transition: max-height 0.4s ease-in; /* Animação para abrir */
+    margin-top: 10px;
   }
 
   /* Gira a seta quando o menu está ativo */
@@ -1197,24 +1207,6 @@ footer {
 
 /* --- Telas pequenas (Celulares - até 768px) --- */
 @media (max-width: 768px) {
-
-  /* Rodapé */
-  .footer-top {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .footer-links,
-  .footer-contact {
-    justify-content: center;
-    text-align: center;
-  }
-
-  .footer-column {
-    align-items: center;
-  }
-
   /* Modal de Autenticação */
   .split-modal {
     flex-direction: column;
