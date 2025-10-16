@@ -1,19 +1,16 @@
-<!--------------------------------------------------------------------------->
-<!-- Barra inicial -->
-<!--------------------------------------------------------------------------->
-<div class="top-bar">
+<div class="top-bar d-none d-lg-block">
   A lógica do futuro é <strong>ecoLogica</strong>
 </div>
 
 
-<!--------------------------------------------------------------------------->
-<!-- Barra entrar e pesquisar -->
-<!--------------------------------------------------------------------------->
 <div class="main-bar">
   <div id="searchBox" class="search-box d-none d-lg-flex">
     <input type="text" placeholder="Pesquisar">
   </div>
 
+<span class="mobile-tagline d-lg-none position-absolute top-50 start-50 translate-middle text-center w-100" style="color: #fefcf0;">
+        A lógica do futuro é <strong>ecoLogica</strong>
+    </span>
 
   <button class="btn-custom d-none d-lg-block" id="searchBtn">
     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
@@ -27,10 +24,13 @@
   </button>
 </div>
 
-<!--------------------------------------------------------------------------->
-<!-- Barra menu -->
-<!--------------------------------------------------------------------------->
 <nav class="navbar navbar-expand-lg secondary-bar">
+<a class="navbar-logo-container" href="index.html">
+        <img src="img/logo-inicio.png" alt="ecoLogica Logo Desktop" class="navbar-logo-img d-none d-lg-block">
+
+        <img src="img/logo-inicio-mobile.png" alt="ecoLogica Logo Mobile" class="navbar-logo-img d-lg-none">
+    </a>
+
   <div class="container-fluid d-flex justify-content-end">
 
     <div class="collapse navbar-collapse justify-content-end d-none d-lg-flex" id="secondaryMenuDesktop">
@@ -43,6 +43,7 @@
       </div>
     </div>
 
+    
     <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu"
       aria-controls="offcanvasMenu" aria-expanded="false" aria-label="Toggle navigation">
       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#fefcf0">
@@ -51,4 +52,3 @@
     </button>
   </div>
 </nav>
-

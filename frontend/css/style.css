@@ -312,7 +312,7 @@ body {
 
 .secondary-bar {
   background-color: #488f58;
-  padding: 0 50px;
+  padding: 0 35px;
   height: 46px;
   z-index: 15;
 }
@@ -430,6 +430,12 @@ body {
   padding: 0;
   border-radius: 6px;
   flex-shrink: 0;
+}
+
+@media (max-width: 991.98px) {
+  .secondary-bar {
+    padding: 0 0px; /* Reduz o padding para o MOBILE */
+  }
 }
 
 
@@ -1123,10 +1129,17 @@ footer {
     margin-bottom: 1rem;
   }
   
-  .footer-column, .footer-contact {
+  /* MUDANÇA 1: A regra agora se aplica SÓ às colunas de menu */
+  .footer-column {
     width: 100%;
     align-items: flex-start !important;
     text-align: left !important;
+  }
+
+  /* MUDANÇA 2: Nova regra SÓ para a seção de contato */
+  .footer-contact {
+    width: 100%;
+    text-align: center; /* Centraliza o texto */
   }
 
   .footer-toggle {
@@ -1140,23 +1153,19 @@ footer {
     transition: transform 0.3s ease;
   }
 
-  /* Estado padrão (escondido) */
   .footer-links-list {
     overflow: hidden;
     max-height: 0;
-    transition: max-height 0.4s ease-out; /* Animação para fechar */
+    transition: max-height 0.4s ease-out;
     padding-left: 0;
   }
   
-  /* Estado quando clicado (visível) */
   .footer-links-list.active {
-    /* A CORREÇÃO ESTÁ AQUI */
-    max-height: 100px; /* <<< AJUSTE AQUI: Um valor mais justo que 200px */
-    transition: max-height 0.4s ease-in; /* Animação para abrir */
+    max-height: 100px;
+    transition: max-height 0.4s ease-in;
     margin-top: 10px;
   }
 
-  /* Gira a seta quando o menu está ativo */
   .footer-toggle.active .footer-arrow {
     transform: rotate(90deg);
   }
@@ -1405,4 +1414,47 @@ footer {
   background-color: #2c5836;
   color: #fefcf0;
   /* Cor bege do seu site */
+}
+
+/* ==========================================================================
+   ESTILOS DA LOGO SOBREPOSTA (VERSÃO SIMPLIFICADA)
+   ========================================================================== */
+
+/* 1. Prepara a barra de navegação para ser a "mãe" da logo */
+.secondary-bar {
+  position: relative; /* Essencial para o posicionamento absoluto da logo */
+}
+
+/* 2. Estiliza o contêiner da logo (SEM FUNDO, SOMBRA, ANIMAÇÃO) */
+.navbar-logo-container {
+  position: absolute;
+  top: 0px; 
+  left: 20px; /* <<< MUDANÇA AQUI: Diminuímos o valor para mover para a esquerda */
+  z-index: 20; 
+}
+
+/* 3. Define o tamanho da imagem da logo */
+.navbar-logo-img {
+  height: 65px; 
+  width: auto;
+}
+
+
+/* --- Responsividade para a logo em telas menores --- */
+@media (max-width: 991.98px) {
+  .navbar-logo-container {
+    top: 0px; 
+    left: 15px; /* <<< MUDANÇA AQUI: Também diminuímos o valor para o mobile */
+  }
+
+  .navbar-logo-img {
+    height: 70px; 
+  }
+}
+
+/* ==========================================================================
+   AJUSTE FINO DO BANNER (REMOVER ESPAÇO SUPERIOR)
+   ========================================================================== */
+#bannerCarousel {
+  margin-top: -0.1px;
 }
