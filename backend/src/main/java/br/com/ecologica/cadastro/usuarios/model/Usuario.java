@@ -24,6 +24,6 @@ public class Usuario {
     private String senha;
 
     @Column(nullable = false)
-    private String perfil; // Ex: "ADMIN", "USUARIO", "EMPRESA"
+    private String perfil; // "ADMIN", "USUARIO", "EMPRESA"
 
 }
