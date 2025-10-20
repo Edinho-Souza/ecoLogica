@@ -1,7 +1,64 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  // 1. Ferramenta para buscar os pedaços da página
-  const carregarHTML = (elementId, filePath) => {
+
+// --- FUNÇÃO PARA ATUALIZAR O DISPLAY DOS BOTÕES DE LOGIN/USUÁRIO ---
+  const updateUserAuthDisplay = () => {
+      console.log("updateUserAuthDisplay: Função iniciada."); // LOG 1
+
+      // Seleciona os elementos relevantes
+      const userAuthSpan = document.getElementById('userAuthSpan');       // Span no botão do header desktop
+      const headerAuthButton = userAuthSpan ? userAuthSpan.closest('button') : null; // Botão do header desktop
+      const offcanvasAuthButton = document.getElementById('offcanvasAuthButton'); // Botão no offcanvas mobile
+
+      // Verifica o localStorage
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const username = localStorage.getItem('username');
+      console.log(`updateUserAuthDisplay: localStorage lido - isLoggedIn='${isLoggedIn}', username='${username}'`); // LOG 3
+
+      if (isLoggedIn === 'true' && username) {
+          // --- ESTADO LOGADO ---
+          console.log("updateUserAuthDisplay: CONDIÇÃO IF (logado) - VERDADEIRA."); // LOG 4a
+
+          // Atualiza botão do header (desktop)
+          if (userAuthSpan && headerAuthButton) {
+              userAuthSpan.textContent = `Olá, ${username}`;
+              headerAuthButton.setAttribute('data-logged-in', 'true');
+              console.log("updateUserAuthDisplay: Texto do header alterado."); // LOG 4b
+          } else {
+              console.warn("updateUserAuthDisplay: Elementos do header não encontrados.");
+          }
+
+          // Atualiza botão do offcanvas (mobile)
+          if (offcanvasAuthButton) {
+              offcanvasAuthButton.textContent = `Olá, ${username}`; // Muda o texto direto no botão
+              offcanvasAuthButton.setAttribute('data-logged-in', 'true');
+              console.log("updateUserAuthDisplay: Texto do offcanvas alterado."); // LOG 4c
+          } else {
+               console.warn("updateUserAuthDisplay: Botão #offcanvasAuthButton não encontrado.");
+          }
+
+      } else {
+          // --- ESTADO NÃO LOGADO ---
+          console.log("updateUserAuthDisplay: CONDIÇÃO ELSE (não logado) - VERDADEIRA."); // LOG 5a
+
+          // Restaura botão do header (desktop)
+          if (userAuthSpan && headerAuthButton) {
+              userAuthSpan.textContent = 'Entre ou cadastre-se';
+              headerAuthButton.removeAttribute('data-logged-in');
+              console.log("updateUserAuthDisplay: Texto do header restaurado."); // LOG 5b
+          }
+
+          // Restaura botão do offcanvas (mobile)
+          if (offcanvasAuthButton) {
+              offcanvasAuthButton.textContent = 'Entrar ou Cadastrar'; // Restaura texto original
+              offcanvasAuthButton.removeAttribute('data-logged-in');
+              console.log("updateUserAuthDisplay: Texto do offcanvas restaurado."); // LOG 5c
+          }
+      }
+      console.log("updateUserAuthDisplay: Função concluída."); // LOG 6
+  };
+
+ const carregarHTML = (elementId, filePath) => {
     return fetch(filePath)
       .then(response => {
         if (!response.ok) throw new Error(`[ERRO 404] Arquivo não encontrado: ${filePath}`);
@@ -9,10 +66,26 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .then(html => {
         const elemento = document.getElementById(elementId);
-        if (elemento) elemento.innerHTML = html;
+        if (elemento) {
+          elemento.innerHTML = html;
+          // ADICIONE ESTE LOG ESPECÍFICO PARA O HEADER
+          if (elementId === 'placeholder-header') {
+            console.log('carregarHTML: CONTEÚDO DO HEADER INJETADO em #placeholder-header.');
+            // Vamos verificar se o span existe IMEDIATAMENTE após a injeção
+            console.log('carregarHTML: Verificando #userAuthSpan LOGO APÓS injeção:', document.getElementById('userAuthSpan'));
+          }
+        } else {
+           console.error(`carregarHTML: Elemento com ID '${elementId}' não encontrado no HTML principal.`);
+        }
       })
-      .catch(error => console.error(error));
+      .catch(error => {
+          console.error(`carregarHTML: Erro ao carregar ${filePath}:`, error);
+          // Retorna a promessa rejeitada para que Promise.all possa falhar se necessário
+          return Promise.reject(error);
+      });
   };
+
+
 
   // 2. Função que "ativa" TODOS os componentes depois que a página está montada
   const inicializarComponentes = () => {
@@ -37,45 +110,112 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    // --- Ativa o Modal ---
-    const authModal = document.getElementById('authModal');
-    const openModalBtns = document.querySelectorAll('.btn-custom.btn-auth, .btn-custom.btn-auth-offcanvas');
-    const closeModalBtn = document.querySelector('.close-modal');
-    if (authModal && openModalBtns.length > 0 && closeModalBtn) {
-      const tabButtons = authModal.querySelectorAll('.tab-btn');
-      const forms = authModal.querySelectorAll('.modal-form');
-      const tabsContainer = authModal.querySelector('.auth-tabs');
-      const recoverForm = authModal.querySelector('#recoverForm');
-      const recoverLink = authModal.querySelector('.recover-link');
-      const backToLoginLink = authModal.querySelector('.back-to-login-link');
-      openModalBtns.forEach(btn => btn.addEventListener('click', () => { authModal.style.display = 'flex'; }));
-      closeModalBtn.addEventListener('click', () => { authModal.style.display = 'none'; });
-      window.addEventListener('click', (e) => { if (e.target === authModal) authModal.style.display = 'none'; });
-      tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          tabButtons.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          forms.forEach(f => f.classList.remove('active'));
-          document.getElementById(btn.dataset.tab + 'Form').classList.add('active');
-          recoverForm.classList.remove('active');
-          tabsContainer.style.display = 'flex';
+// --- Ativa o Modal ---
+  const authModal = document.getElementById('authModal');
+  const openModalBtns = document.querySelectorAll('.btn-custom.btn-auth, .btn-custom.btn-auth-offcanvas'); // Selects both header and offcanvas buttons
+  const closeModalBtn = document.querySelector('.close-modal');
+
+  if (authModal && openModalBtns.length > 0 && closeModalBtn) {
+    const tabButtons = authModal.querySelectorAll('.tab-btn');
+    const forms = authModal.querySelectorAll('.modal-form');
+    const tabsContainer = authModal.querySelector('.auth-tabs');
+    const recoverForm = authModal.querySelector('#recoverForm');
+    const recoverLink = authModal.querySelector('.recover-link');
+    const backToLoginLink = authModal.querySelector('.back-to-login-link');
+
+    // --- MODIFICAÇÃO AQUI ---
+    // Em vez de adicionar o mesmo listener a todos, verificamos cada botão
+    openModalBtns.forEach(btn => {
+      btn.addEventListener('click', (event) => { // Adicionamos 'event'
+        // Verifica se é o botão do header (o que contém o span) E se está logado
+        if (btn.querySelector('#userAuthSpan') && btn.getAttribute('data-logged-in') === 'true') {
+          event.preventDefault();    // Impede ação padrão
+          event.stopPropagation(); // Impede outros listeners
+          window.location.href = 'usuario.html'; // Redireciona
+        } else {
+          // Para qualquer outro botão OU o botão do header (se não logado), abre o modal
+          authModal.style.display = 'flex';
+        }
+      });
+    });
+    // --- FIM DA MODIFICAÇÃO ---
+
+    // --- LÓGICA ADICIONAL PARA REDIRECIONAMENTO QUANDO LOGADO ---
+    // Pega referências aos botões específicos
+    const headerAuthButtonForRedirect = document.querySelector('.btn-custom.btn-auth');
+    const offcanvasAuthButtonForRedirect = document.getElementById('offcanvasAuthButton');
+
+    // Listener APENAS para o botão do header (desktop)
+    if (headerAuthButtonForRedirect) {
+        headerAuthButtonForRedirect.addEventListener('click', function(event) {
+            // Verifica o estado de login SOMENTE se o botão estiver marcado como logado
+            if (this.getAttribute('data-logged-in') === 'true') {
+                console.log("[DEBUG] Header Logado (Redirect Check): Prevenindo modal e redirecionando.");
+                event.preventDefault();    // Impede a ação padrão (que seria abrir o modal pelo listener original)
+                event.stopPropagation(); // Impede outros listeners
+                window.location.href = 'usuario.html'; // Redireciona
+            }
         });
-      });
-      recoverLink.addEventListener('click', (e) => {
-        e.preventDefault();
+    }
+
+    // Listener APENAS para o botão do offcanvas (mobile)
+    if (offcanvasAuthButtonForRedirect) {
+        offcanvasAuthButtonForRedirect.addEventListener('click', function(event) {
+            // Verifica o estado de login SOMENTE se o botão estiver marcado como logado
+            if (this.getAttribute('data-logged-in') === 'true') {
+                 console.log("[DEBUG] Offcanvas Logado (Redirect Check): Prevenindo modal, fechando e redirecionando.");
+                 event.preventDefault();
+                 event.stopPropagation(); // Impede o listener original de abrir o modal
+
+                 const offcanvasElement = document.getElementById('offcanvasMenu');
+                 const offcanvasInstance = offcanvasElement ? bootstrap.Offcanvas.getInstance(offcanvasElement) : null;
+
+                 if (offcanvasInstance) {
+                     // Adiciona listener para redirecionar APÓS o offcanvas fechar
+                     offcanvasElement.addEventListener('hidden.bs.offcanvas', () => {
+                         console.log("[DEBUG] Offcanvas Logado: Evento hidden disparado. Redirecionando.");
+                         window.location.href = 'usuario.html';
+                     }, { once: true });
+                     offcanvasInstance.hide(); // Fecha o offcanvas
+                 } else {
+                     console.warn("[DEBUG] Offcanvas Logado: Instância não encontrada. Redirecionando direto.");
+                     window.location.href = 'usuario.html'; // Fallback
+                 }
+            }
+             // Se não estiver logado, este listener não faz nada,
+             // permitindo que o listener original (do bloco //--- Ativa o Modal ---) abra o modal.
+        });
+    }
+    // --- FIM DA LÓGICA ADICIONAL ---
+
+    // O resto do seu código original permanece EXATAMENTE igual:
+    closeModalBtn.addEventListener('click', () => { authModal.style.display = 'none'; });
+    window.addEventListener('click', (e) => { if (e.target === authModal) authModal.style.display = 'none'; });
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
         forms.forEach(f => f.classList.remove('active'));
-        tabsContainer.style.display = 'none';
-        recoverForm.classList.add('active');
-      });
-      backToLoginLink.addEventListener('click', (e) => {
-        e.preventDefault();
+        document.getElementById(btn.dataset.tab + 'Form').classList.add('active');
         recoverForm.classList.remove('active');
         tabsContainer.style.display = 'flex';
-        document.getElementById('loginForm').classList.add('active');
-        authModal.querySelector('.tab-btn[data-tab="login"]').classList.add('active');
-        authModal.querySelector('.tab-btn[data-tab="register"]').classList.remove('active');
       });
-    }
+    });
+    recoverLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      forms.forEach(f => f.classList.remove('active'));
+      tabsContainer.style.display = 'none';
+      recoverForm.classList.add('active');
+    });
+    backToLoginLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      recoverForm.classList.remove('active');
+      tabsContainer.style.display = 'flex';
+      document.getElementById('loginForm').classList.add('active');
+      authModal.querySelector('.tab-btn[data-tab="login"]').classList.add('active');
+      authModal.querySelector('.tab-btn[data-tab="register"]').classList.remove('active');
+    });
+  }
 
     // --- Ativa o Botão "Voltar ao Topo" ---
     const backToTopButton = document.getElementById("back-to-top");
@@ -92,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (offcanvasElement) {
       new bootstrap.Offcanvas(offcanvasElement);
     }
-    
+
     // --- LÓGICA DO RODAPÉ COLAPSÁVEL ---
     const footerToggles = document.querySelectorAll('.footer-toggle');
     footerToggles.forEach(toggle => {
@@ -159,6 +299,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
     }
+    updateUserAuthDisplay();
+
+
+/////////////////////////////
+
+    
   }; // Fim da função inicializarComponentes
 
   // 3. Ordem de montagem
@@ -173,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
     carregarHTML("placeholder-modal", "partials/modal.html"),
     carregarHTML("placeholder-botao-topo", "partials/botaoVoltarTopo.html"),
     carregarHTML("placeholder-menu", "partials/menuOffcanvas.html"),
-    carregarHTML("placeholder-redesocial", "partials/redesocial.html")
+    carregarHTML("placeholder-redesocial", "partials/redesocial.html"),
   ];
 
 
@@ -183,120 +329,3 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-// Mapa
-
-document.addEventListener('DOMContentLoaded', function() {
-
-    // ===================================================================
-    // 1. DADOS FICTÍCIOS (MOCK DATA) - A "base de dados" do frontend
-    // ===================================================================
-    const pontosDeColeta = [
-        // Blumenau
-        { lat: -26.9184, lng: -49.0621, nome: "EcoPonto Centro", tipo: "geral", cidade: "blumenau" },
-        { lat: -26.9250, lng: -49.0795, nome: "Recicla Eletrônicos Velha", tipo: "eletronicos", cidade: "blumenau" },
-        { lat: -26.8910, lng: -49.0850, nome: "Coleta de Óleo Itoupava", tipo: "oleo", cidade: "blumenau" },
-        // Timbó
-        { lat: -26.8205, lng: -49.2750, nome: "Ponto Verde Timbó", tipo: "papel_vidro", cidade: "timbo" },
-        { lat: -26.8280, lng: -49.2650, nome: "Descarte de Plástico Nações", tipo: "plastico_metal", cidade: "timbo" },
-        // Indaial
-        { lat: -26.8995, lng: -49.2301, nome: "Central de Reciclagem Indaial", tipo: "geral", cidade: "indaial" },
-        { lat: -26.9030, lng: -49.2390, nome: "Coleta Seletiva Tapajós", tipo: "papel_vidro", cidade: "indaial" },
-        // Pomerode
-        { lat: -26.7411, lng: -49.1764, nome: "Pomerode Limpa", tipo: "plastico_metal", cidade: "pomerode" },
-        // Gaspar
-        { lat: -26.9317, lng: -48.9558, nome: "Recicla Gaspar Centro", tipo: "eletronicos", cidade: "gaspar" }
-    ];
-
-    // Mapeia o 'tipo' do ponto de coleta para a cor da legenda
-    const cores = {
-        eletronicos: '#007bff',
-        plastico_metal: '#dc3545',
-        papel_vidro: '#28a745',
-        oleo: '#ffc107',
-        geral: '#6c757d'
-    };
-
-    // ===================================================================
-    // 2. CONFIGURAÇÃO DO MAPA
-    // ===================================================================
-    const cidadesCoordenadas = {
-        blumenau: { lat: -26.9194, lng: -49.0661, zoom: 13 },
-        gaspar:   { lat: -26.9317, lng: -48.9558, zoom: 13 },
-        indaial:  { lat: -26.8975, lng: -49.2319, zoom: 13 },
-        pomerode: { lat: -26.7411, lng: -49.1764, zoom: 13 },
-        timbo:    { lat: -26.8239, lng: -49.2714, zoom: 13 }
-    };
-    const vistaPadrao = { lat: -26.85, lng: -49.15, zoom: 11 };
-
-    const map = L.map('mapa').setView([vistaPadrao.lat, vistaPadrao.lng], vistaPadrao.zoom);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-// ===================================================================
-// 3. LÓGICA DOS PINOS (MARCADORES)
-// ===================================================================
-let marcadores = L.layerGroup().addTo(map);
-
-// Função para criar um ícone de pino SVG com uma cor específica
-function criarIcone(cor) {
-    const svgPath = "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"; // Caminho de um pino de localização do Material Design
-
-    return L.divIcon({
-        className: 'custom-map-pin', // Nova classe para estilização
-        html: `<svg class="map-pin-svg" style="fill: ${cor}; stroke: #fff;" viewBox="0 0 24 24">
-                   <path d="${svgPath}"></path>
-               </svg>`,
-        iconSize: [36, 36],
-        iconAnchor: [18, 36],
-        popupAnchor: [0, -30] 
-    });
-}
-
-// Função que limpa os pinos antigos e adiciona os novos com base no filtro
-function adicionarPinos(cidadeFiltro) {
-    marcadores.clearLayers();
-
-    const pontosFiltrados = pontosDeColeta.filter(ponto => {
-        return !cidadeFiltro || ponto.cidade === cidadeFiltro;
-    });
-
-    pontosFiltrados.forEach(ponto => {
-        const cor = cores[ponto.tipo];
-        const icone = criarIcone(cor); // Chama a nova função criarIcone
-        const marcador = L.marker([ponto.lat, ponto.lng], { icon: icone });
-        
-        // Adiciona um popup mais detalhado ao clicar no pino
-        marcador.bindPopup(`
-            <b>${ponto.nome}</b><br>
-            Tipo: ${ponto.tipo.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-        `);
-        marcadores.addLayer(marcador);
-    });
-}
-
-    // ===================================================================
-    // 4. INTERATIVIDADE DO FILTRO
-    // ===================================================================
-    const cidadeSelect = document.getElementById('cidade-select');
-
-    cidadeSelect.addEventListener('change', function() {
-        const cidadeSelecionada = this.value;
-
-        // Move o mapa para a cidade
-        if (cidadeSelecionada) {
-            const coords = cidadesCoordenadas[cidadeSelecionada];
-            map.flyTo([coords.lat, coords.lng], coords.zoom);
-        } else {
-            map.flyTo([vistaPadrao.lat, vistaPadrao.lng], vistaPadrao.zoom);
-        }
-
-        // Adiciona os pinos correspondentes à cidade selecionada
-        adicionarPinos(cidadeSelecionada);
-    });
-    
-    // Adiciona todos os pinos ao mapa na primeira vez que a página carrega
-    adicionarPinos("");
-
-});
