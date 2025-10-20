@@ -110,112 +110,150 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-// --- Ativa o Modal ---
-  const authModal = document.getElementById('authModal');
-  const openModalBtns = document.querySelectorAll('.btn-custom.btn-auth, .btn-custom.btn-auth-offcanvas'); // Selects both header and offcanvas buttons
-  const closeModalBtn = document.querySelector('.close-modal');
+// --- Ativa o Modal (LÓGICA UNIFICADA E CORRIGIDA DEFINITIVAMENTE) ---
+    const authModal = document.getElementById('authModal');
+    // Selecionamos os botões pelos IDs/Classes específicos
+    const closeModalBtn = document.querySelector('.close-modal');
+    const headerAuthButton = document.querySelector('.btn-custom.btn-auth'); // Botão header desktop
+    const offcanvasAuthButton = document.getElementById('offcanvasAuthButton'); // Botão offcanvas mobile (usando ID)
 
-  if (authModal && openModalBtns.length > 0 && closeModalBtn) {
-    const tabButtons = authModal.querySelectorAll('.tab-btn');
-    const forms = authModal.querySelectorAll('.modal-form');
-    const tabsContainer = authModal.querySelector('.auth-tabs');
-    const recoverForm = authModal.querySelector('#recoverForm');
-    const recoverLink = authModal.querySelector('.recover-link');
-    const backToLoginLink = authModal.querySelector('.back-to-login-link');
+    // Verifica se os elementos essenciais do modal existem
+    if (authModal && closeModalBtn) {
 
-    // --- MODIFICAÇÃO AQUI ---
-    // Em vez de adicionar o mesmo listener a todos, verificamos cada botão
-    openModalBtns.forEach(btn => {
-      btn.addEventListener('click', (event) => { // Adicionamos 'event'
-        // Verifica se é o botão do header (o que contém o span) E se está logado
-        if (btn.querySelector('#userAuthSpan') && btn.getAttribute('data-logged-in') === 'true') {
-          event.preventDefault();    // Impede ação padrão
-          event.stopPropagation(); // Impede outros listeners
-          window.location.href = 'usuario.html'; // Redireciona
+        // Listener específico para o BOTÃO DO HEADER (Desktop)
+        if (headerAuthButton) {
+            headerAuthButton.addEventListener('click', (event) => {
+                // Verifica o estado de login NO MOMENTO DO CLIQUE
+                if (headerAuthButton.getAttribute('data-logged-in') === 'true') {
+                    event.preventDefault(); // Impede ação padrão
+                    // event.stopPropagation(); // Não estritamente necessário aqui, mas pode deixar por segurança
+                    console.log("[DEBUG] Header Logado: Redirecionando...");
+                    window.location.href = 'usuario.html'; // Logado -> Vai p/ usuário
+                } else {
+                    // Se não logado, ABRE O MODAL
+                    console.log("[DEBUG] Header Não Logado: Abrindo modal...");
+                    authModal.style.display = 'flex';
+                }
+            });
         } else {
-          // Para qualquer outro botão OU o botão do header (se não logado), abre o modal
-          authModal.style.display = 'flex';
+             console.warn("Botão de autenticação do header (.btn-custom.btn-auth) não encontrado.");
         }
-      });
-    });
-    // --- FIM DA MODIFICAÇÃO ---
 
-    // --- LÓGICA ADICIONAL PARA REDIRECIONAMENTO QUANDO LOGADO ---
-    // Pega referências aos botões específicos
-    const headerAuthButtonForRedirect = document.querySelector('.btn-custom.btn-auth');
-    const offcanvasAuthButtonForRedirect = document.getElementById('offcanvasAuthButton');
+        // Listener específico para o BOTÃO DO OFFCANVAS (Mobile)
+        if (offcanvasAuthButton) {
+            offcanvasAuthButton.addEventListener('click', (event) => {
+                const offcanvasElement = document.getElementById('offcanvasMenu');
+                const offcanvasInstance = offcanvasElement ? bootstrap.Offcanvas.getInstance(offcanvasElement) : null;
 
-    // Listener APENAS para o botão do header (desktop)
-    if (headerAuthButtonForRedirect) {
-        headerAuthButtonForRedirect.addEventListener('click', function(event) {
-            // Verifica o estado de login SOMENTE se o botão estiver marcado como logado
-            if (this.getAttribute('data-logged-in') === 'true') {
-                console.log("[DEBUG] Header Logado (Redirect Check): Prevenindo modal e redirecionando.");
-                event.preventDefault();    // Impede a ação padrão (que seria abrir o modal pelo listener original)
-                event.stopPropagation(); // Impede outros listeners
-                window.location.href = 'usuario.html'; // Redireciona
-            }
-        });
+                // Verifica o estado de login NO MOMENTO DO CLIQUE
+                if (offcanvasAuthButton.getAttribute('data-logged-in') === 'true') {
+                    event.preventDefault();
+                    // event.stopPropagation(); // Não estritamente necessário aqui
+
+                    console.log("[DEBUG] Offcanvas Logado: Fechando e preparando para redirecionar...");
+
+                    if (offcanvasInstance) {
+                        // Ouvir evento para redirecionar APÓS fechar
+                        offcanvasElement.addEventListener('hidden.bs.offcanvas', () => {
+                            console.log("[DEBUG] Offcanvas Logado: Evento hidden disparado. Redirecionando.");
+                            window.location.href = 'usuario.html';
+                        }, { once: true });
+                        offcanvasInstance.hide();
+                    } else {
+                        console.warn("[DEBUG] Offcanvas Logado: Instância não encontrada. Redirecionando direto.");
+                        window.location.href = 'usuario.html'; // Fallback
+                    }
+                } else {
+                    // Se não logado, fecha o offcanvas (se aberto) e abre o modal
+                     console.log("[DEBUG] Offcanvas Não Logado: Fechando e abrindo modal...");
+                     if (offcanvasInstance) {
+                        // Ouvir evento para abrir modal APÓS fechar
+                         offcanvasElement.addEventListener('hidden.bs.offcanvas', () => {
+                             console.log("[DEBUG] Offcanvas Não Logado: Evento hidden disparado. Abrindo modal.");
+                             authModal.style.display = 'flex';
+                         }, { once: true });
+                        offcanvasInstance.hide();
+                    } else {
+                         console.warn("[DEBUG] Offcanvas Não Logado: Instância não encontrada. Abrindo modal direto.");
+                         authModal.style.display = 'flex';
+                    }
+                }
+            });
+        } else {
+             console.warn("Botão de autenticação do offcanvas (#offcanvasAuthButton) não encontrado.");
+        }
+
+        // --- LÓGICA ORIGINAL DO SEU MODAL (FECHAR, ABAS, RECUPERAR SENHA) ---
+        // Esta parte foi preservada exatamente como no seu código original
+
+        // Fechar modal (Botão X e clique fora)
+        closeModalBtn.addEventListener('click', () => { authModal.style.display = 'none'; });
+        window.addEventListener('click', (e) => { if (e.target === authModal) authModal.style.display = 'none'; });
+
+        // Lógica das Abas
+        const tabButtons = authModal.querySelectorAll('.tab-btn');
+        const forms = authModal.querySelectorAll('.modal-form');
+        const tabsContainer = authModal.querySelector('.auth-tabs'); // Garante que tabsContainer está definido
+        const recoverForm = authModal.querySelector('#recoverForm'); // Garante que recoverForm está definido
+
+        if (tabButtons.length > 0 && forms.length > 0) { // Verifica se existem botões e forms
+            tabButtons.forEach(btn => {
+              btn.addEventListener('click', () => {
+                tabButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                forms.forEach(f => f.classList.remove('active'));
+                const targetForm = document.getElementById(btn.dataset.tab + 'Form');
+                if (targetForm) {
+                    targetForm.classList.add('active');
+                } else {
+                    console.error(`Formulário alvo #${btn.dataset.tab + 'Form'} não encontrado.`);
+                }
+                // Garante que o formulário de recuperação seja escondido ao trocar de aba
+                if (recoverForm) recoverForm.classList.remove('active');
+                // Garante que o container das abas seja exibido
+                if (tabsContainer) tabsContainer.style.display = 'flex';
+              });
+            });
+        }
+
+        // Lógica de Recuperar Senha
+        const recoverLink = authModal.querySelector('.recover-link');
+        if (recoverLink && forms.length > 0 && tabsContainer && recoverForm) {
+            recoverLink.addEventListener('click', (e) => {
+              e.preventDefault();
+              forms.forEach(f => f.classList.remove('active'));
+              tabsContainer.style.display = 'none';
+              recoverForm.classList.add('active');
+            });
+        }
+
+        // Lógica de Voltar para Login
+        const backToLoginLink = authModal.querySelector('.back-to-login-link');
+        if (backToLoginLink && forms.length > 0 && tabsContainer && recoverForm) {
+            backToLoginLink.addEventListener('click', (e) => {
+              e.preventDefault();
+              recoverForm.classList.remove('active');
+              tabsContainer.style.display = 'flex';
+              const loginForm = document.getElementById('loginForm');
+              const loginTab = authModal.querySelector('.tab-btn[data-tab="login"]');
+              const registerTab = authModal.querySelector('.tab-btn[data-tab="register"]');
+              if (loginForm) loginForm.classList.add('active');
+              if (loginTab) loginTab.classList.add('active');
+              if (registerTab) registerTab.classList.remove('active');
+            });
+        }
+        // --- FIM DA LÓGICA ORIGINAL DO SEU MODAL ---
+
+    } else {
+         // Mensagem caso o modal ou o botão de fechar não sejam encontrados
+         if (!authModal) console.warn("Modal de autenticação (#authModal) não encontrado.");
+         if (!closeModalBtn) console.warn("Botão de fechar modal (.close-modal) não encontrado.");
+         console.warn("Lógica principal do modal desativada.");
     }
+    // --- FIM DO BLOCO DO MODAL ---
 
-    // Listener APENAS para o botão do offcanvas (mobile)
-    if (offcanvasAuthButtonForRedirect) {
-        offcanvasAuthButtonForRedirect.addEventListener('click', function(event) {
-            // Verifica o estado de login SOMENTE se o botão estiver marcado como logado
-            if (this.getAttribute('data-logged-in') === 'true') {
-                 console.log("[DEBUG] Offcanvas Logado (Redirect Check): Prevenindo modal, fechando e redirecionando.");
-                 event.preventDefault();
-                 event.stopPropagation(); // Impede o listener original de abrir o modal
 
-                 const offcanvasElement = document.getElementById('offcanvasMenu');
-                 const offcanvasInstance = offcanvasElement ? bootstrap.Offcanvas.getInstance(offcanvasElement) : null;
 
-                 if (offcanvasInstance) {
-                     // Adiciona listener para redirecionar APÓS o offcanvas fechar
-                     offcanvasElement.addEventListener('hidden.bs.offcanvas', () => {
-                         console.log("[DEBUG] Offcanvas Logado: Evento hidden disparado. Redirecionando.");
-                         window.location.href = 'usuario.html';
-                     }, { once: true });
-                     offcanvasInstance.hide(); // Fecha o offcanvas
-                 } else {
-                     console.warn("[DEBUG] Offcanvas Logado: Instância não encontrada. Redirecionando direto.");
-                     window.location.href = 'usuario.html'; // Fallback
-                 }
-            }
-             // Se não estiver logado, este listener não faz nada,
-             // permitindo que o listener original (do bloco //--- Ativa o Modal ---) abra o modal.
-        });
-    }
-    // --- FIM DA LÓGICA ADICIONAL ---
-
-    // O resto do seu código original permanece EXATAMENTE igual:
-    closeModalBtn.addEventListener('click', () => { authModal.style.display = 'none'; });
-    window.addEventListener('click', (e) => { if (e.target === authModal) authModal.style.display = 'none'; });
-    tabButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        forms.forEach(f => f.classList.remove('active'));
-        document.getElementById(btn.dataset.tab + 'Form').classList.add('active');
-        recoverForm.classList.remove('active');
-        tabsContainer.style.display = 'flex';
-      });
-    });
-    recoverLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      forms.forEach(f => f.classList.remove('active'));
-      tabsContainer.style.display = 'none';
-      recoverForm.classList.add('active');
-    });
-    backToLoginLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      recoverForm.classList.remove('active');
-      tabsContainer.style.display = 'flex';
-      document.getElementById('loginForm').classList.add('active');
-      authModal.querySelector('.tab-btn[data-tab="login"]').classList.add('active');
-      authModal.querySelector('.tab-btn[data-tab="register"]').classList.remove('active');
-    });
-  }
 
     // --- Ativa o Botão "Voltar ao Topo" ---
     const backToTopButton = document.getElementById("back-to-top");
