@@ -18,4 +18,7 @@ C:/ecoLogica/
 Alunos:
 
 Edcarlos
+Jonas
+Gabriele
+
 
