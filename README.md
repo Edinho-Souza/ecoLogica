@@ -20,5 +20,6 @@ Alunos:
 Edcarlos
 Jonas
 Gabriele
+Olmir
 
 
