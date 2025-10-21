@@ -11,16 +11,10 @@ public class CadastroLocaisColeta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String nomeLocal;
-
     private String endereco;
-
     private String cidade;
-
     private String estado;
-
     private String horarioFuncionamento;
-
     private boolean ativo;
 }
