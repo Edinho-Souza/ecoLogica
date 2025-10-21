@@ -6,106 +6,126 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadUserData = () => {
         // Simulação de busca de dados
         console.log("Função loadUserData chamada (simulando busca de dados)");
-        document.getElementById('user-name').textContent = "Usuário Teste";
-        document.getElementById('user-email').textContent = "teste@ecologica.com";
+        document.getElementById('user-name').textContent = "Sofia Terra";
+        document.getElementById('user-email').textContent = "terradasofia@ecologica.com";
         const userPoints = Math.floor(Math.random() * 500) + 50; // Pontos aleatórios entre 50 e 549
         document.getElementById('user-points-value').textContent = userPoints;
         const modalPointsSpan = document.getElementById('modal-user-points');
         if (modalPointsSpan) modalPointsSpan.textContent = userPoints;
     };
 
-    // --- Lógica para inicializar o gráfico (com dados FAKE) ---
+// --- Lógica para inicializar o gráfico (ESTILO LINHA COM ÁREA) ---
     const initChart = () => {
-        console.log("Função initChart chamada (criando gráfico com dados fake)");
+        console.log("Função initChart chamada (criando gráfico LINHA com dados fake)");
         const ctx = document.getElementById('disposalHistoryChart');
 
-        // Verifica se o elemento canvas existe e se Chart.js está carregado
         if (ctx && typeof Chart !== 'undefined') {
-            
-            // DADOS FAKE: Simulam o descarte (em Kg) nos últimos 6 meses
-            const labels = ['Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro']; // Meses fictícios
-            const plasticData = [1.5, 2.1, 1.8, 2.5, 2.0, 3.1]; // Kg de plástico
-            const paperData = [3.0, 2.5, 3.5, 4.0, 3.8, 4.5];   // Kg de papel
-            const metalData = [0.5, 0.8, 0.6, 1.0, 0.9, 1.2];   // Kg de metal
-            const glassData = [1.0, 1.2, 0.9, 1.5, 1.3, 1.8];   // Kg de vidro
 
-            // Configuração do Gráfico de Barras Empilhadas
+            // Define a fonte padrão
+            Chart.defaults.font.family = "'Open Sans', sans-serif";
+            Chart.defaults.color = '#555'; // Cor um pouco mais escura para eixos/texto
+
+            // Dados Fake (mesmos de antes)
+            const labels = ['Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro'];
+            const totalData = [6.0, 6.6, 6.8, 9.0, 8.0, 10.6];
+
+            // Cria um gradiente para a área abaixo da linha
+            const gradientFill = ctx.getContext('2d').createLinearGradient(0, 0, 0, 250); // Ajuste a altura (250) se necessário
+            gradientFill.addColorStop(0, 'rgba(72, 143, 88, 0.6)');   // Verde do site (#488f58) com opacidade no topo
+            gradientFill.addColorStop(1, 'rgba(72, 143, 88, 0.05)'); // Quase transparente na base
+
+            // Configuração do Gráfico de Linha
             new Chart(ctx, {
-                type: 'bar', // Tipo de gráfico
+                type: 'line', // <<< MUDANÇA PRINCIPAL: Tipo linha
                 data: {
-                    labels: labels, // Rótulos do eixo X (meses)
+                    labels: labels,
                     datasets: [
                         {
-                            label: 'Plástico (Kg)',
-                            data: plasticData,
-                            backgroundColor: 'rgba(54, 162, 235, 0.7)', // Azul
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Papel/Papelão (Kg)',
-                            data: paperData,
-                            backgroundColor: 'rgba(255, 206, 86, 0.7)', // Amarelo
-                            borderColor: 'rgba(255, 206, 86, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Metal (Kg)',
-                            data: metalData,
-                            backgroundColor: 'rgba(75, 192, 192, 0.7)', // Verde-água
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Vidro (Kg)',
-                            data: glassData,
-                            backgroundColor: 'rgba(153, 102, 255, 0.7)', // Roxo
-                            borderColor: 'rgba(153, 102, 255, 1)',
-                            borderWidth: 1
+                            label: 'Total Reciclado (Kg)',
+                            data: totalData,
+                            fill: true, // <<< Preenche a área abaixo da linha
+                            backgroundColor: gradientFill, // <<< Usa o gradiente criado
+                            borderColor: '#2c5836', // <<< Usa seu verde escuro para a linha
+                            borderWidth: 2.5, // Linha um pouco mais grossa
+                            pointBackgroundColor: '#2c5836', // Cor dos pontos na linha
+                            pointBorderColor: '#fff', // Borda branca nos pontos
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#2c5836',
+                            pointRadius: 4, // Tamanho dos pontos
+                            pointHoverRadius: 6, // Tamanho dos pontos no hover
+                            tension: 0.3 // <<< Deixa a linha levemente curvada (0 = reta)
                         }
                     ]
                 },
                 options: {
-                    responsive: true, // Faz o gráfico se adaptar ao tamanho do container
-                    maintainAspectRatio: false, // Permite controlar a altura independentemente da largura
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Quantidade de Material Descartado (Kg) por Mês'
+                            text: 'Evolução Mensal do Total Reciclado (Kg)', // Título mais adequado
+                            color: '#4f4f4f',
+                            font: { size: 16, weight: 'bold' },
+                            padding: { bottom: 20 }
+                        },
+                        legend: {
+                            display: false // Continua sem legenda
                         },
                         tooltip: {
-                            mode: 'index',
-                            intersect: false
+                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                             titleFont: { weight: 'bold' },
+                             bodyFont: { size: 13 },
+                             callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.y !== null) { label += context.parsed.y.toFixed(1) + ' Kg'; }
+                                    return label;
+                                }
+                            }
                         }
                     },
                     scales: {
                         x: {
-                            stacked: true, // Empilha as barras do mesmo mês
                             title: {
                                 display: true,
-                                text: 'Mês'
+                                text: 'Mês',
+                                font: { weight: '600' }
+                            },
+                            grid: {
+                                display: false // Sem grade vertical
                             }
                         },
                         y: {
-                            stacked: true, // Empilha as barras do mesmo mês
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Quantidade (Kg)'
+                                text: 'Total (Kg)',
+                                font: { weight: '600' }
+                            },
+                            grid: {
+                                color: '#e9e9e9', // Grade horizontal bem clara
+                                drawBorder: false, // Sem linha do eixo Y
+                            },
+                            ticks: {
+                                // Adiciona um pouco de espaço extra no topo
+                                grace: '10%' // Ex: 10% acima do valor máximo
                             }
                         }
-                    }
+                    },
+                     // Melhora a interação com o tooltip
+                    interaction: {
+                        intersect: false, // Mostra tooltip mesmo sem estar exatamente sobre o ponto
+                        mode: 'index', // Mostra tooltips para todos os datasets no mesmo índice X (útil se voltar a ter mais linhas)
+                    },
                 }
             });
-        } else if (!ctx) {
-            console.error("Elemento canvas #disposalHistoryChart não encontrado!");
         } else {
-             console.error("Chart.js não parece estar carregado. Verifique o link no HTML.");
-             // Você pode colocar uma mensagem alternativa no lugar do gráfico
+            // (Código de erro permanece o mesmo)
+             if (!ctx) console.error("Elemento canvas #disposalHistoryChart não encontrado!");
+             else console.error("Chart.js não parece estar carregado.");
              const graphContainer = document.querySelector('.history-graph-container');
-             if(graphContainer) {
-                 graphContainer.innerHTML = '<p class="text-danger text-center">Erro ao carregar a biblioteca de gráficos.</p>';
-             }
+             if(graphContainer) graphContainer.innerHTML = '<p class="text-danger text-center">Erro ao carregar gráfico.</p>';
         }
     };
 
