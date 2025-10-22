@@ -458,7 +458,7 @@ body {
 
 /* --- Seção: Missão, Objetivos e Benefícios --- */
 .eco-box {
-  background-color: #f4f1d2;
+  background-color: #f7f4e0;
   padding: 10px 0;
   width: 100%;
 }
@@ -536,7 +536,7 @@ body {
 }
 
 .campaign-description {
-  background-color: #f4f1d2;
+  background-color: #f7f4e0;
   width: 100%;
   padding: 20px;
   border-radius: 0 0 8px 8px;
@@ -619,7 +619,7 @@ body {
 .ranking-list li {
   display: flex;
   align-items: center;
-  background-color: #f4f1d2;
+  background-color: #f7f4e0;
   padding: 15px 20px;
   border-radius: 12px;
   border-left: 5px solid transparent;
@@ -744,7 +744,7 @@ body {
 
 .news-box,
 .newsletter-box {
-  background-color: #f4f1d2;
+  background-color: #f7f4e0;
   padding: 30px 40px 30px 40px;
   border-radius: 8px;
   flex: 1 1 400px;
@@ -1327,7 +1327,7 @@ footer {
   padding: 12px 15px;
   border: 1px solid #e0d9c4;
   border-radius: 6px;
-  background-color: #f4f1d2;
+  background-color: #f7f4e0;
   /* Cor de fundo dos campos */
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
@@ -1670,25 +1670,52 @@ footer {
 /* --- Seção Histórico --- */
 /* --- Seção Histórico --- */
 .history-graph-container {
-    max-width: 100%;
-    /* height: 300px; */ /* REMOVIDO: Deixa a altura ser definida pelo aspect ratio */
-    /* background-color: #f8f9fa; */ /* REMOVIDO: Remove o fundo cinza */
-    /* display: flex; align-items: center; justify-content: center; */ /* REMOVIDO: Não necessário para o canvas */
+   margin-left: auto; /* <<< ADICIONE: Centraliza o container */
+    margin-right: auto; /* <<< ADICIONE: Centraliza o container */
+   
     border: 0px solid #eee; /* ADICIONADO: Borda sutil */
     border-radius: 6px; /* ADICIONADO: Cantos arredondados */
     padding: 15px; /* ADICIONADO: Espaço interno ao redor do gráfico */
     margin-top: 20px; /* Aumenta um pouco o espaço acima */
     position: relative; /* Necessário para o Chart.js ajustar o tamanho corretamente */
-    min-height: 250px; /* Define uma altura mínima para evitar que fique muito baixo */
+/*     min-height: 250px; /* Define uma altura mínima para evitar que fique muito baixo */
 }
 
 /* Garante que o canvas ocupe o espaço do container */
 #disposalHistoryChart {
     display: block; /* Garante comportamento de bloco */
     width: 100% !important; /* Força a largura total do container */
-    height: auto !important; /* Permite que a altura seja calculada */
-    max-height: 350px; /* Limita a altura máxima se necessário */
+    /* height: auto !important; /* Permite que a altura seja calculada */
+/*     max-height: 350px; /* Limita a altura máxima se necessário */
+ }
+
+/* Ajuste de padding do container APENAS para desktop (quando o gráfico usa padding negativo) */
+@media (min-width: 992px) {
+    .history-graph-container {
+        /* Reduz o padding esquerdo do container para compensar o -10px do gráfico */
+        padding-left: 0px; 
+        padding-right: 0px;
+        height: 350px;      
+    }
+
+    #disposalHistoryChart {
+        margin-bottom: 10px; /* Experimente valores como 10px, 15px, 20px */
 }
+.history-section .history-graph-container p.text-muted {
+        margin-bottom: 85px; /* Experimente 20px, 25px, 30px */
+    }
+
+}
+
+/* Ajuste de ALTURA do container APENAS para mobile */
+@media (max-width: 767.98px) {
+    .history-graph-container {
+        /* height: 300px; */ /* REMOVIDO */
+        padding: 10px; /* Mantém o padding menor se desejar */
+        height: 300px;
+    }
+}
+
 
 
 /* --- Seção Orientações (Accordion) --- */
@@ -1734,7 +1761,7 @@ footer {
 
 /* --- Seção Pontos --- */
 .points-section {
-    background-color: #e9f5e9; /* Fundo verde claro para destaque */
+    background-color: #fff; /* Fundo verde claro para destaque */
     text-align: center;
 }
 .points-section h3 {
@@ -1960,4 +1987,132 @@ footer {
     padding: 0.4em 0.7em;
     min-width: 80px; /* Largura mínima para alinhamento */
     text-align: center;
+}
+
+/* --- Estilos para o link da imagem no modal de resgate --- */
+.redeem-item-image-link {
+    position: relative;
+    display: block;
+    width: 50px;
+    height: 50px;
+    margin-right: 1rem;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: zoom-in; /* Mantém o cursor de lupa */
+    background-color: #f8f9fa; /* Fundo leve caso a imagem tenha transparência */
+    border: 1px solid #ddd; /* Borda sutil para o quadrado da imagem */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra leve */
+}
+
+/* Ícone de setas de expansão no canto */
+.redeem-item-image-link::before {
+    content: "\f065"; /* <<< CÓDIGO DO ÍCONE fa-expand */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900; /* Para ícones Solid */
+    position: absolute;
+    top: 3px;   /* Ajuste fino da posição */
+    left: 3px;  /* Ajuste fino da posição */
+    width: 11px;  /* Ajuste do tamanho do container do ícone */
+    height: 11px; /* Ajuste do tamanho do container do ícone */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.3); /* Fundo escuro semitransparente (padrão) */
+    color: #fefcf0;
+    font-size: 0.4rem; /* Tamanho do ícone das setas */
+    border-radius: 3px;
+    z-index: 15;
+    /* box-shadow: 0 1px 2px rgba(0,0,0,0.3); */ /* Sombra opcional */
+    transition: background-color 0.2s ease; /* Transição suave no hover */
+}
+
+/* Opcional: Mudar a cor do fundo do ícone no hover */
+.redeem-item-image-link:hover::before {
+     background-color: rgba(72, 143, 88, 0.8); /* Fica verde no hover */
+}
+
+/* Garante que a imagem dentro do link ocupe todo o espaço */
+.redeem-item-image-link .redeem-item-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.2s ease; /* Efeito de zoom suave no hover */
+    padding: 3px; /* Pequeno padding para não ficar colado na borda/ícone */
+}
+
+/* Pequeno efeito ao passar o mouse sobre o link */
+.redeem-item-image-link:hover .redeem-item-img {
+    transform: scale(1.05); /* Pequeno zoom na imagem no hover */
+}
+
+/* ==========================================================================
+   AJUSTE DE COR - BOTÃO REGISTRAR MATERIAL
+   ========================================================================== */
+
+/* Seleciona o botão submit DENTRO do formulário #registerMaterialForm na seção .register-material-section */
+.register-material-section #registerMaterialForm button[type="submit"] {
+  background-color: #488f58; /* Sua cor laranja principal */
+  border-color: #488f58;     /* Cor da borda igual */
+  color: #fefcf0;           /* Cor do texto (bege claro) */
+}
+
+/* Efeito hover (opcional, mas recomendado para consistência) */
+.register-material-section #registerMaterialForm button[type="submit"]:hover {
+  background-color: #3a7547; /* Sua cor laranja mais escura (do :hover de .btn-custom) */
+  border-color: #3a7547;
+  color: #fefcf0;
+}
+
+/* ==========================================================================
+   AJUSTE DE COR - BOTÃO RESGATAR PONTOS
+   ========================================================================== */
+
+/* Seleciona o botão DENTRO da seção .points-section que abre o modal #redeemModal */
+.points-section button[data-bs-target="#redeemModal"] {
+  background-color: #488f58; /* Sua cor laranja principal */
+  border-color: #488f58;     /* Cor da borda igual */
+  color: #fefcf0;           /* Cor do texto (bege claro) */
+  /* Remove o estilo padrão 'success' do Bootstrap */
+  --bs-btn-bg: #488f58;
+  --bs-btn-border-color: #488f58;
+  --bs-btn-hover-bg: #3a7547;         /* Laranja escuro no hover */
+  --bs-btn-hover-border-color: #3a7547;
+  --bs-btn-active-bg: #3a7547;
+  --bs-btn-active-border-color: #3a7547;
+  --bs-btn-disabled-bg: #488f58;
+  --bs-btn-disabled-border-color: #488f58;
+}
+
+/* Efeito hover explícito (reforço) */
+.points-section button[data-bs-target="#redeemModal"]:hover {
+  background-color: #3a7547; /* Sua cor laranja mais escura */
+  border-color: #3a7547;
+  color: #fefcf0;
+}
+
+/* ==========================================================================
+   AJUSTE DE COR - BOTÃO BUSCAR PRÓXIMOS (PONTOS DE COLETA)
+   ========================================================================== */
+
+/* Seleciona o botão submit DENTRO do formulário #collectionPointSearchForm na seção .collection-points-section */
+.collection-points-section #collectionPointSearchForm button[type="submit"] {
+  background-color: #488f58; /* Sua cor laranja principal */
+  border-color: #488f58;     /* Cor da borda igual */
+  color: #fefcf0;           /* Cor do texto (bege claro) */
+  /* Sobrescreve variáveis do btn-secondary (ou qualquer outra classe base) */
+  --bs-btn-bg: #488f58;
+  --bs-btn-border-color: #488f58;
+  --bs-btn-hover-bg: #3a7547;         /* Laranja escuro no hover */
+  --bs-btn-hover-border-color: #3a7547;
+  --bs-btn-active-bg: #3a7547;
+  --bs-btn-active-border-color: #3a7547;
+  --bs-btn-disabled-bg: #488f58;
+  --bs-btn-disabled-border-color: #488f58;
+}
+
+/* Efeito hover explícito (reforço) */
+.collection-points-section #collectionPointSearchForm button[type="submit"]:hover {
+  background-color: #3a7547; /* Sua cor laranja mais escura */
+  border-color: #3a7547;
+  color: #fefcf0;
 }

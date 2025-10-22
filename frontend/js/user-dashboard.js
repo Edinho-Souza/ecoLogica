@@ -12,71 +12,91 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('user-points-value').textContent = userPoints;
         const modalPointsSpan = document.getElementById('modal-user-points');
         if (modalPointsSpan) modalPointsSpan.textContent = userPoints;
+
     };
 
-// --- Lógica para inicializar o gráfico (ESTILO LINHA COM ÁREA) ---
+    // --- Lógica para inicializar o gráfico (ESTILO LINHA COM ÁREA) ---
     const initChart = () => {
-        console.log("Função initChart chamada (criando gráfico LINHA com dados fake)");
+        console.log("Função initChart chamada...");
         const ctx = document.getElementById('disposalHistoryChart');
 
         if (ctx && typeof Chart !== 'undefined') {
-
-            // Define a fonte padrão
+            // ... (Definições de fonte, labels, totalData, gradientFill) ...
             Chart.defaults.font.family = "'Open Sans', sans-serif";
-            Chart.defaults.color = '#555'; // Cor um pouco mais escura para eixos/texto
+            Chart.defaults.color = '#555';
+            const allLabels = ['Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro'];
+            const allTotalData = [6.0, 6.6, 6.8, 9.0, 8.0, 10.6];
+            let displayLabels = allLabels;
+            let displayData = allTotalData;
+            const screenWidth = window.innerWidth;
+            const leftPadding = screenWidth >= 992 ? -5 : 0;
 
-            // Dados Fake (mesmos de antes)
-            const labels = ['Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro'];
-            const totalData = [6.0, 6.6, 6.8, 9.0, 8.0, 10.6];
+            // --- AJUSTE PARA MOBILE (Dados e Aspect Ratio) ---
+            let chartAspectRatio = 2.5; // Proporção padrão (largura é 2x a altura)
+            if (screenWidth < 768) {
+                displayLabels = allLabels.slice(-4);
+                displayData = allTotalData.slice(-4);
+                chartAspectRatio = 1.5; // <<< GRÁFICO MAIS ALTO NO MOBILE (Experimente 1, 1.2, 1.5)
+                console.log("Mobile detectado, mostrando 4 meses e aspectRatio:", chartAspectRatio);
+            } else {
+                console.log("Desktop detectado, aspectRatio:", chartAspectRatio);
+            }
+            // --- FIM DO AJUSTE ---
 
-            // Cria um gradiente para a área abaixo da linha
-            const gradientFill = ctx.getContext('2d').createLinearGradient(0, 0, 0, 250); // Ajuste a altura (250) se necessário
-            gradientFill.addColorStop(0, 'rgba(72, 143, 88, 0.6)');   // Verde do site (#488f58) com opacidade no topo
-            gradientFill.addColorStop(1, 'rgba(72, 143, 88, 0.05)'); // Quase transparente na base
+            const gradientFill = ctx.getContext('2d').createLinearGradient(0, 0, 0, 250);
+            gradientFill.addColorStop(0, 'rgba(72, 143, 88, 0.6)');
+            gradientFill.addColorStop(1, 'rgba(72, 143, 88, 0.05)');
 
             // Configuração do Gráfico de Linha
             new Chart(ctx, {
-                type: 'line', // <<< MUDANÇA PRINCIPAL: Tipo linha
+                type: 'line',
                 data: {
-                    labels: labels,
+                    labels: displayLabels, // <-- USA OS DADOS FILTRADOS/COMPLETOS
                     datasets: [
                         {
                             label: 'Total Reciclado (Kg)',
-                            data: totalData,
-                            fill: true, // <<< Preenche a área abaixo da linha
-                            backgroundColor: gradientFill, // <<< Usa o gradiente criado
-                            borderColor: '#2c5836', // <<< Usa seu verde escuro para a linha
-                            borderWidth: 2.5, // Linha um pouco mais grossa
-                            pointBackgroundColor: '#2c5836', // Cor dos pontos na linha
-                            pointBorderColor: '#fff', // Borda branca nos pontos
+                            data: displayData, // <-- E AQUI
+                            fill: true,
+                            backgroundColor: gradientFill,
+                            borderColor: '#2c5836',
+                            borderWidth: 2.5,
+                            pointBackgroundColor: '#2c5836',
+                            pointBorderColor: '#fff',
                             pointHoverBackgroundColor: '#fff',
                             pointHoverBorderColor: '#2c5836',
-                            pointRadius: 4, // Tamanho dos pontos
-                            pointHoverRadius: 6, // Tamanho dos pontos no hover
-                            tension: 0.3 // <<< Deixa a linha levemente curvada (0 = reta)
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0.3
                         }
                     ]
                 },
+
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: false, // Mantém false
+                    aspectRatio: chartAspectRatio, // <<< ADICIONA A PROPORÇÃO CALCULADA
+                    layout: {
+                        padding: {
+                            left: leftPadding
+                        }
+                    },
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Evolução Mensal do Total Reciclado (Kg)', // Título mais adequado
+                            text: 'Evolução Mensal do Total Reciclado (Kg)',
                             color: '#4f4f4f',
                             font: { size: 16, weight: 'bold' },
                             padding: { bottom: 20 }
                         },
                         legend: {
-                            display: false // Continua sem legenda
+                            display: false
                         },
                         tooltip: {
-                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                             titleFont: { weight: 'bold' },
-                             bodyFont: { size: 13 },
-                             callbacks: {
-                                label: function(context) {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: { weight: 'bold' },
+                            bodyFont: { size: 13 },
+                            callbacks: {
+                                label: function (context) {
                                     let label = context.dataset.label || '';
                                     if (label) { label += ': '; }
                                     if (context.parsed.y !== null) { label += context.parsed.y.toFixed(1) + ' Kg'; }
@@ -93,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 font: { weight: '600' }
                             },
                             grid: {
-                                display: false // Sem grade vertical
+                                display: false
                             }
                         },
                         y: {
@@ -104,28 +124,29 @@ document.addEventListener('DOMContentLoaded', () => {
                                 font: { weight: '600' }
                             },
                             grid: {
-                                color: '#e9e9e9', // Grade horizontal bem clara
-                                drawBorder: false, // Sem linha do eixo Y
+                                color: '#e9e9e9',
+                                drawBorder: false,
                             },
                             ticks: {
-                                // Adiciona um pouco de espaço extra no topo
-                                grace: '10%' // Ex: 10% acima do valor máximo
-                            }
+                                grace: '10%',
+                                padding: 0, // Padding dos números do eixo Y reduzido
+                                stepSize: 2
+                            },
+                            offset: false // Tenta colar o eixo Y na borda
                         }
                     },
-                     // Melhora a interação com o tooltip
                     interaction: {
-                        intersect: false, // Mostra tooltip mesmo sem estar exatamente sobre o ponto
-                        mode: 'index', // Mostra tooltips para todos os datasets no mesmo índice X (útil se voltar a ter mais linhas)
+                        intersect: false,
+                        mode: 'index',
                     },
                 }
             });
         } else {
             // (Código de erro permanece o mesmo)
-             if (!ctx) console.error("Elemento canvas #disposalHistoryChart não encontrado!");
-             else console.error("Chart.js não parece estar carregado.");
-             const graphContainer = document.querySelector('.history-graph-container');
-             if(graphContainer) graphContainer.innerHTML = '<p class="text-danger text-center">Erro ao carregar gráfico.</p>';
+            if (!ctx) console.error("Elemento canvas #disposalHistoryChart não encontrado!");
+            else console.error("Chart.js não parece estar carregado.");
+            const graphContainer = document.querySelector('.history-graph-container');
+            if (graphContainer) graphContainer.innerHTML = '<p class="text-danger text-center">Erro ao carregar gráfico.</p>';
         }
     };
 
@@ -171,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
             feedbackDiv.textContent = '';
             userPoints = parseInt(document.getElementById('user-points-value').textContent || '0');
             const modalPointsSpan = document.getElementById('modal-user-points');
-             if (modalPointsSpan) modalPointsSpan.textContent = userPoints;
+            if (modalPointsSpan) modalPointsSpan.textContent = userPoints;
 
             redeemOptions.forEach(option => {
                 option.classList.remove('selected', 'disabled');
@@ -219,6 +240,47 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1500);
         });
     }
+
+    // --- Lógica para o Lightbox de Imagem no Modal de Resgate ---
+    const lightboxModalElement = document.getElementById('imageLightboxModal'); // Pega o modal lightbox
+    const lightboxImage = document.getElementById('lightboxImage'); // Pega a tag <img> dentro do lightbox
+    const lightboxLabel = document.getElementById('imageLightboxModalLabel'); // Pega o título do lightbox
+
+    if (redeemModalElement && lightboxModalElement && lightboxImage && lightboxLabel) {
+        // Adiciona um listener no modal de resgate que "escuta" cliques nos links de imagem
+        redeemModalElement.addEventListener('click', function (event) {
+            // Verifica se o elemento clicado (ou um pai dele) é o link da imagem
+            const imageLink = event.target.closest('.redeem-item-image-link');
+
+            if (imageLink) {
+                event.preventDefault(); // Impede o link de navegar (embora href seja #)
+                const imageUrl = imageLink.getAttribute('data-image-src'); // Pega a URL da imagem grande
+                const itemDetailsDiv = imageLink.nextElementSibling; // Pega o div de detalhes ao lado
+                const itemTitle = itemDetailsDiv ? itemDetailsDiv.textContent.trim() : 'Detalhe do Item'; // Pega o título
+
+                // Define os atributos do modal lightbox ANTES de ele ser mostrado
+                lightboxImage.setAttribute('src', imageUrl);
+                lightboxImage.setAttribute('alt', itemTitle); // Adiciona alt text
+                lightboxLabel.textContent = itemTitle;
+
+                // Não precisamos abrir o modal via JS aqui, pois o data-bs-toggle já faz isso
+                // console.log("Preparando lightbox para: ", imageUrl);
+            }
+        });
+
+        // Resetar a imagem quando o Lightbox fechar (boa prática)
+        lightboxModalElement.addEventListener('hidden.bs.modal', function () {
+            lightboxImage.setAttribute('src', ''); // Limpa a imagem
+            lightboxImage.setAttribute('alt', 'Imagem do Item');
+            lightboxLabel.textContent = 'Detalhe do Item'; // Restaura título
+        });
+    } else {
+        console.warn("Elementos necessários para o lightbox de resgate não foram encontrados.");
+    }
+
+    // --- FIM DA LÓGICA DO LIGHTBOX ---
+
+
 
     // --- Chamadas Iniciais ---
     loadUserData(); // Carrega os dados do usuário (simulado)

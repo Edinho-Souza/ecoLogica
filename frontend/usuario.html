@@ -21,8 +21,6 @@
 
     <main>
         <div id="placeholder-menu"></div>
-        <div id="placeholder-banner"></div>
-
 
         <div class="content-wrapper user-dashboard">
             <h1>Minha Conta</h1>
@@ -54,7 +52,7 @@
                         <p>Acompanhe o impacto positivo das suas ações!</p>
                         <div class="history-graph-container">
                             <canvas id="disposalHistoryChart" aria-label="Gráfico de histórico de descarte"></canvas>
-                            <p class="text-muted text-center mt-2">Gráfico representando a quantidade (Kg ou itens) de
+                            <p class="text-muted text-center mt-2">Gráfico da quantidade de
                                 material reciclado por mês.</p>
                         </div>
                     </section>
@@ -207,7 +205,10 @@
                     <div class="list-group">
                         <button type="button" class="list-group-item list-group-item-action d-flex align-items-center"
                             data-points-cost="50">
-                            <img src="img/recompensas/ecobag.png" alt="Ecobag" class="redeem-item-img me-3">
+                            <a href="#" class="redeem-item-image-link" data-bs-toggle="modal"
+                                data-bs-target="#imageLightboxModal" data-image-src="img/recompensas/ecobag.png">
+                                <img src="img/recompensas/ecobag.png" alt="Ecobag" class="redeem-item-img me-3">
+                            </a>
                             <div class="redeem-item-details flex-grow-1"> Ecobag ecoLogica
                             </div>
                             <span class="badge redeem-points-badge rounded-pill">50 pontos</span>
@@ -215,36 +216,44 @@
 
                         <button type="button" class="list-group-item list-group-item-action d-flex align-items-center"
                             data-points-cost="75">
-                            <img src="img/recompensas/garrafa.png" alt="Garrafa" class="redeem-item-img me-3">
-                            <div class="redeem-item-details flex-grow-1">
-                                Garrafa ecoLogica
+                            <a href="#" class="redeem-item-image-link" data-bs-toggle="modal"
+                                data-bs-target="#imageLightboxModal" data-image-src="img/recompensas/garrafa.png">
+                                <img src="img/recompensas/garrafa.png" alt="Garrafa" class="redeem-item-img me-3">
+                            </a>
+                            <div class="redeem-item-details flex-grow-1"> Garrafa ecoLogica
                             </div>
                             <span class="badge redeem-points-badge rounded-pill">75 pontos</span>
                         </button>
 
                         <button type="button" class="list-group-item list-group-item-action d-flex align-items-center"
                             data-points-cost="30">
-                            <img src="img/recompensas/caixa-sementes.png" alt="Sementes" class="redeem-item-img me-3">
-                            <div class="redeem-item-details flex-grow-1">
-                                Pacote de Sementes ecoLogica
+                            <a href="#" class="redeem-item-image-link" data-bs-toggle="modal"
+                                data-bs-target="#imageLightboxModal" data-image-src="img/recompensas/caixa-sementes.png">
+                                <img src="img/recompensas/caixa-sementes.png" alt="Sementes" class="redeem-item-img me-3">
+                            </a>                            
+                            <div class="redeem-item-details flex-grow-1"> Pacote de Sementes
                             </div>
                             <span class="badge redeem-points-badge rounded-pill">30 pontos</span>
                         </button>
 
                         <button type="button" class="list-group-item list-group-item-action d-flex align-items-center"
                             data-points-cost="150">
-                            <img src="img/recompensas/muda-arvore.png" alt="Árvore" class="redeem-item-img me-3">
-                            <div class="redeem-item-details flex-grow-1">
-                                Plante uma Árvore
+                            <a href="#" class="redeem-item-image-link" data-bs-toggle="modal"
+                                data-bs-target="#imageLightboxModal" data-image-src="img/recompensas/muda-arvore.png">
+                                <img src="img/recompensas/muda-arvore.png" alt="Árvore" class="redeem-item-img me-3">
+                            </a>
+                            <div class="redeem-item-details flex-grow-1"> Plante uma Árvore
                             </div>
                             <span class="badge redeem-points-badge rounded-pill">150 pontos</span>
                         </button>
 
                         <button type="button" class="list-group-item list-group-item-action d-flex align-items-center"
                             data-points-cost="100">
-                            <img src="img/recompensas/cupom-desconto.png" alt="Cupom" class="redeem-item-img me-3">
-                            <div class="redeem-item-details flex-grow-1">
-                                Cupom de Desconto de 5% em uma de nossas lojas parceiras
+                            <a href="#" class="redeem-item-image-link" data-bs-toggle="modal"
+                                data-bs-target="#imageLightboxModal" data-image-src="img/recompensas/cupom-desconto.png">
+                                <img src="img/recompensas/cupom-desconto.png" alt="Cupom" class="redeem-item-img me-3">
+                            </a>
+                            <div class="redeem-item-details flex-grow-1"> Cupom de Desconto
                             </div>
                             <span class="badge redeem-points-badge rounded-pill">100 pontos</span>
                         </button>
@@ -257,6 +266,21 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-success" id="confirmRedeemButton" disabled>Confirmar
                         Resgate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="imageLightboxModal" tabindex="-1" aria-labelledby="imageLightboxModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageLightboxModalLabel">Detalhe do Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="" class="img-fluid" id="lightboxImage" alt="Imagem do Item">
                 </div>
             </div>
         </div>
