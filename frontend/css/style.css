@@ -1819,6 +1819,8 @@ footer {
   border: none;
   padding-left: 0;
   padding-right: 0;
+  padding-top: 0;    /* Era ~0.75rem ou 1rem. Tente 0.5rem (8px) */
+    padding-bottom: 9px; /* Tente 0.5rem (8px) */
 }
 
 .active-campaigns-section .list-group-item a {
@@ -2439,78 +2441,83 @@ footer {
 }
 
 /* ==========================================================================
-   REORDENAMENTO DAS SEÇÕES DO USUÁRIO NO MOBILE
+   REORDENAMENTO DAS SEÇÕES DO USUÁRIO NO MOBILE (VERSÃO CORRIGIDA)
    ========================================================================== */
 
 /* Aplica-se em telas menores que o breakpoint 'lg' (desktop) */
 @media (max-width: 991.98px) {
 
-  /* 1. Faz a 'row' principal se comportar como uma coluna flexível */
-  .user-dashboard .row.g-4 {
-    display: flex;
-    flex-direction: column;
-  }
+    /* --- Reordenação do Dashboard --- */
 
-  /* 2. "Desembrulha" o conteúdo das colunas.
-       Isto faz com que as <section> dentro das colunas
-       se comportem como filhas diretas da 'row' */
-  .user-dashboard .row.g-4>.col-lg-8,
-  .user-dashboard .row.g-4>.col-lg-4 {
-    display: contents;
-  }
+    /* 1. Faz a 'row' principal se comportar como uma coluna flexível */
+    .user-dashboard .row.g-4 {
+        display: flex;
+        flex-direction: column;
+        /* Remove o gap da row, pois vamos controlar manualmente */
+        --bs-gutter-y: 0; 
+        gap: 0;
+    }
 
-  /* 3. Aplica a ordem desejada a CADA seção individual */
+    /* 2. "Desembrulha" TODAS as colunas e rows aninhadas */
+    .user-dashboard .row.g-4 > .col-lg-8,
+    .user-dashboard .row.g-4 > .col-lg-4,
+    .user-dashboard .row.g-4 > .col-lg-8 > .row,
+    .user-dashboard .row.g-4 > .col-lg-8 > .row > .col-lg-6 {
+        display: contents;
+    }
 
-  /* Ordem 1: Meu Perfil */
-  .user-dashboard .user-profile-v2 {
-    order: 1;
-  }
+    /* 3. ADICIONA O ESPAÇAMENTO DE VOLTA (CORRIGIDO) */
+    /* Este seletor aplica a margem a TODAS as seções filhas */
+    .user-dashboard .user-profile-v2,
+    .user-dashboard .dashboard-section {
+        margin-bottom: 1.5rem; /* Aplica o gap (g-4 = 1.5rem) */
+    }
+    
+    /* 4. Aplica a ordem desejada */
+    
+    /* Ordem 1: Meu Perfil */
+    .user-dashboard .user-profile-v2 {
+        order: 1;
+    }
+    /* Ordem 2: Meus Pontos */
+    .user-dashboard .points-section {
+        order: 2;
+    }
+    /* Ordem 3: Histórico de Descarte */
+    .user-dashboard .history-section {
+        order: 3;
+    }
+    /* Ordem 4: Cadastrar Material */
+    .user-dashboard .register-material-section {
+        order: 4;
+    }
+    /* Ordem 5: Encontrar Pontos */
+    .user-dashboard .collection-points-section {
+        order: 5;
+    }
+    /* Ordem 6: Orientações */
+    .user-dashboard .guidelines-section-v2 {
+        order: 6;
+    }
+    /* Ordem 7: Campanhas (será o último item) */
+    .user-dashboard .active-campaigns-section {
+        order: 7;
+        margin-bottom: 0; /* REMOVE a margem do último item */
+    }
 
-  /* Ordem 2: Meus Pontos */
-  .user-dashboard .points-section {
-    order: 2;
-  }
+    /* --- Outras regras mobile que você já tinha --- */
+    .btn-custom.btn-auth {
+        padding: 10px 10px;
+    }
 
-  /* Ordem 3: Histórico de Descarte */
-  .user-dashboard .history-section {
-    order: 3;
-  }
+    .ranking-container {
+        flex-direction: column;
+        gap: 25px;
+    }
 
-  /* Ordem 4: Cadastrar Material */
-  .user-dashboard .register-material-section {
-    order: 4;
-  }
-
-  /* Ordem 5: Encontrar Pontos */
-  .user-dashboard .collection-points-section {
-    order: 5;
-  }
-
-  /* Ordem 6: Orientações */
-  .user-dashboard .guidelines-section-v2 {
-    order: 6;
-  }
-
-  /* Ordem 7: Campanhas */
-  .user-dashboard .active-campaigns-section {
-    order: 7;
-  }
+    .ranking-content-wrapper {
+        text-align: left;
+        margin-top: 0;
+    }
 }
 
-/* ==========================================================================
-   REORDENAMENTO DAS SEÇÕES DO USUÁRIO NO MOBILE
-   ========================================================================== */
-
-@media (max-width: 991.98px) {
-
-  .user-dashboard .row.g-4>.col-lg-8>section,
-  .user-dashboard .row.g-4>.col-lg-4>section {
-    margin-bottom: var(--bs-gutter-y, 1.5rem);
-  }
-
-
-  .user-dashboard .active-campaigns-section {
-    margin-bottom: 0;
-  }
-
-}
