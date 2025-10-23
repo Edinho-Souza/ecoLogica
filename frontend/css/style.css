@@ -434,7 +434,8 @@ body {
 
 @media (max-width: 991.98px) {
   .secondary-bar {
-    padding: 0 0px; /* Reduz o padding para o MOBILE */
+    padding: 0 0px;
+    /* Reduz o padding para o MOBILE */
   }
 }
 
@@ -1093,21 +1094,25 @@ footer {
 }
 
 .footer-toggle h4 {
-  margin: 0; /* Remove a margem original do h4 */
+  margin: 0;
+  /* Remove a margem original do h4 */
 }
 
 .footer-arrow {
-  display: none; /* A seta fica escondida em telas grandes */
+  display: none;
+  /* A seta fica escondida em telas grandes */
 }
 
 .footer-links-list {
   list-style: none;
   padding: 0;
-  margin: 0.5rem 0 0 0; /* Pequena margem para separar do título */
+  margin: 0.5rem 0 0 0;
+  /* Pequena margem para separar do título */
 }
 
 .footer-links-list li a {
-  display: block; /* Garante que o link ocupe a linha toda */
+  display: block;
+  /* Garante que o link ocupe a linha toda */
 }
 
 
@@ -1128,7 +1133,7 @@ footer {
     align-self: center;
     margin-bottom: 1rem;
   }
-  
+
   /* MUDANÇA 1: A regra agora se aplica SÓ às colunas de menu */
   .footer-column {
     width: 100%;
@@ -1139,7 +1144,8 @@ footer {
   /* MUDANÇA 2: Nova regra SÓ para a seção de contato */
   .footer-contact {
     width: 100%;
-    text-align: center; /* Centraliza o texto */
+    text-align: center;
+    /* Centraliza o texto */
   }
 
   .footer-toggle {
@@ -1159,7 +1165,7 @@ footer {
     transition: max-height 0.4s ease-out;
     padding-left: 0;
   }
-  
+
   .footer-links-list.active {
     max-height: 100px;
     transition: max-height 0.4s ease-in;
@@ -1216,6 +1222,7 @@ footer {
 
 /* --- Telas pequenas (Celulares - até 768px) --- */
 @media (max-width: 768px) {
+
   /* Modal de Autenticação */
   .split-modal {
     flex-direction: column;
@@ -1422,20 +1429,22 @@ footer {
 
 /* 1. Prepara a barra de navegação para ser a "mãe" da logo */
 .secondary-bar {
-  position: relative; /* Essencial para o posicionamento absoluto da logo */
+  position: relative;
+  /* Essencial para o posicionamento absoluto da logo */
 }
 
 /* 2. Estiliza o contêiner da logo (SEM FUNDO, SOMBRA, ANIMAÇÃO) */
 .navbar-logo-container {
   position: absolute;
-  top: 0px; 
-  left: 20px; /* <<< MUDANÇA AQUI: Diminuímos o valor para mover para a esquerda */
-  z-index: 20; 
+  top: 0px;
+  left: 20px;
+  /* <<< MUDANÇA AQUI: Diminuímos o valor para mover para a esquerda */
+  z-index: 20;
 }
 
 /* 3. Define o tamanho da imagem da logo */
 .navbar-logo-img {
-  height: 65px; 
+  height: 65px;
   width: auto;
 }
 
@@ -1443,12 +1452,13 @@ footer {
 /* --- Responsividade para a logo em telas menores --- */
 @media (max-width: 991.98px) {
   .navbar-logo-container {
-    top: 0px; 
-    left: 15px; /* <<< MUDANÇA AQUI: Também diminuímos o valor para o mobile */
+    top: 0px;
+    left: 15px;
+    /* <<< MUDANÇA AQUI: Também diminuímos o valor para o mobile */
   }
 
   .navbar-logo-img {
-    height: 70px; 
+    height: 70px;
   }
 }
 
@@ -1464,84 +1474,84 @@ footer {
 
 /* Estiliza o container do mapa */
 #mapa {
-    height: 600px;
-    width: 100%;
-    border-radius: 8px;
-    border: 1px solid #ccc;   
-    background-color: #e9e9e9;
+  height: 600px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #e9e9e9;
 }
 
 /* ---- CSS PARA A LEGENDA DO MAPA ---- */
 
 /* A div #mapa precisa ter position relative para a legenda se posicionar dentro dela */
 #mapa {
-    position: relative;
+  position: relative;
 }
 
 .legenda-mapa {
-    position: absolute;
-    bottom: 20px; 
-    right: 20px; 
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    z-index: 1000; 
-    max-width: 200px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  max-width: 200px;
 }
 
 .legenda-mapa h4 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1rem;
-    font-weight: bold;
-    text-align: center;
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
 }
 
 .legenda-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-    font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
 }
 
 /* O quadradinho colorido */
 .cor-legenda {
-    width: 18px;
-    height: 18px;
-    border: 1px solid rgba(0,0,0,0.2);
-    border-radius: 4px;
-    margin-right: 8px;
-    display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  margin-right: 8px;
+  display: inline-block;
 }
 
 /* ---- CSS PARA OS ÍCONES PERSONALIZADOS DO MAPA ---- */
 
 .custom-div-icon {
-    position: relative;
-    text-align: center;
+  position: relative;
+  text-align: center;
 
 }
 
 /* O ícone de pino do Font Awesome */
 .custom-div-icon .fa-location-dot {
-    font-size: 40px;
-    color: #333;
-    position: absolute;
-    top: 0;
-    left: -2px;
+  font-size: 40px;
+  color: #333;
+  position: absolute;
+  top: 0;
+  left: -2px;
 }
 
 /* A bolinha colorida que fica "dentro" do pino */
 .custom-div-icon .marker-pin {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid #fff;
-    position: absolute;
-    top: 5px;
-    left: 3px;
-    z-index: 1;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  position: absolute;
+  top: 5px;
+  left: 3px;
+  z-index: 1;
 }
 
 /* ==========================================================================
@@ -1550,14 +1560,16 @@ footer {
 
 .news-page-container h1 {
   margin-bottom: 0.5em;
-  color: #2c5836; /* Verde escuro do site */
+  color: #2c5836;
+  /* Verde escuro do site */
 }
 
 .news-intro {
   font-size: 1.1rem;
   color: #6c757d;
   margin-bottom: 2.5em;
-  border-bottom: 1px solid #e0d9c4; /* Linha divisória sutil */
+  border-bottom: 1px solid #e0d9c4;
+  /* Linha divisória sutil */
   padding-bottom: 1.5em;
 }
 
@@ -1576,13 +1588,15 @@ footer {
 }
 
 .rss-item-title a {
-  color: #488f58; /* Verde do site */
+  color: #488f58;
+  /* Verde do site */
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .rss-item-title a:hover {
-  color: #e87a00; /* Laranja do site */
+  color: #e87a00;
+  /* Laranja do site */
   text-decoration: underline;
 }
 
@@ -1618,8 +1632,8 @@ footer {
 }
 
 /* Esconde a última linha divisória */
-.rss-item:last-child + .rss-item-divider {
-    display: none;
+.rss-item:last-child+.rss-item-divider {
+  display: none;
 }
 
 /* ==========================================================================
@@ -1627,118 +1641,174 @@ footer {
    ========================================================================== */
 
 .user-dashboard h1 {
-    color: #2c5836;
-    margin-bottom: 1.5em;
-    padding-bottom: 0.5em;
-    border-bottom: 2px solid #e87a00; /* Linha laranja abaixo do título */
+  color: #2c5836;
+  margin-bottom: 1.5em;
+  padding-bottom: 0.5em;
+  border-bottom: 2px solid #e87a00;
+  /* Linha laranja abaixo do título */
 }
 
 .dashboard-section {
-    background-color: #fff; /* Fundo branco para as seções */
-    padding: 25px;
-    margin-bottom: 2rem; /* Espaço entre as seções */
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  background-color: #fff;
+  /* Fundo branco para as seções */
+  padding: 25px;
+  margin-bottom: 2rem;
+  /* Espaço entre as seções */
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
 
 .dashboard-section h2,
 .dashboard-section h3 {
-    color: #4f4f4f;
-    margin-top: 0;
-    margin-bottom: 1em;
-    font-weight: 600;
+  color: #4f4f4f;
+  margin-top: 0;
+  margin-bottom: 1em;
+  font-weight: 600;
 }
 
 /* --- Seção Perfil --- */
 .user-profile-section .profile-details {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .profile-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .profile-details p {
-    margin-bottom: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 /* --- Seção Histórico --- */
-/* --- Seção Histórico --- */
 .history-graph-container {
-   margin-left: auto; /* <<< ADICIONE: Centraliza o container */
-    margin-right: auto; /* <<< ADICIONE: Centraliza o container */
-   
-    border: 0px solid #eee; /* ADICIONADO: Borda sutil */
-    border-radius: 6px; /* ADICIONADO: Cantos arredondados */
-    padding: 15px; /* ADICIONADO: Espaço interno ao redor do gráfico */
-    margin-top: 20px; /* Aumenta um pouco o espaço acima */
-    position: relative; /* Necessário para o Chart.js ajustar o tamanho corretamente */
-/*     min-height: 250px; /* Define uma altura mínima para evitar que fique muito baixo */
+  max-width: 100%;
+  padding-top: 15px;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 30px;
+  /* <<< AUMENTADO padding inferior (Experimente 25px, 30px, 35px) */
+  margin-top: 20px;
+  position: relative;
 }
 
 /* Garante que o canvas ocupe o espaço do container */
 #disposalHistoryChart {
-    display: block; /* Garante comportamento de bloco */
-    width: 100% !important; /* Força a largura total do container */
-    /* height: auto !important; /* Permite que a altura seja calculada */
-/*     max-height: 350px; /* Limita a altura máxima se necessário */
- }
+  display: block;
+  /* Garante comportamento de bloco */
+  width: 100% !important;
+  /* Força a largura total do container */
+  /* height: auto !important; /* Permite que a altura seja calculada */
+  /*     max-height: 350px; /* Limita a altura máxima se necessário */
+}
 
 /* Ajuste de padding do container APENAS para desktop (quando o gráfico usa padding negativo) */
 @media (min-width: 992px) {
-    .history-graph-container {
-        /* Reduz o padding esquerdo do container para compensar o -10px do gráfico */
-        padding-left: 0px; 
-        padding-right: 0px;
-        height: 350px;      
-    }
+  .history-graph-container {
+    /* Reduz o padding esquerdo do container para compensar o -10px do gráfico */
+    padding-left: 0px;
+    padding-right: 0px;
+    height: 400px;
+  }
 
-    #disposalHistoryChart {
-        margin-bottom: 10px; /* Experimente valores como 10px, 15px, 20px */
+  #disposalHistoryChart {
+    margin-bottom: 10px;
+    /* Experimente valores como 10px, 15px, 20px */
+  }
 }
-.history-section .history-graph-container p.text-muted {
-        margin-bottom: 85px; /* Experimente 20px, 25px, 30px */
-    }
 
+/* Ajuste de ALTURA e Layout do container APENAS para mobile */
+@media (max-width: 767.98px) {
+  .history-graph-container {
+    /* height: auto; */
+    /* Remove qualquer altura fixa */
+    min-height: 300px;
+    /* Garante uma altura mínima */
+    padding: 10px;
+    /* Padding geral menor para mobile */
+    /* Garante que o container se comporte como esperado */
+    display: flex;
+    /* Usar flexbox para controlar o conteúdo interno */
+    flex-direction: column;
+    /* Empilhar canvas e parágrafo */
+    justify-content: space-between;
+    /* Tenta espaçar verticalmente */
+  }
+
+  /* Garante que o canvas ocupe o espaço disponível, mas não mais que o necessário */
+  #disposalHistoryChart {
+    flex-grow: 1;
+    /* Permite que o canvas cresça para preencher espaço */
+    display: block;
+    width: 100% !important;
+    /* height: auto !important; */
+    /* Deixa o aspect ratio controlar */
+    min-height: 200px;
+    /* Altura mínima para o gráfico em si */
+    margin-bottom: 10px;
+    /* Espaço entre o gráfico e o texto abaixo */
+  }
+
+  /* Ajusta o parágrafo descritivo do gráfico no mobile */
+  .history-graph-container p.text-muted {
+    font-size: 0.8rem;
+    margin-top: auto;
+    /* Tenta empurrar para baixo se houver espaço extra */
+    margin-bottom: 0;
+    /* Remove margem inferior padrão */
+    line-height: 1.3;
+    text-align: center;
+    width: 100%;
+    /* Garante que ocupe a largura */
+    box-sizing: border-box;
+    padding: 0 5px;
+    /* Pequeno padding lateral para segurança */
+  }
 }
 
 /* Ajuste de ALTURA do container APENAS para mobile */
 @media (max-width: 767.98px) {
-    .history-graph-container {
-        /* height: 300px; */ /* REMOVIDO */
-        padding: 10px; /* Mantém o padding menor se desejar */
-        height: 300px;
-    }
+  .history-graph-container {
+    /* height: 300px; */
+    /* REMOVIDO */
+    padding: 10px;
+    /* Mantém o padding menor se desejar */
+    height: 300px;
+  }
 }
 
 
 
 /* --- Seção Orientações (Accordion) --- */
 .guidelines-section .accordion-button {
-    font-weight: 600;
-    color: #488f58;
+  font-weight: 600;
+  color: #488f58;
 }
+
 .guidelines-section .accordion-button:not(.collapsed) {
-    background-color: #e9f5e9; /* Fundo leve quando aberto */
-    color: #2c5836;
+  background-color: #e9f5e9;
+  /* Fundo leve quando aberto */
+  color: #2c5836;
 }
+
 .guidelines-section .accordion-button:focus {
-    box-shadow: none;
-    border-color: rgba(0,0,0,.125);
+  box-shadow: none;
+  border-color: rgba(0, 0, 0, .125);
 }
+
 .guidelines-section .accordion-body {
-    background-color: #fdfcf5; /* Fundo um pouco diferente para o corpo */
+  background-color: #fdfcf5;
+  /* Fundo um pouco diferente para o corpo */
 }
 
 /* --- Seção Cadastro de Material --- */
 .register-material-section .form-label {
-    font-weight: 600;
-    font-size: 0.9rem;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 /* --- Seção Pontos de Coleta --- */
@@ -1746,59 +1816,72 @@ footer {
 
 /* --- Seção Campanhas --- */
 .active-campaigns-section .list-group-item {
-    border: none;
-    padding-left: 0;
-    padding-right: 0;
+  border: none;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;    /* Era ~0.75rem ou 1rem. Tente 0.5rem (8px) */
+    padding-bottom: 9px; /* Tente 0.5rem (8px) */
 }
+
 .active-campaigns-section .list-group-item a {
-    color: #488f58;
-    text-decoration: none;
+  color: #488f58;
+  text-decoration: none;
 }
+
 .active-campaigns-section .list-group-item a:hover {
-    color: #e87a00;
-    text-decoration: underline;
+  color: #e87a00;
+  text-decoration: underline;
 }
 
 /* --- Seção Pontos --- */
 .points-section {
-    background-color: #fff; /* Fundo verde claro para destaque */
-    text-align: center;
+  background-color: #fff;
+  /* Fundo verde claro para destaque */
+  text-align: center;
 }
+
 .points-section h3 {
-    margin-bottom: 0.5em;
+  margin-bottom: 0.5em;
 }
+
 .points-display {
-    margin-bottom: 1em;
+  margin-bottom: 1em;
 }
+
 .points-value {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #2c5836;
-    display: block; /* Para ficar em linha separada */
-    margin: 5px 0;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #2c5836;
+  display: block;
+  /* Para ficar em linha separada */
+  margin: 5px 0;
 }
 
 /* --- Modal de Resgate --- */
 #redeemModal .list-group-item {
-    cursor: pointer;
+  cursor: pointer;
 }
+
 #redeemModal .list-group-item.selected {
-    background-color: #d1e7dd; /* Verde claro de seleção */
-    font-weight: bold;
+  background-color: #d1e7dd;
+  /* Verde claro de seleção */
+  font-weight: bold;
 }
+
 #redeemModal .list-group-item.disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    background-color: #f8f9fa;
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f8f9fa;
 }
 
 
 /* --- Responsividade da Página do Usuário --- */
 @media (max-width: 991.98px) {
-    /* Em telas menores, as colunas empilham automaticamente por causa do Bootstrap */
-    .user-dashboard h1 {
-        font-size: 1.8rem;
-    }
+
+  /* Em telas menores, as colunas empilham automaticamente por causa do Bootstrap */
+  .user-dashboard h1 {
+    font-size: 1.8rem;
+  }
 }
 
 /* ==========================================================================
@@ -1807,15 +1890,18 @@ footer {
 
 /* Sobrescreve o padding padrão do .content-wrapper APENAS quando ele também tem a classe .user-dashboard */
 .user-dashboard.content-wrapper {
-  padding-left: 0px;  /* Aumenta o padding esquerdo (era 50px) */
-  padding-right: 0px; /* Aumenta o padding direito (era 50px) */
+  padding-left: 0px;
+  /* Aumenta o padding esquerdo (era 50px) */
+  padding-right: 0px;
+  /* Aumenta o padding direito (era 50px) */
   /* Você pode ajustar 80px para 100px ou outro valor se quiser mais espaço */
 }
 
 /* Ajuste para telas menores (opcional, mas recomendado) */
 @media (max-width: 768px) {
   .user-dashboard.content-wrapper {
-    padding-left: 20px;  /* Volta para um padding menor em telas de celular */
+    padding-left: 20px;
+    /* Volta para um padding menor em telas de celular */
     padding-right: 20px;
   }
 }
@@ -1825,224 +1911,280 @@ footer {
    ========================================================================== */
 
 .user-profile-v2 {
-    background-color: #fff; /* Fundo branco para a parte inferior */
-    border-radius: 8px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden; /* Importante para o efeito do avatar */
-    position: relative; /* Para posicionar o avatar */
+  background-color: #fff;
+  /* Fundo branco para a parte inferior */
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  /* Importante para o efeito do avatar */
+  position: relative;
+  /* Para posicionar o avatar */
 }
 
 .profile-v2-header {
-    background-color: #2c5836; /* Seu verde médio */
-    color: #fefcf0; /* Seu bege claro */
-    padding: 25px 30px;
-    padding-bottom: 22px; /* Deixa espaço para o avatar vazar para baixo */
-    display: flex;
-    align-items: center;
-    position: relative; /* Para o avatar se posicionar em relação a ele */
+  background-color: #2c5836;
+  /* Seu verde médio */
+  color: #fefcf0;
+  /* Seu bege claro */
+  padding: 25px 30px;
+  padding-bottom: 22px;
+  /* Deixa espaço para o avatar vazar para baixo */
+  display: flex;
+  align-items: center;
+  position: relative;
+  /* Para o avatar se posicionar em relação a ele */
 }
 
 .profile-v2-avatar {
-    width: 100px; /* Tamanho do avatar */
-    height: 100px;
-    border-radius: 50%;
-    border: 4px solid #fff; /* Borda branca ao redor */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    object-fit: cover;
-    position: absolute;
-    bottom: -40px; /* Metade para baixo, metade para cima */
-    left: 30px;
-    z-index: 2; /* Fica acima do header e do content */
+  width: 100px;
+  /* Tamanho do avatar */
+  height: 100px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  /* Borda branca ao redor */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  object-fit: cover;
+  position: absolute;
+  bottom: -40px;
+  /* Metade para baixo, metade para cima */
+  left: 30px;
+  z-index: 2;
+  /* Fica acima do header e do content */
 }
 
 .profile-v2-greeting {
-    margin-left: 145px; /* Espaço para acomodar o avatar (100px + borda + margem) */
+  margin-left: 145px;
+  /* Espaço para acomodar o avatar (100px + borda + margem) */
 }
 
 .profile-v2-welcome {
-    font-size: 1.1rem;
-    font-weight: 400;
-    opacity: 0.9;
-    margin: 0;
+  font-size: 1.1rem;
+  font-weight: 400;
+  opacity: 0.9;
+  margin: 0;
 }
 
 .profile-v2-name {
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin: 0;
-    line-height: 1.2;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.2;
 }
 
 .profile-v2-content {
-    padding: 25px 30px;
-    padding-top: 50px; /* Começa abaixo de onde o avatar termina */
-    display: flex;
-    justify-content: space-between; /* Alinha info à esquerda e botão à direita */
-    align-items: center;
-    flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
-    gap: 15px;
+  padding: 25px 30px;
+  padding-top: 50px;
+  /* Começa abaixo de onde o avatar termina */
+  display: flex;
+  justify-content: space-between;
+  /* Alinha info à esquerda e botão à direita */
+  align-items: center;
+  flex-wrap: wrap;
+  /* Permite quebrar linha em telas pequenas */
+  gap: 15px;
 }
 
 .profile-v2-info {
-    font-size: 1rem;
+  font-size: 1rem;
 }
 
 .profile-v2-label {
-    color: #555;
-    font-weight: 600;
+  color: #555;
+  font-weight: 600;
 }
 
 .profile-v2-value {
-    color: #333;
+  color: #333;
 }
 
 .profile-v2-edit-btn {
-    border-color: #ccc;
-    color: #555;
-    font-size: 0.85rem;
+  border-color: #ccc;
+  color: #555;
+  font-size: 0.85rem;
 }
 
 .profile-v2-edit-btn:hover {
-    background-color: #e9ecef;
-    border-color: #bbb;
-    color: #333;
+  background-color: #e9ecef;
+  border-color: #bbb;
+  color: #333;
 }
 
 /* --- Responsividade Perfil V2 --- */
 @media (max-width: 576px) {
-    .profile-v2-header {
-        padding: 20px;
-        padding-bottom: 45px; /* Ajusta o espaço para o avatar menor */
-        flex-direction: column; /* Empilha no mobile */
-        align-items: flex-start;
-        text-align: center; /* Centraliza o texto */
-    }
-    .profile-v2-avatar {
-        position: relative; /* Volta ao fluxo normal */
-        width: 80px;
-        height: 80px;
-        bottom: auto;
-        left: auto;
-        margin: 0 auto 15px auto; /* Centraliza e adiciona espaço abaixo */
-        border-width: 3px;
-    }
-    .profile-v2-greeting {
-        margin-left: 0; /* Remove a margem lateral */
-        width: 100%; /* Ocupa toda a largura */
-    }
-    .profile-v2-name {
-        font-size: 1.5rem;
-    }
-    .profile-v2-content {
-        padding: 20px;
-        padding-top: 25px; /* Menos padding superior no mobile */
-        justify-content: center; /* Centraliza itens no mobile */
-        text-align: center;
-    }
-    .profile-v2-info {
-        margin-bottom: 10px;
-    }
+  .profile-v2-header {
+    padding: 25px;
+    padding-bottom: 22px;
+    /* <<< REDUZIDO (Experimente 15px, 20px) */
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: center;
+  }
+
+  /* ... (regra do avatar - pode manter a margin-bottom dela) ... */
+  .profile-v2-avatar {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    bottom: auto;
+    left: auto;
+    margin: 0px auto 15px auto;
+    /* Mantém espaço abaixo do avatar */
+    border-width: 3px;
+  }
+
+  .profile-v2-content {
+    padding: 20px;
+    padding-top: 20px;
+    /* <<< REDUZIDO (Experimente 10px, 15px) */
+    justify-content: center;
+    text-align: center;
+  }
+
+  .profile-v2-greeting {
+    margin-left: 0;
+    /* Remove a margem lateral */
+    width: 100%;
+    /* Ocupa toda a largura */
+  }
+
+  .profile-v2-name {
+    font-size: 1.5rem;
+  }
+
+  .profile-v2-info {
+    margin-bottom: 0px;
+  }
 }
 
 /* --- Modal de Resgate --- */
 #redeemModal .list-group-item {
-    cursor: pointer;
-    padding-top: 15px; /* Mais espaço vertical */
-    padding-bottom: 15px;
+  cursor: pointer;
+  padding-top: 15px;
+  /* Mais espaço vertical */
+  padding-bottom: 15px;
 }
 
 #redeemModal .list-group-item.selected {
-    background-color: #e9f5e9; /* Verde bem claro para seleção */
-    font-weight: normal; /* Remove negrito padrão que pode atrapalhar leitura */
-    border-left: 4px solid #488f58; /* Adiciona borda verde na seleção */
-    padding-left: calc(1.25rem - 4px); /* Ajusta padding esquerdo */
+  background-color: #e9f5e9;
+  /* Verde bem claro para seleção */
+  font-weight: normal;
+  /* Remove negrito padrão que pode atrapalhar leitura */
+  border-left: 4px solid #488f58;
+  /* Adiciona borda verde na seleção */
+  padding-left: calc(1.25rem - 4px);
+  /* Ajusta padding esquerdo */
 }
 
 #redeemModal .list-group-item.disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    background-color: #f8f9fa;
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f8f9fa;
 }
 
 /* Estilo para a imagem do item */
 .redeem-item-img {
-    width: 100px; /* Largura da imagem */
-    height: 100px; /* Altura da imagem */
-    object-fit: contain; /* Garante que a imagem caiba sem distorcer */
-    border-radius: 4px; /* Cantos levemente arredondados (opcional) */
-    background-color: #f8f9fa; /* Fundo leve caso a imagem tenha transparência */
+  width: 100px;
+  /* Largura da imagem */
+  height: 100px;
+  /* Altura da imagem */
+  object-fit: contain;
+  /* Garante que a imagem caiba sem distorcer */
+  border-radius: 4px;
+  /* Cantos levemente arredondados (opcional) */
+  background-color: #f8f9fa;
+  /* Fundo leve caso a imagem tenha transparência */
 }
 
 /* Estilo para os detalhes do item (texto) */
 .redeem-item-details {
-    font-size: 1rem;
-    color: #333;
+  font-size: 1rem;
+  color: #333;
 }
 
 /* Estilo para o Badge de Pontos (Verde) */
 .redeem-points-badge {
-    background-color: #488f58 !important; /* Seu verde médio, !important para sobrescrever Bootstrap */
-    color: white;
-    font-size: 0.8rem;
-    padding: 0.4em 0.7em;
-    min-width: 80px; /* Largura mínima para alinhamento */
-    text-align: center;
+  background-color: #488f58 !important;
+  /* Seu verde médio, !important para sobrescrever Bootstrap */
+  color: white;
+  font-size: 0.8rem;
+  padding: 0.4em 0.7em;
+  min-width: 80px;
+  /* Largura mínima para alinhamento */
+  text-align: center;
 }
 
 /* --- Estilos para o link da imagem no modal de resgate --- */
 .redeem-item-image-link {
-    position: relative;
-    display: block;
-    width: 50px;
-    height: 50px;
-    margin-right: 1rem;
-    border-radius: 4px;
-    overflow: hidden;
-    cursor: zoom-in; /* Mantém o cursor de lupa */
-    background-color: #f8f9fa; /* Fundo leve caso a imagem tenha transparência */
-    border: 1px solid #ddd; /* Borda sutil para o quadrado da imagem */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra leve */
+  position: relative;
+  display: block;
+  width: 50px;
+  height: 50px;
+  margin-right: 1rem;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: zoom-in;
+  /* Mantém o cursor de lupa */
+  background-color: #f8f9fa;
+  /* Fundo leve caso a imagem tenha transparência */
+  border: 1px solid #ddd;
+  /* Borda sutil para o quadrado da imagem */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  /* Sombra leve */
 }
 
 /* Ícone de setas de expansão no canto */
 .redeem-item-image-link::before {
-    content: "\f065"; /* <<< CÓDIGO DO ÍCONE fa-expand */
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900; /* Para ícones Solid */
-    position: absolute;
-    top: 3px;   /* Ajuste fino da posição */
-    left: 3px;  /* Ajuste fino da posição */
-    width: 11px;  /* Ajuste do tamanho do container do ícone */
-    height: 11px; /* Ajuste do tamanho do container do ícone */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.3); /* Fundo escuro semitransparente (padrão) */
-    color: #fefcf0;
-    font-size: 0.4rem; /* Tamanho do ícone das setas */
-    border-radius: 3px;
-    z-index: 15;
-    /* box-shadow: 0 1px 2px rgba(0,0,0,0.3); */ /* Sombra opcional */
-    transition: background-color 0.2s ease; /* Transição suave no hover */
+  content: "\f065";
+  /* <<< CÓDIGO DO ÍCONE fa-expand */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  /* Para ícones Solid */
+  position: absolute;
+  top: 3px;
+  /* Ajuste fino da posição */
+  left: 3px;
+  /* Ajuste fino da posição */
+  width: 11px;
+  /* Ajuste do tamanho do container do ícone */
+  height: 11px;
+  /* Ajuste do tamanho do container do ícone */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  /* Fundo escuro semitransparente (padrão) */
+  color: #fefcf0;
+  font-size: 0.4rem;
+  /* Tamanho do ícone das setas */
+  border-radius: 3px;
+  z-index: 15;
+  /* box-shadow: 0 1px 2px rgba(0,0,0,0.3); */
+  /* Sombra opcional */
+  transition: background-color 0.2s ease;
+  /* Transição suave no hover */
 }
 
 /* Opcional: Mudar a cor do fundo do ícone no hover */
 .redeem-item-image-link:hover::before {
-     background-color: rgba(72, 143, 88, 0.8); /* Fica verde no hover */
+  background-color: rgba(72, 143, 88, 0.8);
+  /* Fica verde no hover */
 }
 
 /* Garante que a imagem dentro do link ocupe todo o espaço */
 .redeem-item-image-link .redeem-item-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: transform 0.2s ease; /* Efeito de zoom suave no hover */
-    padding: 3px; /* Pequeno padding para não ficar colado na borda/ícone */
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+  /* Efeito de zoom suave no hover */
+  padding: 3px;
+  /* Pequeno padding para não ficar colado na borda/ícone */
 }
 
 /* Pequeno efeito ao passar o mouse sobre o link */
 .redeem-item-image-link:hover .redeem-item-img {
-    transform: scale(1.05); /* Pequeno zoom na imagem no hover */
+  transform: scale(1.05);
+  /* Pequeno zoom na imagem no hover */
 }
 
 /* ==========================================================================
@@ -2051,14 +2193,18 @@ footer {
 
 /* Seleciona o botão submit DENTRO do formulário #registerMaterialForm na seção .register-material-section */
 .register-material-section #registerMaterialForm button[type="submit"] {
-  background-color: #488f58; /* Sua cor laranja principal */
-  border-color: #488f58;     /* Cor da borda igual */
-  color: #fefcf0;           /* Cor do texto (bege claro) */
+  background-color: #488f58;
+  /* Sua cor laranja principal */
+  border-color: #488f58;
+  /* Cor da borda igual */
+  color: #fefcf0;
+  /* Cor do texto (bege claro) */
 }
 
 /* Efeito hover (opcional, mas recomendado para consistência) */
 .register-material-section #registerMaterialForm button[type="submit"]:hover {
-  background-color: #3a7547; /* Sua cor laranja mais escura (do :hover de .btn-custom) */
+  background-color: #3a7547;
+  /* Sua cor laranja mais escura (do :hover de .btn-custom) */
   border-color: #3a7547;
   color: #fefcf0;
 }
@@ -2069,13 +2215,17 @@ footer {
 
 /* Seleciona o botão DENTRO da seção .points-section que abre o modal #redeemModal */
 .points-section button[data-bs-target="#redeemModal"] {
-  background-color: #488f58; /* Sua cor laranja principal */
-  border-color: #488f58;     /* Cor da borda igual */
-  color: #fefcf0;           /* Cor do texto (bege claro) */
+  background-color: #488f58;
+  /* Sua cor laranja principal */
+  border-color: #488f58;
+  /* Cor da borda igual */
+  color: #fefcf0;
+  /* Cor do texto (bege claro) */
   /* Remove o estilo padrão 'success' do Bootstrap */
   --bs-btn-bg: #488f58;
   --bs-btn-border-color: #488f58;
-  --bs-btn-hover-bg: #3a7547;         /* Laranja escuro no hover */
+  --bs-btn-hover-bg: #3a7547;
+  /* Laranja escuro no hover */
   --bs-btn-hover-border-color: #3a7547;
   --bs-btn-active-bg: #3a7547;
   --bs-btn-active-border-color: #3a7547;
@@ -2085,7 +2235,8 @@ footer {
 
 /* Efeito hover explícito (reforço) */
 .points-section button[data-bs-target="#redeemModal"]:hover {
-  background-color: #3a7547; /* Sua cor laranja mais escura */
+  background-color: #3a7547;
+  /* Sua cor laranja mais escura */
   border-color: #3a7547;
   color: #fefcf0;
 }
@@ -2096,13 +2247,17 @@ footer {
 
 /* Seleciona o botão submit DENTRO do formulário #collectionPointSearchForm na seção .collection-points-section */
 .collection-points-section #collectionPointSearchForm button[type="submit"] {
-  background-color: #488f58; /* Sua cor laranja principal */
-  border-color: #488f58;     /* Cor da borda igual */
-  color: #fefcf0;           /* Cor do texto (bege claro) */
+  background-color: #488f58;
+  /* Sua cor laranja principal */
+  border-color: #488f58;
+  /* Cor da borda igual */
+  color: #fefcf0;
+  /* Cor do texto (bege claro) */
   /* Sobrescreve variáveis do btn-secondary (ou qualquer outra classe base) */
   --bs-btn-bg: #488f58;
   --bs-btn-border-color: #488f58;
-  --bs-btn-hover-bg: #3a7547;         /* Laranja escuro no hover */
+  --bs-btn-hover-bg: #3a7547;
+  /* Laranja escuro no hover */
   --bs-btn-hover-border-color: #3a7547;
   --bs-btn-active-bg: #3a7547;
   --bs-btn-active-border-color: #3a7547;
@@ -2112,7 +2267,257 @@ footer {
 
 /* Efeito hover explícito (reforço) */
 .collection-points-section #collectionPointSearchForm button[type="submit"]:hover {
-  background-color: #3a7547; /* Sua cor laranja mais escura */
+  background-color: #3a7547;
+  /* Sua cor laranja mais escura */
   border-color: #3a7547;
   color: #fefcf0;
 }
+
+/* ==========================================================================
+   AJUSTE DE ESPAÇAMENTO ENTRE SEÇÕES (MOBILE) - PÁGINA USUÁRIO
+   ========================================================================== */
+
+@media (max-width: 767.98px) {
+
+  /* Reduz a margem inferior APENAS das seções .dashboard-section (exclui o perfil) */
+  .user-dashboard .dashboard-section {
+    margin-bottom: 1.5rem;
+    /* <<< Define o espaço para as seções comuns no mobile */
+  }
+
+  /* Remove a margem da ÚLTIMA .dashboard-section em cada coluna (não afeta o perfil) */
+  .user-dashboard>.row>div>.dashboard-section:last-child {
+    margin-bottom: 0;
+  }
+
+  /* A seção .user-profile-v2 usará a margem definida pela classe mb-4 no HTML */
+}
+
+/* --- Ajustes de Espaçamento entre Seções (Desktop) --- */
+@media (min-width: 992px) {
+  /* Ou o ponto de quebra que define seu layout desktop */
+
+  /* Garante espaçamento consistente abaixo das seções no desktop */
+  .user-dashboard .dashboard-section {
+    margin-bottom: 1.5rem;
+    /* <<< IGUALA ao mb-4 do perfil (Ajuste se desejar outro valor) */
+  }
+
+  /* Remove a margem da ÚLTIMA .dashboard-section em cada coluna (não afeta o perfil) */
+  .user-dashboard>.row>div>.dashboard-section:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Regras que já tínhamos para o gráfico no desktop */
+  .history-graph-container {
+    padding-left: 5px;
+    height: 400px;
+    /* margin-bottom: 0; */
+    /* Removemos margem daqui */
+  }
+
+  #disposalHistoryChart {
+    margin-bottom: 15px;
+  }
+
+  /* Regra .history-section { margin-bottom... } deve ser removida */
+
+}
+
+/* Fim da media query desktop */
+
+/* ==========================================================================
+   ESTILOS DA PÁGINA DO USUÁRIO - ORIENTAÇÕES V2 (CARDS)
+   ========================================================================== */
+
+.guidelines-section-v2 h2 {
+  margin-bottom: 1.5rem;
+  /* Mais espaço abaixo do título principal */
+}
+
+.guidelines-card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  /* Espaço entre os cards */
+}
+
+.guideline-card {
+  background-color: #f8f9fa;
+  /* Fundo cinza bem claro */
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+  /* Importante para a animação */
+  transition: box-shadow 0.3s ease;
+}
+
+.guideline-card:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  /* Sombra sutil no hover */
+}
+
+.guideline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  background-color: #fff;
+  /* Fundo branco para o header */
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+.guideline-card.active .guideline-header {
+  background-color: #e9f5e9;
+  /* Fundo verde claro quando ativo */
+}
+
+.guideline-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.guideline-icon {
+  font-size: 1.3rem;
+  color: #488f58;
+  /* Verde do site */
+  width: 25px;
+  /* Largura fixa para alinhar títulos */
+  text-align: center;
+}
+
+.guideline-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  position: relative;
+  /* Permite mover o elemento */
+  top: 9px;
+}
+
+.guideline-arrow {
+  font-size: 0.9rem;
+  color: #6c757d;
+  transition: transform 0.3s ease;
+}
+
+/* Gira a seta quando o card está ativo/aberto */
+.guideline-card.active .guideline-arrow {
+  transform: rotate(180deg);
+}
+
+.guideline-body {
+  max-height: 0;
+  /* Começa escondido */
+  overflow: hidden;
+  transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+  /* Animação suave */
+  padding: 0 1.25rem;
+  /* Padding horizontal */
+  background-color: #fff;
+  /* Fundo branco para o corpo */
+}
+
+.guideline-body p {
+  margin: 0;
+  padding: 1rem 0;
+  /* Padding vertical interno do texto */
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* Estilo quando o corpo está visível */
+.guideline-card.active .guideline-body {
+  max-height: 200px;
+  /* Altura máxima (ajuste se o texto for maior) */
+  padding: 0 1.25rem;
+  /* Garante padding horizontal */
+  transition: max-height 0.4s ease-in, padding 0.4s ease-in;
+}
+
+/* ==========================================================================
+   REORDENAMENTO DAS SEÇÕES DO USUÁRIO NO MOBILE (VERSÃO CORRIGIDA)
+   ========================================================================== */
+
+/* Aplica-se em telas menores que o breakpoint 'lg' (desktop) */
+@media (max-width: 991.98px) {
+
+    /* --- Reordenação do Dashboard --- */
+
+    /* 1. Faz a 'row' principal se comportar como uma coluna flexível */
+    .user-dashboard .row.g-4 {
+        display: flex;
+        flex-direction: column;
+        /* Remove o gap da row, pois vamos controlar manualmente */
+        --bs-gutter-y: 0; 
+        gap: 0;
+    }
+
+    /* 2. "Desembrulha" TODAS as colunas e rows aninhadas */
+    .user-dashboard .row.g-4 > .col-lg-8,
+    .user-dashboard .row.g-4 > .col-lg-4,
+    .user-dashboard .row.g-4 > .col-lg-8 > .row,
+    .user-dashboard .row.g-4 > .col-lg-8 > .row > .col-lg-6 {
+        display: contents;
+    }
+
+    /* 3. ADICIONA O ESPAÇAMENTO DE VOLTA (CORRIGIDO) */
+    /* Este seletor aplica a margem a TODAS as seções filhas */
+    .user-dashboard .user-profile-v2,
+    .user-dashboard .dashboard-section {
+        margin-bottom: 1.5rem; /* Aplica o gap (g-4 = 1.5rem) */
+    }
+    
+    /* 4. Aplica a ordem desejada */
+    
+    /* Ordem 1: Meu Perfil */
+    .user-dashboard .user-profile-v2 {
+        order: 1;
+    }
+    /* Ordem 2: Meus Pontos */
+    .user-dashboard .points-section {
+        order: 2;
+    }
+    /* Ordem 3: Histórico de Descarte */
+    .user-dashboard .history-section {
+        order: 3;
+    }
+    /* Ordem 4: Cadastrar Material */
+    .user-dashboard .register-material-section {
+        order: 4;
+    }
+    /* Ordem 5: Encontrar Pontos */
+    .user-dashboard .collection-points-section {
+        order: 5;
+    }
+    /* Ordem 6: Orientações */
+    .user-dashboard .guidelines-section-v2 {
+        order: 6;
+    }
+    /* Ordem 7: Campanhas (será o último item) */
+    .user-dashboard .active-campaigns-section {
+        order: 7;
+        margin-bottom: 0; /* REMOVE a margem do último item */
+    }
+
+    /* --- Outras regras mobile que você já tinha --- */
+    .btn-custom.btn-auth {
+        padding: 10px 10px;
+    }
+
+    .ranking-container {
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .ranking-content-wrapper {
+        text-align: left;
+        margin-top: 0;
+    }
+}
+

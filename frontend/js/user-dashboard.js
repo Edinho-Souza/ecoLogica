@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     };
 
-    // --- Lógica para inicializar o gráfico (ESTILO LINHA COM ÁREA) ---
+        // --- Lógica para inicializar o gráfico (ESTILO LINHA COM ÁREA) ---
     const initChart = () => {
         console.log("Função initChart chamada...");
         const ctx = document.getElementById('disposalHistoryChart');
@@ -279,6 +279,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- FIM DA LÓGICA DO LIGHTBOX ---
+
+    // --- Lógica para os Cards de Orientações ---
+    const guidelineHeaders = document.querySelectorAll('.guideline-header');
+
+    guidelineHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            const card = header.closest('.guideline-card');
+            const body = header.nextElementSibling; // Pega o .guideline-body
+
+            if (!card || !body) return; // Segurança
+
+            // Fecha todos os outros cards antes de abrir o clicado
+            guidelineHeaders.forEach(otherHeader => {
+                const otherCard = otherHeader.closest('.guideline-card');
+                if (otherCard !== card && otherCard.classList.contains('active')) {
+                    otherCard.classList.remove('active');
+                    otherHeader.nextElementSibling.style.maxHeight = null; // Reseta max-height
+                     // Ajusta padding ao fechar (opcional, para mais suavidade)
+                    // otherHeader.nextElementSibling.style.paddingTop = '0';
+                    // otherHeader.nextElementSibling.style.paddingBottom = '0';
+                }
+            });
+
+            // Abre ou fecha o card clicado
+            card.classList.toggle('active');
+
+            // Ajusta o max-height para animar
+            if (card.classList.contains('active')) {
+                 // Define max-height igual à altura real do conteúdo para animação correta
+                 // body.style.maxHeight = body.scrollHeight + "px";
+                 // OU usar um valor fixo seguro (mais simples)
+                 body.style.maxHeight = '200px'; // Ajuste se necessário
+                 // Ajusta padding ao abrir (opcional)
+                 // body.style.paddingTop = '1rem';
+                 // body.style.paddingBottom = '1rem';
+            } else {
+                body.style.maxHeight = null; // Remove max-height para fechar
+                 // Ajusta padding ao fechar (opcional)
+                 // body.style.paddingTop = '0';
+                 // body.style.paddingBottom = '0';
+            }
+        });
+
+         // Adiciona acessibilidade para teclado (Enter ou Espaço)
+         header.addEventListener('keydown', (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault(); // Evita rolagem da página com espaço
+                  header.click(); // Simula o clique
+              }
+         });
+    });
+    // --- FIM DA LÓGICA DOS CARDS ---
 
 
 
