@@ -1668,17 +1668,14 @@ footer {
 }
 
 /* --- Seção Histórico --- */
-/* --- Seção Histórico --- */
 .history-graph-container {
-   margin-left: auto; /* <<< ADICIONE: Centraliza o container */
-    margin-right: auto; /* <<< ADICIONE: Centraliza o container */
-   
-    border: 0px solid #eee; /* ADICIONADO: Borda sutil */
-    border-radius: 6px; /* ADICIONADO: Cantos arredondados */
-    padding: 15px; /* ADICIONADO: Espaço interno ao redor do gráfico */
-    margin-top: 20px; /* Aumenta um pouco o espaço acima */
-    position: relative; /* Necessário para o Chart.js ajustar o tamanho corretamente */
-/*     min-height: 250px; /* Define uma altura mínima para evitar que fique muito baixo */
+    max-width: 100%;
+    padding-top: 15px;   
+    padding-left: 15px;  
+    padding-right: 15px;  
+    padding-bottom: 30px; /* <<< AUMENTADO padding inferior (Experimente 25px, 30px, 35px) */
+    margin-top: 20px;
+    position: relative;
 }
 
 /* Garante que o canvas ocupe o espaço do container */
@@ -1695,16 +1692,47 @@ footer {
         /* Reduz o padding esquerdo do container para compensar o -10px do gráfico */
         padding-left: 0px; 
         padding-right: 0px;
-        height: 350px;      
+        height: 400px;      
     }
 
     #disposalHistoryChart {
         margin-bottom: 10px; /* Experimente valores como 10px, 15px, 20px */
 }
-.history-section .history-graph-container p.text-muted {
-        margin-bottom: 85px; /* Experimente 20px, 25px, 30px */
+}
+
+/* Ajuste de ALTURA e Layout do container APENAS para mobile */
+@media (max-width: 767.98px) {
+    .history-graph-container {
+        /* height: auto; */ /* Remove qualquer altura fixa */
+        min-height: 300px; /* Garante uma altura mínima */
+        padding: 10px; /* Padding geral menor para mobile */
+        /* Garante que o container se comporte como esperado */
+        display: flex; /* Usar flexbox para controlar o conteúdo interno */
+        flex-direction: column; /* Empilhar canvas e parágrafo */
+        justify-content: space-between; /* Tenta espaçar verticalmente */
     }
 
+    /* Garante que o canvas ocupe o espaço disponível, mas não mais que o necessário */
+    #disposalHistoryChart {
+       flex-grow: 1; /* Permite que o canvas cresça para preencher espaço */
+       display: block;
+       width: 100% !important;
+       /* height: auto !important; */ /* Deixa o aspect ratio controlar */
+       min-height: 200px; /* Altura mínima para o gráfico em si */
+       margin-bottom: 10px; /* Espaço entre o gráfico e o texto abaixo */
+    }
+
+    /* Ajusta o parágrafo descritivo do gráfico no mobile */
+    .history-graph-container p.text-muted {
+        font-size: 0.8rem;
+        margin-top: auto; /* Tenta empurrar para baixo se houver espaço extra */
+        margin-bottom: 0; /* Remove margem inferior padrão */
+        line-height: 1.3;
+        text-align: center;
+        width: 100%; /* Garante que ocupe a largura */
+        box-sizing: border-box;
+        padding: 0 5px; /* Pequeno padding lateral para segurança */
+    }
 }
 
 /* Ajuste de ALTURA do container APENAS para mobile */
@@ -1910,22 +1938,30 @@ footer {
 
 /* --- Responsividade Perfil V2 --- */
 @media (max-width: 576px) {
-    .profile-v2-header {
-        padding: 20px;
-        padding-bottom: 45px; /* Ajusta o espaço para o avatar menor */
-        flex-direction: column; /* Empilha no mobile */
+  .profile-v2-header {
+        padding: 25px;
+        padding-bottom: 22px; /* <<< REDUZIDO (Experimente 15px, 20px) */
+        flex-direction: column;
         align-items: flex-start;
-        text-align: center; /* Centraliza o texto */
+        text-align: center;
     }
-    .profile-v2-avatar {
-        position: relative; /* Volta ao fluxo normal */
+    /* ... (regra do avatar - pode manter a margin-bottom dela) ... */
+     .profile-v2-avatar {
+        position: relative;
         width: 80px;
         height: 80px;
         bottom: auto;
         left: auto;
-        margin: 0 auto 15px auto; /* Centraliza e adiciona espaço abaixo */
+        margin: 0px auto 15px auto; /* Mantém espaço abaixo do avatar */
         border-width: 3px;
     }
+    .profile-v2-content {
+        padding: 20px;
+        padding-top: 20px; /* <<< REDUZIDO (Experimente 10px, 15px) */
+        justify-content: center;
+        text-align: center;
+    }
+    
     .profile-v2-greeting {
         margin-left: 0; /* Remove a margem lateral */
         width: 100%; /* Ocupa toda a largura */
@@ -1933,14 +1969,9 @@ footer {
     .profile-v2-name {
         font-size: 1.5rem;
     }
-    .profile-v2-content {
-        padding: 20px;
-        padding-top: 25px; /* Menos padding superior no mobile */
-        justify-content: center; /* Centraliza itens no mobile */
-        text-align: center;
-    }
+
     .profile-v2-info {
-        margin-bottom: 10px;
+        margin-bottom: 0px;
     }
 }
 
@@ -2115,4 +2146,145 @@ footer {
   background-color: #3a7547; /* Sua cor laranja mais escura */
   border-color: #3a7547;
   color: #fefcf0;
+}
+
+/* ==========================================================================
+   AJUSTE DE ESPAÇAMENTO ENTRE SEÇÕES (MOBILE) - PÁGINA USUÁRIO
+   ========================================================================== */
+
+@media (max-width: 767.98px) {
+
+  /* Reduz a margem inferior APENAS das seções .dashboard-section (exclui o perfil) */
+  .user-dashboard .dashboard-section {
+    margin-bottom: 1.5rem; /* <<< Define o espaço para as seções comuns no mobile */
+  }
+
+  /* Remove a margem da ÚLTIMA .dashboard-section em cada coluna (não afeta o perfil) */
+  .user-dashboard > .row > div > .dashboard-section:last-child {
+      margin-bottom: 0;
+  }
+
+  /* A seção .user-profile-v2 usará a margem definida pela classe mb-4 no HTML */
+}
+
+/* --- Ajustes de Espaçamento entre Seções (Desktop) --- */
+@media (min-width: 992px) { /* Ou o ponto de quebra que define seu layout desktop */
+
+    /* Garante espaçamento consistente abaixo das seções no desktop */
+    .user-dashboard .dashboard-section {
+        margin-bottom: 1.5rem; /* <<< IGUALA ao mb-4 do perfil (Ajuste se desejar outro valor) */
+    }
+
+    /* Remove a margem da ÚLTIMA .dashboard-section em cada coluna (não afeta o perfil) */
+    .user-dashboard > .row > div > .dashboard-section:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Regras que já tínhamos para o gráfico no desktop */
+    .history-graph-container {
+        padding-left: 5px;
+        height: 400px;
+        /* margin-bottom: 0; */ /* Removemos margem daqui */
+    }
+    #disposalHistoryChart {
+        margin-bottom: 15px;
+    }
+    /* Regra .history-section { margin-bottom... } deve ser removida */
+
+} /* Fim da media query desktop */
+
+/* ==========================================================================
+   ESTILOS DA PÁGINA DO USUÁRIO - ORIENTAÇÕES V2 (CARDS)
+   ========================================================================== */
+
+.guidelines-section-v2 h2 {
+    margin-bottom: 1.5rem; /* Mais espaço abaixo do título principal */
+}
+
+.guidelines-card-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Espaço entre os cards */
+}
+
+.guideline-card {
+    background-color: #f8f9fa; /* Fundo cinza bem claro */
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    overflow: hidden; /* Importante para a animação */
+    transition: box-shadow 0.3s ease;
+}
+
+.guideline-card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Sombra sutil no hover */
+}
+
+.guideline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    background-color: #fff; /* Fundo branco para o header */
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s ease;
+}
+.guideline-card.active .guideline-header {
+     background-color: #e9f5e9; /* Fundo verde claro quando ativo */
+}
+
+.guideline-icon-title {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.guideline-icon {
+    font-size: 1.3rem;
+    color: #488f58; /* Verde do site */
+    width: 25px; /* Largura fixa para alinhar títulos */
+    text-align: center;
+}
+
+.guideline-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    position: relative; /* Permite mover o elemento */
+    top: 9px;
+}
+
+.guideline-arrow {
+    font-size: 0.9rem;
+    color: #6c757d;
+    transition: transform 0.3s ease;
+}
+
+/* Gira a seta quando o card está ativo/aberto */
+.guideline-card.active .guideline-arrow {
+    transform: rotate(180deg);
+}
+
+.guideline-body {
+    max-height: 0; /* Começa escondido */
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.4s ease-out; /* Animação suave */
+    padding: 0 1.25rem; /* Padding horizontal */
+    background-color: #fff; /* Fundo branco para o corpo */
+}
+
+.guideline-body p {
+   margin: 0;
+   padding: 1rem 0; /* Padding vertical interno do texto */
+   font-size: 0.95rem;
+   line-height: 1.6;
+   color: #555;
+}
+
+/* Estilo quando o corpo está visível */
+.guideline-card.active .guideline-body {
+    max-height: 200px; /* Altura máxima (ajuste se o texto for maior) */
+    padding: 0 1.25rem; /* Garante padding horizontal */
+    transition: max-height 0.4s ease-in, padding 0.4s ease-in;
 }
