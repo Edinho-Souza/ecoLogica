@@ -2466,11 +2466,14 @@ footer {
         display: contents;
     }
 
-    /* 3. ADICIONA O ESPAÇAMENTO DE VOLTA (CORRIGIDO) */
-    /* Este seletor aplica a margem a TODAS as seções filhas */
+    /* 3. FORÇA O ESPAÇAMENTO */
     .user-dashboard .user-profile-v2,
-    .user-dashboard .dashboard-section {
-        margin-bottom: 1.5rem; /* Aplica o gap (g-4 = 1.5rem) */
+    .user-dashboard .points-section,
+    .user-dashboard .history-section,
+    .user-dashboard .register-material-section,
+    .user-dashboard .collection-points-section,
+    .user-dashboard .guidelines-section-v2 {
+        margin-bottom: 1.5rem !important; /* Força a margem */
     }
     
     /* 4. Aplica a ordem desejada */
