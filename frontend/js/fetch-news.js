@@ -1,142 +1,176 @@
+/**
+ * @file fetch-news.js
+ * Busca, processa e exibe feeds RSS na página de notícias.
+ * Utiliza rss2json.com como proxy para evitar problemas de CORS.
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Pega o container onde as notícias serão inseridas e a mensagem de loading
+
+    // --- Elementos DOM Principais ---
     const feedContainer = document.getElementById('rss-feed-container');
     const loadingMessage = document.getElementById('loading-message');
 
-    // ==========================================================
-    //   CONFIGURAÇÃO DOS FEEDS RSS (CURADOS)
-    // ==========================================================
-    // Lista de URLs dos feeds RSS que você quer exibir
-    // IMPORTANTE: Use o serviço rss2json para converter para JSON e evitar CORS
-    // Fontes selecionadas: G1 Natureza, CicloVivo e ((o))eco
-    const rssFeeds = [
-        'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fg1.globo.com%2Fnatureza%2Frss.xml',           // G1 Natureza
-        'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fciclovivo.com.br%2Ffeed%2F',                // CicloVivo (Sustentabilidade)
-        'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Foeco.org.br%2Ffeed%2F'                     // ((o))eco (Jornalismo Ambiental)
-        // Você pode adicionar mais feeds aqui se encontrar outras boas fontes
+    // --- Configuração ---
+    const RSS_FEEDS_URLS = [
+        'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fg1.globo.com%2Fnatureza%2Frss.xml',       // G1 Natureza
+        'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fciclovivo.com.br%2Ffeed%2F',            // CicloVivo (Sustentabilidade)
+        'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Foeco.org.br%2Ffeed%2F'                 // ((o))eco (Jornalismo Ambiental)
+        // Adicione mais URLs de feeds aqui
     ];
+    const NUMBER_OF_ITEMS_TO_SHOW = 15; // Quantidade de notícias a exibir
+    const DESCRIPTION_MAX_LENGTH = 250;  // Limite de caracteres para a descrição
 
-    // ==========================================================
-    //   FUNÇÃO PARA BUSCAR E EXIBIR AS NOTÍCIAS
-    // ==========================================================
-    const fetchAndDisplayFeeds = async () => {
-        if (!feedContainer || !loadingMessage) {
-            console.error("Elemento container ou mensagem de loading não encontrado em noticias.html!");
-            return;
+    // ===================================================================
+    // FUNÇÕES AUXILIARES (Helpers)
+    // ===================================================================
+
+    /**
+     * Limpa o texto de descrição (remove tags HTML e limita o tamanho).
+     * @param {string} descriptionHtml - O texto HTML vindo do feed.
+     * @returns {string} - O texto limpo e truncado.
+     */
+    const sanitizeDescription = (descriptionHtml) => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = descriptionHtml || '';
+        let descriptionText = tempDiv.textContent || tempDiv.innerText || '';
+        
+        if (descriptionText.length > DESCRIPTION_MAX_LENGTH) {
+            descriptionText = descriptionText.substring(0, DESCRIPTION_MAX_LENGTH) + '...';
+        }
+        return descriptionText;
+    };
+
+    /**
+     * Formata a data e a fonte para exibição.
+     * @param {string} pubDate - A string de data do item.
+     * @param {string} [author=''] - O autor ou fonte do item.
+     * @returns {string} - A string de metadados formatada (ex: "Publicado em: 24/10/2025 | Fonte: G1")
+     */
+    const formatMetaData = (pubDate, author = '') => {
+        let metaText = 'Data indisponível';
+        try {
+            const date = new Date(pubDate);
+            if (!isNaN(date)) {
+                metaText = `Publicado em: ${date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+            }
+        } catch (e) {
+            console.warn("Não foi possível formatar a data:", pubDate, e);
         }
 
+        if (author) {
+            metaText += ` | Fonte: ${author}`;
+        }
+        return metaText;
+    };
+
+    /**
+     * Cria e retorna um elemento <article> completo para um item de notícia.
+     * @param {object} item - O objeto do item de notícia (título, link, pubDate, etc.)
+     * @param {string} [sourceTitle=''] - O título da fonte do feed.
+     * @returns {HTMLElement} - O elemento <article> pronto para ser inserido no DOM.
+     */
+    const createRssItemElement = (item, sourceTitle = '') => {
+        const article = document.createElement('article');
+        article.classList.add('rss-item');
+
+        // Título com link
+        const title = document.createElement('h2');
+        title.classList.add('rss-item-title');
+        const titleLink = document.createElement('a');
+        titleLink.href = item.link;
+        titleLink.target = '_blank';
+        titleLink.rel = 'noopener noreferrer';
+        titleLink.textContent = item.title || 'Título indisponível';
+        title.appendChild(titleLink);
+
+        // Metadados (Data e Fonte)
+        const author = item.author || item.creator || sourceTitle;
+        const meta = document.createElement('p');
+        meta.classList.add('rss-item-meta');
+        meta.textContent = formatMetaData(item.pubDate, author);
+
+        // Descrição
+        const descriptionText = sanitizeDescription(item.description || item.content);
+        const description = document.createElement('p');
+        description.classList.add('rss-item-description');
+        description.textContent = descriptionText;
+
+        // Link "Leia mais"
+        const readMore = document.createElement('a');
+        readMore.classList.add('rss-item-readmore');
+        readMore.href = item.link;
+        readMore.target = '_blank';
+        readMore.rel = 'noopener noreferrer';
+        readMore.textContent = 'Leia mais →';
+
+        // Monta o artigo
+        article.appendChild(title);
+        article.appendChild(meta);
+        if (descriptionText.trim()) { // Só adiciona descrição se ela existir
+            article.appendChild(description);
+        }
+        article.appendChild(readMore);
+
+        return article;
+    };
+
+    // ===================================================================
+    // FUNÇÃO PRINCIPAL (Fetch e Renderização)
+    // ===================================================================
+
+    /**
+     * Busca todos os feeds RSS, processa os dados e os exibe no container.
+     */
+    const fetchAndDisplayFeeds = async () => {
         let allItems = []; // Array para guardar todos os itens de todos os feeds
+        loadingMessage.style.display = 'block'; // Mostra "Carregando..."
 
         try {
-            // Mostra a mensagem de carregamento
-            loadingMessage.style.display = 'block';
-
-            // Busca os dados de todos os feeds em paralelo
-            const responses = await Promise.all(rssFeeds.map(url => fetch(url)));
+            // 1. Buscar todos os feeds em paralelo
+            const responses = await Promise.all(RSS_FEEDS_URLS.map(url => fetch(url)));
             const feedData = await Promise.all(responses.map(res => {
                 if (!res.ok) {
                     console.error(`Erro ao buscar feed: ${res.url}, Status: ${res.status}`);
-                    return { items: [] }; // Retorna vazio se houver erro
+                    return { status: 'error', items: [] }; // Retorna objeto de erro
                 }
                 return res.json();
             }));
 
-            // Junta os itens de todos os feeds em um único array
+            // 2. Processar e juntar os itens
             feedData.forEach(feed => {
-                // Verifica se o status da resposta do rss2json foi 'ok'
                 if (feed.status === 'ok' && feed.items) {
+                    // Adiciona o título da fonte a cada item para referência
+                    feed.items.forEach(item => item.sourceTitle = feed.feed?.title || ''); 
                     allItems = allItems.concat(feed.items);
                 } else {
                     console.warn(`Feed ${feed.feed?.url || 'desconhecido'} retornou status: ${feed.status}. Itens não adicionados.`);
                 }
             });
 
-            // Ordena todos os itens pela data de publicação (do mais novo para o mais antigo)
-            // Tratamento para datas inválidas
+            // 3. Ordenar todos os itens por data
             allItems.sort((a, b) => {
                 const dateA = new Date(a.pubDate);
                 const dateB = new Date(b.pubDate);
-                // Coloca itens com data inválida no final
                 if (isNaN(dateA)) return 1;
                 if (isNaN(dateB)) return -1;
-                return dateB - dateA;
-             });
+                return dateB - dateA; // Mais novo primeiro
+            });
 
-            // Limpa a mensagem de "Carregando..."
+            // 4. Esconder loading e limpar container
             loadingMessage.style.display = 'none';
+            feedContainer.innerHTML = ''; // Limpa o container
 
-            // Limita o número de notícias a serem exibidas (opcional)
-            const numberOfItemsToShow = 15; // Aumentei um pouco para ter mais conteúdo
-            const itemsToShow = allItems.slice(0, numberOfItemsToShow);
+            // 5. Pegar o número limitado de itens para exibir
+            const itemsToShow = allItems.slice(0, NUMBER_OF_ITEMS_TO_SHOW);
 
-
-            // Cria o HTML para cada item de notícia e insere no container
+            // 6. Renderizar os itens no DOM
             if (itemsToShow.length > 0) {
-                feedContainer.innerHTML = ''; // Limpa o container antes de adicionar novos itens
                 itemsToShow.forEach((item, index) => {
-                    const article = document.createElement('article');
-                    article.classList.add('rss-item');
+                    // Cria o elemento <article>
+                    const articleElement = createRssItemElement(item, item.sourceTitle);
+                    feedContainer.appendChild(articleElement);
 
-                    // Título com link
-                    const title = document.createElement('h2');
-                    title.classList.add('rss-item-title');
-                    const titleLink = document.createElement('a');
-                    titleLink.href = item.link;
-                    titleLink.target = '_blank'; // Abrir em nova aba
-                    titleLink.rel = 'noopener noreferrer'; // Boa prática de segurança
-                    titleLink.textContent = item.title || 'Título indisponível';
-                    title.appendChild(titleLink);
-
-                    // Data de publicação (formatada) e Autor/Fonte (se disponível)
-                    const meta = document.createElement('p');
-                    meta.classList.add('rss-item-meta');
-                    let metaText = 'Data indisponível';
-                    try {
-                        const pubDate = new Date(item.pubDate);
-                        if (!isNaN(pubDate)) {
-                            metaText = `Publicado em: ${pubDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
-                        }
-                    } catch (e) { /* Ignora erro de data inválida */ }
-
-                    // Tenta adicionar o autor ou o nome do feed como fonte
-                    const author = item.author || item.creator || feedData.find(f => f.items?.includes(item))?.feed?.title;
-                    if(author) {
-                        metaText += ` | Fonte: ${author}`;
-                    }
-                    meta.textContent = metaText;
-
-                    // Descrição (limpa e limitada)
-                    const description = document.createElement('p');
-                    description.classList.add('rss-item-description');
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = item.description || item.content || '';
-                    let descriptionText = tempDiv.textContent || tempDiv.innerText || '';
-                    if (descriptionText.length > 250) { // Aumentei um pouco o limite
-                       descriptionText = descriptionText.substring(0, 250) + '...';
-                    }
-                    description.textContent = descriptionText;
-
-
-                    // Link "Leia mais"
-                    const readMore = document.createElement('a');
-                    readMore.classList.add('rss-item-readmore');
-                    readMore.href = item.link;
-                    readMore.target = '_blank';
-                    readMore.rel = 'noopener noreferrer';
-                    readMore.textContent = 'Leia mais →';
-
-                    // Monta o artigo
-                    article.appendChild(title);
-                    article.appendChild(meta);
-                    if (descriptionText.trim()) {
-                      article.appendChild(description);
-                    }
-                    article.appendChild(readMore);
-
-                    // Adiciona o artigo ao container
-                    feedContainer.appendChild(article);
-
-                    // Adiciona a linha divisória depois de cada artigo (exceto o último)
+                    // Adiciona a linha divisória (exceto após o último item)
                     if (index < itemsToShow.length - 1) {
                         const divider = document.createElement('hr');
                         divider.classList.add('rss-item-divider');
@@ -148,14 +182,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
         } catch (error) {
+            // Tratamento de erro geral (ex: falha de rede)
             console.error("Erro ao processar feeds RSS:", error);
             loadingMessage.style.display = 'none';
             feedContainer.innerHTML = '<p>Ocorreu um erro ao carregar as notícias. Verifique o console para mais detalhes.</p>';
         }
     };
 
-    // Chama a função para buscar e exibir os feeds quando a página carregar
-    // Apenas executa se estivermos na página de notícias (verificando a existência do container)
+    // ===================================================================
+    // INICIALIZAÇÃO
+    // ===================================================================
+
+    // Só executa se estivermos na página de notícias
     if (feedContainer) {
         fetchAndDisplayFeeds();
     }
