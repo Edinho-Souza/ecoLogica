@@ -2466,11 +2466,14 @@ footer {
         display: contents;
     }
 
-    /* 3. ADICIONA O ESPAÇAMENTO DE VOLTA (CORRIGIDO) */
-    /* Este seletor aplica a margem a TODAS as seções filhas */
+    /* 3. FORÇA O ESPAÇAMENTO */
     .user-dashboard .user-profile-v2,
-    .user-dashboard .dashboard-section {
-        margin-bottom: 1.5rem; /* Aplica o gap (g-4 = 1.5rem) */
+    .user-dashboard .points-section,
+    .user-dashboard .history-section,
+    .user-dashboard .register-material-section,
+    .user-dashboard .collection-points-section,
+    .user-dashboard .guidelines-section-v2 {
+        margin-bottom: 1.5rem !important; /* Força a margem */
     }
     
     /* 4. Aplica a ordem desejada */
@@ -2521,3 +2524,135 @@ footer {
     }
 }
 
+/* ==========================================================================
+   ESTILOS DO MODAL DE EDITAR PERFIL
+   ========================================================================== */
+
+/* 1. Muda o botão "Editar Perfil" na página para verde */
+.profile-v2-edit-btn {
+  background-color: #488f58; /* Verde do site */
+  border-color: #488f58;
+  color: #fefcf0;
+  font-size: 0.85rem;
+  /* Sobrescreve classes do btn-outline-secondary */
+  --bs-btn-bg: #488f58;
+  --bs-btn-border-color: #488f58;
+  --bs-btn-color: #fefcf0;
+  --bs-btn-hover-bg: #3a7547; /* Verde escuro no hover */
+  --bs-btn-hover-border-color: #3a7547;
+  --bs-btn-hover-color: #fefcf0;
+}
+.profile-v2-edit-btn:hover {
+    background-color: #3a7547;
+    border-color: #3a7547;
+    color: #fefcf0;
+}
+
+/* 2. Estiliza o conteúdo do novo modal */
+#editProfileModal .modal-content {
+    background-color: #fefcf0; /* Cor de fundo principal do site */
+    border: none;
+}
+#editProfileModal .modal-header {
+    background-color: #f7f4e0; /* Cor de fundo clara (do eco-box) */
+    border-bottom: 1px solid #e0d9c4;
+}
+#editProfileModal .modal-title {
+    color: #2c5836; /* Verde escuro */
+    font-weight: 600;
+}
+
+/* 3. Avatar no modal */
+.profile-edit-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    margin-bottom: 0.5rem;
+}
+
+/* 4. Botão "Trocar foto" */
+#editProfileModal .btn-link {
+    color: #488f58;
+    text-decoration: none;
+    font-weight: 600;
+}
+#editProfileModal .btn-link:hover {
+    text-decoration: underline;
+}
+
+/* 5. Reusa estilos do .form-group que você já tem no CSS principal */
+#editProfileModal .form-group label {
+    font-weight: 600;
+    color: #4f4f4f;
+    margin-bottom: 0.5rem;
+}
+#editProfileModal .form-group .form-control {
+    background-color: #fff; /* Fundo branco para os inputs */
+    border: 1px solid #ccc;
+}
+/* Muda a cor do focus para o verde do site */
+#editProfileModal .form-group .form-control:focus {
+    border-color: #488f58;
+    box-shadow: 0 0 0 3px rgba(72, 143, 88, 0.2);
+}
+
+.password-change-section h6 {
+    font-weight: 600;
+    color: #4f4f4f;
+}
+
+/* 6. Botão Salvar Mudanças (usa o verde do seu site) */
+#saveProfileChangesButton {
+    background-color: #488f58;
+    border-color: #488f58;
+    /* Variáveis do Bootstrap para garantir consistência */
+    --bs-btn-bg: #488f58;
+    --bs-btn-border-color: #488f58;
+    --bs-btn-color: #fefcf0;
+    --bs-btn-hover-bg: #3a7547;
+    --bs-btn-hover-border-color: #3a7547;
+    --bs-btn-hover-color: #fefcf0;
+    --bs-btn-active-bg: #3a7547;
+    --bs-btn-active-border-color: #3a7547;
+}
+
+
+.profile-v2-info-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Espaço entre Email e Endereço */
+    flex-grow: 1; /* Faz o grupo ocupar o espaço disponível */
+}
+
+/* Garante que o botão de editar fique alinhado ao centro verticalmente */
+.profile-v2-content {
+    align-items: center; 
+}
+
+/* ==========================================================================
+   AJUSTE DE MARGENS INTERNAS (PADDING) - MODAL EDITAR PERFIL
+   ========================================================================== */
+
+/* Adiciona mais espaço interno (padding) no corpo do modal, onde ficam os campos */
+#editProfileModal .modal-body {
+    padding: 2rem; /* O padrão do Bootstrap é 1rem. Tente 2rem (32px) */
+    /* Se achar muito, pode tentar "1.5rem" */
+}
+
+/* Adiciona mais espaço interno no rodapé do modal, onde ficam os botões */
+#editProfileModal .modal-footer {
+    padding: 1.5rem; /* O padrão é ~0.75rem. Tente 1.5rem (24px) */
+}
+
+/* Ajuste fino para o modal no mobile (para não ficar tão grande) */
+@media (max-width: 576px) {
+    #editProfileModal .modal-body {
+        padding: 1.5rem; /* Um pouco menos de padding no mobile */
+    }
+    #editProfileModal .modal-footer {
+        padding: 1rem;
+    }
+}
