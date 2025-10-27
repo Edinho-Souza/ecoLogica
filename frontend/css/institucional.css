@@ -1,0 +1,149 @@
+/* ==========================================================================
+   ESTILOS DA PÁGINA INSTITUCIONAL (institucional.html)
+   ========================================================================== */
+
+/* --- Seção Missão/Objetivos (Reutiliza .eco-box da home) --- */
+.eco-box {
+  background-color: #f7f4e0;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.eco-box-content {
+  max-width: 1350px;
+  margin: 0 auto;
+  padding: 0 50px;
+}
+
+.eco-block {
+  margin-bottom: 40px;
+}
+
+.eco-block h2 {
+  color: #4f4f4f;
+  font-size: 22px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+/* --- Seção Precisa de Ajuda? (Formulário) --- */
+.help-form-section {
+  padding: 10px 20px;
+  background-color: #fefcf0;
+}
+
+.form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 40px;
+  background-color: #fefcf0;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.form-container h2 {
+  font-size: 29px;
+  color: #4f4f4f;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.form-container p {
+  font-size: 16px;
+  color: #6c757d;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #4f4f4f;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #e0d9c4;
+  border-radius: 6px;
+  background-color: #f7f4e0;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  color: #4f4f4f;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #a08787;
+  opacity: 0.4;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #e87a00;
+  box-shadow: 0 0 0 3px rgba(232, 122, 0, 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.btn-form-submit {
+  background-color: #e87a00;
+  color: #fefcf0;
+  border: none;
+  padding: 12px 40px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 10px;
+}
+
+.btn-form-submit:hover {
+  background-color: #cf6b00;
+  transform: translateY(-2px);
+}
+
+.form-buttons-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-form-submit {
+  margin-top: 0;
+}
+
+.btn-form-secondary {
+  background-color: transparent;
+  color: #2c5836;
+  border: 2px solid #2c5836;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-form-secondary:hover {
+  background-color: #2c5836;
+  color: #fefcf0;
+}

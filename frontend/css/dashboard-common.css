@@ -1,0 +1,511 @@
+/* ==========================================================================
+   ESTILOS COMUNS AOS DASHBOARDS (Usuário e Empresa)
+   ========================================================================== */
+
+.user-dashboard h1 {
+  color: #2c5836;
+  margin-bottom: 1.5em;
+  padding-bottom: 0.5em;
+  border-bottom: 2px solid #e87a00;
+  /* Linha laranja abaixo do título */
+}
+
+.dashboard-section {
+  background-color: #fff;
+  /* Fundo branco para as seções */
+  padding: 25px;
+  margin-bottom: 2rem;
+  /* Espaço entre as seções */
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-section h2,
+.dashboard-section h3 {
+  color: #4f4f4f;
+  margin-top: 0;
+  margin-bottom: 1em;
+  font-weight: 600;
+}
+
+/* --- Seção Histórico --- */
+.history-graph-container {
+  max-width: 100%;
+  padding-top: 15px;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 30px;
+  margin-top: 20px;
+  position: relative;
+}
+
+#disposalHistoryChart {
+  display: block;
+  width: 100% !important;
+}
+
+@media (min-width: 992px) {
+  .history-graph-container {
+    padding-left: 0px;
+    padding-right: 0px;
+    height: 400px;
+  }
+
+  #disposalHistoryChart {
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .history-graph-container {
+    min-height: 300px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  #disposalHistoryChart {
+    flex-grow: 1;
+    display: block;
+    width: 100% !important;
+    min-height: 200px;
+    margin-bottom: 10px;
+  }
+
+  .history-graph-container p.text-muted {
+    font-size: 0.8rem;
+    margin-top: auto;
+    margin-bottom: 0;
+    line-height: 1.3;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 5px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .history-graph-container {
+    padding: 10px;
+    height: 300px;
+  }
+}
+
+/* --- Seção Campanhas --- */
+.active-campaigns-section .list-group-item {
+  border: none;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+  padding-bottom: 9px;
+}
+
+.active-campaigns-section .list-group-item a {
+  color: #488f58;
+  text-decoration: none;
+}
+
+.active-campaigns-section .list-group-item a:hover {
+  color: #e87a00;
+  text-decoration: underline;
+}
+
+/* --- Seção Pontos --- */
+.points-section {
+  background-color: #fff;
+  text-align: center;
+}
+
+.points-section h3 {
+  margin-bottom: 0.5em;
+}
+
+.points-display {
+  margin-bottom: 0em;
+}
+
+.points-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #2c5836;
+  display: block;
+  margin: 5px 0;
+}
+
+/* --- Responsividade dos Dashboards --- */
+@media (max-width: 991.98px) {
+  .user-dashboard h1 {
+    font-size: 1.8rem;
+  }
+}
+
+/* --- Ajuste de Margens Laterais --- */
+.user-dashboard.content-wrapper {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+@media (max-width: 768px) {
+  .user-dashboard.content-wrapper {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/* --- Perfil V2 (Usado por ambos) --- */
+.user-profile-v2 {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+.profile-v2-header {
+  background-color: #2c5836;
+  color: #fefcf0;
+  padding: 25px 30px;
+  padding-bottom: 22px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.profile-v2-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  object-fit: cover;
+  position: absolute;
+  bottom: -40px;
+  left: 30px;
+  z-index: 2;
+}
+
+.profile-v2-greeting {
+  margin-left: 145px;
+}
+
+.profile-v2-welcome {
+  font-size: 1.1rem;
+  font-weight: 400;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.profile-v2-name {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.profile-v2-content {
+  padding: 25px 30px;
+  padding-top: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.profile-v2-info {
+  font-size: 1rem;
+}
+
+.profile-v2-label {
+  color: #555;
+  font-weight: 600;
+}
+
+.profile-v2-value {
+  color: #333;
+}
+
+.profile-v2-edit-btn {
+  border-color: #ccc;
+  color: #555;
+  font-size: 0.85rem;
+}
+
+.profile-v2-edit-btn:hover {
+  background-color: #e9ecef;
+  border-color: #bbb;
+  color: #333;
+}
+
+@media (max-width: 576px) {
+  .profile-v2-header {
+    padding: 25px;
+    padding-bottom: 22px;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: center;
+  }
+
+  .profile-v2-avatar {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    bottom: auto;
+    left: auto;
+    margin: 0px auto 15px auto;
+    border-width: 3px;
+  }
+
+  .profile-v2-content {
+    padding: 20px;
+    padding-top: 20px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .profile-v2-greeting {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .profile-v2-name {
+    font-size: 1.5rem;
+  }
+
+  .profile-v2-info {
+    margin-bottom: 0px;
+  }
+}
+
+.profile-v2-info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex-grow: 1;
+}
+
+.profile-v2-content {
+  align-items: center;
+}
+
+/* --- Orientações V2 (Accordion, usado por ambos) --- */
+.guidelines-section-v2 h2 {
+  margin-bottom: 1.5rem;
+}
+
+.guidelines-card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.guideline-card {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.guideline-card:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.guideline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  background-color: #fff;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+.guideline-card.active .guideline-header {
+  background-color: #e9f5e9;
+}
+
+.guideline-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.guideline-icon {
+  font-size: 1.3rem;
+  color: #488f58;
+  width: 25px;
+  text-align: center;
+}
+
+.guideline-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  position: relative;
+  top: 9px;
+}
+
+.guideline-arrow {
+  font-size: 0.9rem;
+  color: #6c757d;
+  transition: transform 0.3s ease;
+}
+
+.guideline-card.active .guideline-arrow {
+  transform: rotate(180deg);
+}
+
+.guideline-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+  padding: 0 1.25rem;
+  background-color: #fff;
+}
+
+.guideline-body p {
+  margin: 0;
+  padding: 1rem 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+.guideline-card.active .guideline-body {
+  max-height: 200px;
+  padding: 0 1.25rem;
+  transition: max-height 0.4s ease-in, padding 0.4s ease-in;
+}
+
+/* --- Botão Editar Perfil (Verde, usado por ambos) --- */
+.profile-v2-edit-btn {
+  background-color: #488f58;
+  border-color: #488f58;
+  color: #fefcf0;
+  font-size: 0.85rem;
+  --bs-btn-bg: #488f58;
+  --bs-btn-border-color: #488f58;
+  --bs-btn-color: #fefcf0;
+  --bs-btn-hover-bg: #3a7547;
+  --bs-btn-hover-border-color: #3a7547;
+  --bs-btn-hover-color: #fefcf0;
+}
+
+.profile-v2-edit-btn:hover {
+  background-color: #3a7547;
+  border-color: #3a7547;
+  color: #fefcf0;
+}
+
+/* --- Modal Editar Perfil (Comum a ambos) --- */
+#editProfileModal .modal-content {
+  background-color: #fefcf0;
+  border: none;
+}
+
+#editProfileModal .modal-header {
+  background-color: #f7f4e0;
+  border-bottom: 1px solid #e0d9c4;
+}
+
+#editProfileModal .modal-title {
+  color: #2c5836;
+  font-weight: 600;
+}
+
+.profile-edit-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  margin-bottom: 0.5rem;
+}
+
+#editProfileModal .btn-link {
+  color: #488f58;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+#editProfileModal .btn-link:hover {
+  text-decoration: underline;
+}
+
+#editProfileModal .form-group label {
+  font-weight: 600;
+  color: #4f4f4f;
+  margin-bottom: 0.5rem;
+}
+
+#editProfileModal .form-group .form-control {
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+
+#editProfileModal .form-group .form-control:focus {
+  border-color: #488f58;
+  box-shadow: 0 0 0 3px rgba(72, 143, 88, 0.2);
+}
+
+.password-change-section h6 {
+  font-weight: 600;
+  color: #4f4f4f;
+}
+
+#saveProfileChangesButton {
+  background-color: #488f58;
+  border-color: #488f58;
+  --bs-btn-bg: #488f58;
+  --bs-btn-border-color: #488f58;
+  --bs-btn-color: #fefcf0;
+  --bs-btn-hover-bg: #3a7547;
+  --bs-btn-hover-border-color: #3a7547;
+  --bs-btn-hover-color: #fefcf0;
+  --bs-btn-active-bg: #3a7547;
+  --bs-btn-active-border-color: #3a7547;
+}
+
+#editProfileModal .modal-body {
+  padding: 2rem;
+}
+
+#editProfileModal .modal-footer {
+  padding: 1.5rem;
+}
+
+@media (max-width: 576px) {
+  #editProfileModal .modal-body {
+    padding: 1.5rem;
+  }
+
+  #editProfileModal .modal-footer {
+    padding: 1rem;
+  }
+}
+
+/* --- Ajuste de Espaçamento entre Seções --- */
+@media (max-width: 767.98px) {
+  .user-dashboard .dashboard-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .user-dashboard>.row>div>.dashboard-section:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@media (min-width: 992px) {
+  .user-dashboard .dashboard-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .user-dashboard>.row>div>.dashboard-section:last-child {
+    margin-bottom: 0;
+  }
+}

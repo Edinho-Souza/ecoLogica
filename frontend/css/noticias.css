@@ -1,0 +1,76 @@
+/* ==========================================================================
+   ESTILOS DA PÁGINA DE NOTÍCIAS (noticias.html)
+   ========================================================================== */
+
+.news-page-container h1 {
+  margin-bottom: 0.5em;
+  color: #2c5836;
+}
+
+.news-intro {
+  font-size: 1.1rem;
+  color: #6c757d;
+  margin-bottom: 2.5em;
+  border-bottom: 1px solid #e0d9c4;
+  padding-bottom: 1.5em;
+}
+
+.rss-feed-container {
+  margin-top: 20px;
+}
+
+.rss-item {
+  margin-bottom: 2.5em;
+}
+
+.rss-item-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 0.3em;
+}
+
+.rss-item-title a {
+  color: #488f58;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.rss-item-title a:hover {
+  color: #e87a00;
+  text-decoration: underline;
+}
+
+.rss-item-meta {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 1em;
+}
+
+.rss-item-description {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+.rss-item-readmore {
+  display: inline-block;
+  margin-top: 1em;
+  color: #e87a00;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.rss-item-readmore:hover {
+  text-decoration: underline;
+}
+
+.rss-item-divider {
+  border: 0;
+  height: 1px;
+  background-color: #e0d9c4;
+  margin: 2.5em 0;
+}
+
+.rss-item:last-child+.rss-item-divider {
+  display: none;
+}
