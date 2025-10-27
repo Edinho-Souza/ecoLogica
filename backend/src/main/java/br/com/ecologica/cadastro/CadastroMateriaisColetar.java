@@ -11,12 +11,8 @@ public class CadastroMateriaisColetar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String nomeMaterial;
-
     private String tipoMaterial;
-
     private String descricao;
-
     private boolean reciclavel;
 }
