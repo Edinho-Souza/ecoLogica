@@ -14,4 +14,6 @@ public class EmpresaApoiadoraRequest {
 
     private String contato;
     private boolean ativa;
+
+    private boolean aprovada;
 }

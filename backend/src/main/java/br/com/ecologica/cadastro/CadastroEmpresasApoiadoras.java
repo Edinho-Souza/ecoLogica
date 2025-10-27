@@ -1,11 +1,9 @@
 package br.com.ecologica.cadastro;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Entity
@@ -20,6 +18,12 @@ public class CadastroEmpresasApoiadoras {
     private String cnpj;
     private String contato;
     private boolean ativa;
+
+    @Column(nullable = false)
+    private boolean aprovada;
+
+    @OneToMany(mappedBy = "empresaApoiadora")
+    private List<CadastroCampanhas> campanhas;
 
     public void registrarEmpresa() {
         // lógica para registrar empresa apoiadora

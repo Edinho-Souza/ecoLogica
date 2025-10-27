@@ -3,6 +3,7 @@ package br.com.ecologica.cadastro.usuarios.service;
 import br.com.ecologica.cadastro.usuarios.dto.UsuarioResponse;
 import br.com.ecologica.cadastro.usuarios.model.Usuario;
 import br.com.ecologica.cadastro.usuarios.repository.UsuarioRepository;
+import br.com.ecologica.validacao.ValidadorCPF;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,9 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
 
     public Usuario salvar(Usuario usuario) {
+        if (!ValidadorCPF.isCPFValido(usuario.getCpf())) {
+            throw new IllegalArgumentException("CPF inválido");
+        }
         return usuarioRepository.save(usuario);
     }
 
@@ -38,5 +42,4 @@ public class UsuarioService {
         response.setPerfil(usuario.getPerfil());
         return response;
     }
-
 }

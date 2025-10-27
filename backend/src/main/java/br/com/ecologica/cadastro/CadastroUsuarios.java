@@ -1,34 +1,43 @@
 package br.com.ecologica.cadastro;
-import lombok.Data;
+
+import jakarta.persistence.*;
+import lombok.*;
 
 @Data
+@Entity
+@Table(name = "usuarios")
+@NoArgsConstructor
+@AllArgsConstructor
 public class CadastroUsuarios {
-	private String nome;
-	private String email;
-	private String senha;
-	private String telefone;
-	private String cpf;
 
-	// Construtor
-	public CadastroUsuarios(String nome, String email, String senha, String telefone, String cpf) {
-		this.nome = nome;
-		this.email = email;
-		this.senha = senha;
-		this.telefone = telefone;
-		this.cpf = cpf;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	// Método para exibir os dados do usuário
-	public void exibirDados() {
-	    System.out.println("Nome: " + nome);
-	    System.out.println("Email: " + email);
-	    System.out.println("Telefone: " + telefone);
-	    System.out.println("CPF: " + cpf);
-	}
+    @Column(nullable = false)
+    private String nome;
 
-	// Método para validar o cadastro
-	public boolean validarCadastro() {
-		return nome != null && !nome.isEmpty() && email != null && email.contains("@") && senha != null
-				&& senha.length() >= 6;
-	}
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String senha;
+
+    private String telefone;
+
+    @Column(nullable = false, unique = true)
+    private String cpf;
+
+    public void exibirDados() {
+        System.out.println("Nome: " + nome);
+        System.out.println("Email: " + email);
+        System.out.println("Telefone: " + telefone);
+        System.out.println("CPF: " + cpf);
+    }
+
+    public boolean validarCadastro() {
+        return nome != null && !nome.isEmpty()
+            && email != null && email.contains("@")
+            && senha != null && senha.length() >= 6;
+    }
 }
