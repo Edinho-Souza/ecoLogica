@@ -1,11 +1,10 @@
-
 package br.com.ecologica.login.service;
 
-import br.com.ecologica.cadastro.usuarios.model.Usuario;
 import br.com.ecologica.cadastro.usuarios.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import br.com.ecologica.login.security.JwtUtil;
 
 @Service
 public class LoginService {
@@ -16,9 +15,13 @@ public class LoginService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public boolean autenticar(String email, String senha) {
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    public String autenticar(String email, String senha) {
         return usuarioRepository.findByEmail(email)
-            .map(usuario -> passwordEncoder.matches(senha, usuario.getSenha()))
-            .orElse(false);
+                .filter(usuario -> passwordEncoder.matches(senha, usuario.getSenha()))
+                .map(usuario -> jwtUtil.gerarToken(email))
+                .orElse(null);
     }
 }

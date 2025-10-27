@@ -12,4 +12,6 @@ public class EmpresaRecicladoraRequest {
     private String cidade;
     private String tipoMaterial;
     private boolean ativa;
+
+    private boolean aprovada;
 }
