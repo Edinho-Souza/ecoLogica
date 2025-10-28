@@ -3,6 +3,8 @@ package br.com.ecologica.login.controller;
 import br.com.ecologica.login.model.UsuarioLogin;
 import br.com.ecologica.login.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,8 +15,12 @@ public class LoginController {
     private LoginService loginService;
 
     @PostMapping
-    public String login(@RequestBody UsuarioLogin login) {
-        boolean autenticado = loginService.autenticar(login.getEmail(), login.getSenha());
-        return autenticado ? "Login realizado com sucesso!" : "Credenciais inválidas.";
+    public ResponseEntity<String> login(@RequestBody UsuarioLogin login) {
+        String token = loginService.autenticar(login.getEmail(), login.getSenha());
+        if (token != null) {
+            return ResponseEntity.ok(token);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
+        }
     }
 }

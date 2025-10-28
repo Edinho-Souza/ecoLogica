@@ -1,10 +1,7 @@
 package br.com.ecologica.pontuacao;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import br.com.ecologica.cadastro.CadastroUsuarios;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
@@ -16,9 +13,12 @@ public class AtribuicaoPontuacao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long usuarioId;
     private int pontos;
     private String motivo;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private CadastroUsuarios usuario;
 
     public void atribuir(int valor) {
         this.pontos += valor;

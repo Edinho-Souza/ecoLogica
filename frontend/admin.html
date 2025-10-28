@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Administração | ecoLogica</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="img/logo-aba-navegador.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/dashboard-common.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+
+<body>
+
+    <header id="placeholder-header"></header>
+
+    <main>
+        <div id="placeholder-menu"></div>
+
+        <div class="content-wrapper admin-dashboard">
+            <h1>Painel de Administração</h1>
+
+            <div class="row g-4">
+
+                <div class="col-lg-8">
+
+                    <section class="dashboard-section admin-profile-section mb-4">
+                        <div class="admin-profile-header">
+                            <img src="img/avatar.png" alt="Avatar Admin" class="admin-profile-avatar"
+                                id="admin-avatar-display">
+                            <div class="admin-profile-greeting">
+                                <p class="admin-profile-welcome">Bem-vindo(a),</p>
+                                <p class="admin-profile-name">Administrador</p>
+                            </div>
+                        </div>
+
+                        <div class="admin-profile-content">
+                            <div class="admin-profile-info-group">
+                                <p><strong>Nome:</strong> <span id="admin-name-display">Administrador</span>
+                                </p>
+                                <p><strong>Email:</strong> <span id="admin-email-display">admin@ecologica.com</span></p>
+                            </div>
+
+                            <button class="btn btn-sm btn-outline-secondary profile-v2-edit-btn" data-bs-toggle="modal"
+                                data-bs-target="#editAdminProfileModal">
+                                <i class="fas fa-pencil-alt me-1"></i> Editar Perfil
+                            </button>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-section charts-section mb-4">
+                        <h2>Visão Geral da Coleta</h2>
+                        <div class="row">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <h5>Coleta por Empresa (Kg/Ton)</h5>
+                                <canvas id="companyCollectionChart" aria-label="Gráfico de coleta por empresa"></canvas>
+                                <p class="text-muted text-center small mt-2">Volume coletado por cada empresa parceira.
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Total Reciclado pelos Usuários (Kg)</h5>
+                                <canvas id="totalUserRecyclingChart"
+                                    aria-label="Gráfico de total reciclado por usuários"></canvas>
+                                <p class="text-muted text-center small mt-2">Volume total registrado pelos usuários.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-section user-management-section mb-4">
+                        <h2>Gerenciamento de Usuários</h2>
+                        <div class="row mb-3 gx-2 gy-2 align-items-end">
+                            <div class="col-md-4">
+                                <label for="userSearchInput" class="form-label visually-hidden">Buscar</label>
+                                <input type="text" class="form-control form-control-sm" id="userSearchInput"
+                                    placeholder="Buscar por nome ou email...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="userStatusFilter" class="form-label visually-hidden">Status</label>
+                                <select class="form-select form-select-sm" id="userStatusFilter">
+                                    <option value="" selected>Todos os Status</option>
+                                    <option value="ativo">Ativo</option>
+                                    <option value="inativo">Inativo</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-sm btn-secondary w-100" id="user-search-button">Buscar</button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-sm admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Pontos</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="user-table-body">
+                                    <tr>
+                                        <td>Sofia Terra</td>
+                                        <td>terradasofia@ecologica.com</td>
+                                        <td>150</td>
+                                        <td><span class="badge bg-success">Ativo</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary action-btn"
+                                                title="Ver Perfil"><i class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary action-btn"
+                                                title="Add/Rem Pontos"><i class="fas fa-coins"></i></button>
+                                            <button class="btn btn-sm btn-outline-warning action-btn"
+                                                title="Resetar Senha"><i class="fas fa-key"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger action-btn"
+                                                title="Desativar Conta"><i class="fas fa-user-slash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Carlos Rocha</td>
+                                        <td>carlos@email.com</td>
+                                        <td>1180</td>
+                                        <td><span class="badge bg-success">Ativo</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary action-btn"
+                                                title="Ver Perfil"><i class="fas fa-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary action-btn"
+                                                title="Add/Rem Pontos"><i class="fas fa-coins"></i></button>
+                                            <button class="btn btn-sm btn-outline-warning action-btn"
+                                                title="Resetar Senha"><i class="fas fa-key"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger action-btn"
+                                                title="Desativar Conta"><i class="fas fa-user-slash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <nav aria-label="Paginação de usuários" class="mt-3 d-flex justify-content-center">
+                            <ul class="pagination pagination-sm">
+                                <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">Próximo</a></li>
+                            </ul>
+                        </nav>
+                    </section>
+                    <section class="dashboard-section activity-logs-section mb-4">
+                        <h2>Logs de Atividade de Reciclagem</h2>
+                        <div class="row mb-3 gx-2 gy-2">
+                            <div class="col-md-3"> <input type="text" class="form-control form-control-sm"
+                                    placeholder="Filtrar por Usuário..."> </div>
+                            <div class="col-md-3"> <input type="text" class="form-control form-control-sm"
+                                    placeholder="Filtrar por Empresa..."> </div>
+                            <div class="col-md-3"> <input type="date" class="form-control form-control-sm"
+                                    placeholder="Data Início"> </div>
+                            <div class="col-md-3"> <input type="date" class="form-control form-control-sm"
+                                    placeholder="Data Fim"> </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data/Hora</th>
+                                        <th>Usuário</th>
+                                        <th>Ação</th>
+                                        <th>Detalhes</th>
+                                        <th>Pontos</th>
+                                        <th>Empresa (se aplicável)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="log-table-body">
+                                    <tr>
+                                        <td>26/10/2025 14:30</td>
+                                        <td>Sofia Terra</td>
+                                        <td>Registro Material</td>
+                                        <td>Plástico (Aprox. 2 sacolas)</td>
+                                        <td>+50</td>
+                                        <td>Recicladora Vale Limpo</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <nav aria-label="Paginação de logs" class="mt-3 d-flex justify-content-center">
+                            <ul class="pagination pagination-sm">
+                                <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">Próximo</a></li>
+                            </ul>
+                        </nav>
+                    </section>
+
+                    <section class="dashboard-section content-moderation-section mb-4">
+                        <h2>Moderação de Conteúdo <span class="badge bg-warning text-dark ms-2"
+                                id="pending-count-badge">0</span></h2>
+                        <p class="text-muted small">Aprovar ou remover comentários/postagens pendentes.</p>
+                        <div id="pending-content-list">
+                            <div class="alert alert-secondary" id="no-pending-content-msg">Nenhum conteúdo pendente no
+                                momento.</div>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-section detailed-analytics-section mb-4">
+                        <h2>Analytics e Relatórios</h2>
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <h5>Crescimento de Usuários</h5>
+                                <canvas id="userGrowthChart" aria-label="Gráfico de crescimento de usuários"></canvas>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Visitantes do Site (Exemplo)</h5>
+                                <canvas id="siteVisitorsChart" aria-label="Gráfico de visitantes do site"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h6>Outros Relatórios</h6>
+                            <ul>
+                                <li><a href="#">Relatório de Performance de Campanhas</a></li>
+                                <li><a href="#">Ranking Geral de Usuários</a></li>
+                                <li><a href="#">Volume por Tipo de Material</a></li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-section add-campaign-section mb-4">
+                        <h2>Adicionar/Editar Campanha</h2>
+                        <form id="addCampaignForm">
+                            <div class="mb-3">
+                                <label for="campaignTitle" class="form-label">Título da Campanha</label>
+                                <input type="text" class="form-control" id="campaignTitle" required>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="campaignStartDate" class="form-label">Data de Início</label>
+                                    <input type="date" class="form-control" id="campaignStartDate">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="campaignEndDate" class="form-label">Data de Fim</label>
+                                    <input type="date" class="form-control" id="campaignEndDate">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="campaignDescription" class="form-label">Descrição</label>
+                                <textarea class="form-control" id="campaignDescription" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="campaignImage" class="form-label">URL da Imagem</label>
+                                <input type="url" class="form-control" id="campaignImage"
+                                    placeholder="https://exemplo.com/imagem.jpg">
+                            </div>
+                            <div class="mb-3">
+                                <label for="campaignPoints" class="form-label">Pontos Extras (Opcional)</label>
+                                <input type="number" class="form-control" id="campaignPoints" placeholder="Ex: 100">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Salvar Campanha</button>
+                        </form>
+                        <h5 class="mt-4">Campanhas Atuais</h5>
+                        <div class="list-group list-group-flush" id="current-campaigns-list">
+                            <a href="#"
+                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                Campanha Exemplo 1 <span class="badge bg-secondary rounded-pill"><i
+                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                        </div>
+                    </section>
+
+                </div>
+                <div class="col-lg-4">
+
+                    <section class="dashboard-section collection-points-management-section mb-4">
+                        <h3>Gerenciar Pontos de Coleta</h3>
+                        <div id="mini-map-placeholder"
+                            style="height: 150px; background-color: #eee; border-radius: 4px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: #999;">
+                            (Preview Mapa)</div>
+                        <button class="btn btn-sm btn-info w-100 mb-2"><i class="fas fa-map-marked-alt me-1"></i> Abrir
+                            Editor de Mapa</button>
+                        <div class="list-group list-group-flush company-list-scrollable" style="max-height: 150px;">
+                            <a href="#"
+                                class="list-group-item list-group-item-action py-1 px-2 d-flex justify-content-between align-items-center">
+                                EcoPonto Centro <span class="badge bg-secondary rounded-pill"><i
+                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action py-1 px-2 d-flex justify-content-between align-items-center">
+                                Recicla Eletrônicos Velha <span class="badge bg-secondary rounded-pill"><i
+                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-section points-system-management-section mb-4">
+                        <h3>Sistema de Pontos</h3>
+                        <form id="pointsSystemForm">
+                            <div class="mb-2">
+                                <label for="pointsKgPlastico" class="form-label">Pontos por Kg de Plástico</label>
+                                <input type="number" class="form-control form-control-sm" id="pointsKgPlastico"
+                                    value="50">
+                            </div>
+                            <div class="mb-2">
+                                <label for="pointsKgPapel" class="form-label">Pontos por Kg de Papel</label>
+                                <input type="number" class="form-control form-control-sm" id="pointsKgPapel" value="30">
+                            </div>
+                            <div class="mb-3">
+                                <label for="pointsNewsletter" class="form-label">Pontos por Cadastro Newsletter</label>
+                                <input type="number" class="form-control form-control-sm" id="pointsNewsletter"
+                                    value="10">
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-warning w-100">Salvar Valores</button>
+                        </form>
+                        <hr>
+                        <h6>Ajuste Manual</h6>
+                        <div class="input-group input-group-sm mb-1">
+                            <input type="email" class="form-control" placeholder="Email do usuário">
+                            <input type="number" class="form-control" placeholder="Pontos (+/-)">
+                            <button class="btn btn-outline-secondary" type="button">Aplicar</button>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-section rewards-management-section mb-4">
+                        <h3>Gerenciar Recompensas</h3>
+                        <div class="list-group list-group-flush company-list-scrollable" style="max-height: 200px;">
+                            <a href="#"
+                                class="list-group-item list-group-item-action py-1 px-2 d-flex justify-content-between align-items-center">
+                                Ecobag (50 pts) <span class="badge bg-secondary rounded-pill"><i
+                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action py-1 px-2 d-flex justify-content-between align-items-center">
+                                Garrafa (75 pts) <span class="badge bg-secondary rounded-pill"><i
+                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                        </div>
+                        <button class="btn btn-sm btn-success w-100 mt-2"><i class="fas fa-plus me-1"></i> Adicionar
+                            Recompensa</button>
+                    </section>
+
+                    <section class="dashboard-section company-list-section mb-4">
+                        <h3>Empresas Recicladoras</h3>
+                        <div class="list-group list-group-flush company-list-scrollable">
+                            <a href="#"
+                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                Recicladora Vale Limpo <span class="badge bg-secondary rounded-pill"><i
+                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                Cooperativa Bairro Verde <span class="badge bg-secondary rounded-pill"><i
+                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                MetalNorte Reciclagem <span class="badge bg-secondary rounded-pill"><i
+                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm w-100 mt-2">Ver Todas</button>
+                    </section>
+
+                    <section class="dashboard-section company-list-section mb-4">
+                        <h3>Empresas Apoiadoras</h3>
+                        <div class="list-group list-group-flush company-list-scrollable">
+                            <a href="#"
+                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                Supermercado Econômico <span class="badge bg-secondary rounded-pill"><i
+                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                Loja de Roupas VerdesFolhas <span class="badge bg-secondary rounded-pill"><i
+                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm w-100 mt-2">Ver Todas</button>
+                    </section>
+
+                    <section class="dashboard-section add-company-section mb-4">
+                        <h3>Cadastrar Nova Empresa</h3>
+                        <form id="addCompanyForm">
+                            <div class="mb-3">
+                                <label for="companyName" class="form-label">Nome da Empresa</label>
+                                <input type="text" class="form-control" id="companyName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="companyEmail" class="form-label">Email de Contato</label>
+                                <input type="email" class="form-control" id="companyEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="companyType" class="form-label">Tipo de Empresa</label>
+                                <select class="form-select" id="companyType" required>
+                                    <option selected disabled value="">Selecione...</option>
+                                    <option value="recicladora">Empresa Recicladora</option>
+                                    <option value="apoiadora">Empresa Apoiadora</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="companyCNPJ" class="form-label">CNPJ</label>
+                                <input type="text" class="form-control" id="companyCNPJ">
+                            </div>
+                            <div class="mb-3">
+                                <label for="companyAddress" class="form-label">Endereço</label>
+                                <input type="text" class="form-control" id="companyAddress">
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Cadastrar Empresa</button>
+                        </form>
+                    </section>
+
+                    <section class="dashboard-section announcements-section mb-4">
+                        <h3>Criar Anúncio no Site</h3>
+                        <form id="announcementForm">
+                            <div class="mb-2">
+                                <label for="announcementText" class="form-label">Mensagem</label>
+                                <textarea class="form-control form-control-sm" id="announcementText" rows="3"
+                                    placeholder="Ex: Manutenção programada para domingo..." required></textarea>
+                            </div>
+                            <div class="mb-2">
+                                <label for="announcementType" class="form-label">Tipo</label>
+                                <select id="announcementType" class="form-select form-select-sm">
+                                    <option value="info" selected>Informativo (Azul)</option>
+                                    <option value="warning">Atenção (Amarelo)</option>
+                                    <option value="success">Sucesso (Verde)</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-secondary w-100">Publicar Anúncio</button>
+                        </form>
+                    </section>
+
+                    <section class="dashboard-section site-settings-section">
+                        <h3>Configurações Gerais</h3>
+                        <form id="siteSettingsForm">
+                            <div class="mb-3">
+                                <label for="settingTelegramLink" class="form-label">Link Telegram</label>
+                                <input type="url" class="form-control form-control-sm" id="settingTelegramLink"
+                                    value="https://t.me/+Fsirxfskk-MyOTRh">
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingFacebookLink" class="form-label">Link Facebook</label>
+                                <input type="url" class="form-control form-control-sm" id="settingFacebookLink"
+                                    placeholder="https://facebook.com/suapagina">
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingInstagramLink" class="form-label">Link Instagram</label>
+                                <input type="url" class="form-control form-control-sm" id="settingInstagramLink"
+                                    placeholder="https://instagram.com/seuusuario">
+                            </div>
+                            <div class="mb-3">
+                                <label for="settingContactEmail" class="form-label">Email de Contato (Rodapé)</label>
+                                <input type="email" class="form-control form-control-sm" id="settingContactEmail"
+                                    value="contato@ecologica.com">
+                            </div>
+                            <button type="submit" class="btn btn-warning w-100 btn-sm">Salvar Configurações</button>
+                        </form>
+                    </section>
+
+                </div>
+            </div>
+        </div>
+        <div id="placeholder-imagem-rodape"></div>
+        <div id="placeholder-redesocial"></div>
+    </main>
+
+    <footer id="placeholder-rodape"></footer>
+
+    <div id="placeholder-modal"></div>
+    <div id="placeholder-botao-topo"></div>
+
+    <div class="modal fade" id="editAdminProfileModal" tabindex="-1" aria-labelledby="editAdminProfileModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editAdminProfileModalLabel">Editar Perfil do Administrador</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAdminProfileForm" onsubmit="return false;">
+                        <div class="row">
+                            <div class="col-md-4 text-center d-flex flex-column align-items-center">
+                                <img src="img/avatar-admin-placeholder.png" id="edit-admin-profile-avatar-img"
+                                    class="profile-edit-avatar" alt="Avatar Atual">
+                                <label for="adminAvatarUpload" class="btn btn-link btn-sm mt-2">
+                                    <i class="fas fa-upload me-1"></i> Trocar foto
+                                </label>
+                                <input type="file" id="adminAvatarUpload" class="d-none" accept="image/png, image/jpeg">
+                                <small class="d-block text-muted mt-1" style="font-size: 0.8rem;">JPG ou PNG, max
+                                    2MB.</small>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">Nome:</label>
+                                    <p class="form-control-plaintext" id="modal-admin-name-display">[Nome Admin]</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">E-mail:</label>
+                                    <p class="form-control-plaintext" id="modal-admin-email-display">[Email Admin]</p>
+                                </div>
+                                <hr class="my-3">
+                                <div class="password-change-section">
+                                    <h6>Alterar Senha</h6>
+                                    <div class="mb-3 form-group">
+                                        <label for="edit-admin-current-password" class="form-label">Senha Atual</label>
+                                        <input type="password" class="form-control" id="edit-admin-current-password"
+                                            placeholder="••••••••" autocomplete="current-password">
+                                    </div>
+                                    <div class="mb-3 form-group">
+                                        <label for="edit-admin-new-password" class="form-label">Nova Senha</label>
+                                        <input type="password" class="form-control" id="edit-admin-new-password"
+                                            placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                                    </div>
+                                    <div class="mb-3 form-group">
+                                        <label for="edit-admin-confirm-password" class="form-label">Confirmar Nova
+                                            Senha</label>
+                                        <input type="password" class="form-control" id="edit-admin-confirm-password"
+                                            placeholder="Repita a nova senha" autocomplete="new-password">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="edit-admin-profile-feedback" class="mt-3 text-center"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="saveAdminProfileChangesButton">Salvar
+                        Mudanças</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="userProfileModal" tabindex="-1" aria-labelledby="userProfileModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="userProfileModalLabel">Detalhes do Usuário</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <img src="img/avatar-pessoa-ia.png" alt="Avatar" class="profile-edit-avatar mb-2"
+                            id="modal-user-avatar">
+                        <h5 class="mb-0" id="modal-user-name"></h5>
+                        <p class="text-muted small" id="modal-user-status"></p>
+                    </div>
+
+                    <hr>
+
+                    <div class="user-details-info">
+                        <h6>Informações da Conta:</h6>
+                        <p><strong>ID:</strong> <span id="modal-user-id"></span></p>
+                        <p><strong>Email:</strong> <span id="modal-user-email"></span></p>
+                        <p><strong>Pontuação Atual:</strong> <span id="modal-user-points"
+                                class="fw-bold text-success"></span></p>
+                        <p><strong>Total Reciclado (Sim.):</strong> <span id="modal-user-total-recycled">--</span></p>
+                        <p><strong>Último Login (Sim.):</strong> <span id="modal-user-last-login">--</span></p>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button class="btn btn-sm btn-outline-warning" data-bs-dismiss="modal" data-action="reset_pw"
+                            id="modal-reset-pw-btn"><i class="fas fa-key me-1"></i> Resetar Senha</button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-dismiss="modal"
+                            data-action="toggle_status" id="modal-toggle-status-btn"><i
+                                class="fas fa-user-slash me-1"></i> Desativar Conta</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+</body>
+
+</html>

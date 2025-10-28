@@ -71,27 +71,35 @@ document.addEventListener("DOMContentLoaded", function () {
      * @param {string} filePath - O caminho para o arquivo .html (ex: "partials/header.html").
      */
     const carregarHTML = (elementId, filePath) => {
+        // Tenta encontrar o elemento placeholder na página atual
+        const elemento = document.getElementById(elementId);
+
+        // **MODIFICAÇÃO AQUI:** Se o elemento NÃO for encontrado,
+        // simplesmente retorna uma promessa resolvida e não faz mais nada.
+        if (!elemento) {
+            // console.log(`carregarHTML: Placeholder '${elementId}' não encontrado nesta página. Pulando ${filePath}.`); // Log opcional para debug
+            return Promise.resolve(); // <-- Retorna sucesso silenciosamente
+        }
+
+        // Se o elemento FOI encontrado, continua carregando o HTML
         return fetch(filePath)
             .then(response => {
                 if (!response.ok) throw new Error(`[ERRO 404] Arquivo não encontrado: ${filePath}`);
                 return response.text();
             })
             .then(html => {
-                const elemento = document.getElementById(elementId);
-                if (elemento) {
-                    elemento.innerHTML = html;
-                    // Log de verificação (mantido para garantir que o ID do span seja encontrado)
-                    if (elementId === 'placeholder-header') {
-                        console.log('carregarHTML: CONTEÚDO DO HEADER INJETADO em #placeholder-header.');
-                        console.log('carregarHTML: Verificando #userAuthSpan LOGO APÓS injeção:', document.getElementById('userAuthSpan'));
-                    }
-                } else {
-                    console.error(`carregarHTML: Elemento com ID '${elementId}' não encontrado no HTML principal.`);
+                elemento.innerHTML = html;
+                // Log de verificação (mantido para garantir que o ID do span seja encontrado)
+                if (elementId === 'placeholder-header') {
+                    console.log('carregarHTML: CONTEÚDO DO HEADER INJETADO em #placeholder-header.');
+                    console.log('carregarHTML: Verificando #userAuthSpan LOGO APÓS injeção:', document.getElementById('userAuthSpan'));
                 }
             })
             .catch(error => {
-                console.error(`carregarHTML: Erro ao carregar ${filePath}:`, error);
-                return Promise.reject(error); // Propaga o erro
+                // Erros de fetch (404, rede) ainda serão mostrados
+                console.error(`carregarHTML: Erro ao carregar ${filePath} para #${elementId}:`, error);
+                // Mesmo em caso de erro de fetch, resolvemos para não parar Promise.all
+                return Promise.resolve(); // <-- Resolve mesmo em erro de fetch para não travar
             });
     };
 
@@ -147,7 +155,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 });
             } else {
-                 console.warn("Botão de autenticação do header (.btn-custom.btn-auth) não encontrado.");
+                console.warn("Botão de autenticação do header (.btn-custom.btn-auth) não encontrado.");
             }
 
             // Listener para o BOTÃO DO OFFCANVAS (Mobile)
@@ -172,21 +180,21 @@ document.addEventListener("DOMContentLoaded", function () {
                             window.location.href = 'usuario.html';
                         }
                     } else {
-                         console.log("[DEBUG] Offcanvas Não Logado: Fechando e abrindo modal...");
-                         if (offcanvasInstance) {
-                             offcanvasElement.addEventListener('hidden.bs.offcanvas', () => {
-                                 console.log("[DEBUG] Offcanvas Não Logado: Evento hidden disparado. Abrindo modal.");
-                                 authModal.style.display = 'flex';
-                             }, { once: true });
+                        console.log("[DEBUG] Offcanvas Não Logado: Fechando e abrindo modal...");
+                        if (offcanvasInstance) {
+                            offcanvasElement.addEventListener('hidden.bs.offcanvas', () => {
+                                console.log("[DEBUG] Offcanvas Não Logado: Evento hidden disparado. Abrindo modal.");
+                                authModal.style.display = 'flex';
+                            }, { once: true });
                             offcanvasInstance.hide();
                         } else {
-                             console.warn("[DEBUG] Offcanvas Não Logado: Instância não encontrada. Abrindo modal direto.");
-                             authModal.style.display = 'flex';
+                            console.warn("[DEBUG] Offcanvas Não Logado: Instância não encontrada. Abrindo modal direto.");
+                            authModal.style.display = 'flex';
                         }
                     }
                 });
             } else {
-                 console.warn("Botão de autenticação do offcanvas (#offcanvasAuthButton) não encontrado.");
+                console.warn("Botão de autenticação do offcanvas (#offcanvasAuthButton) não encontrado.");
             }
 
             // --- Lógica Interna do Modal (Fechar, Abas, Recuperar Senha) ---
@@ -202,50 +210,50 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (tabButtons.length > 0 && forms.length > 0) {
                 tabButtons.forEach(btn => {
-                  btn.addEventListener('click', () => {
-                    tabButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    forms.forEach(f => f.classList.remove('active'));
-                    const targetForm = document.getElementById(btn.dataset.tab + 'Form');
-                    if (targetForm) {
-                        targetForm.classList.add('active');
-                    } else {
-                        console.error(`Formulário alvo #${btn.dataset.tab + 'Form'} não encontrado.`);
-                    }
-                    if (recoverForm) recoverForm.classList.remove('active');
-                    if (tabsContainer) tabsContainer.style.display = 'flex';
-                  });
+                    btn.addEventListener('click', () => {
+                        tabButtons.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        forms.forEach(f => f.classList.remove('active'));
+                        const targetForm = document.getElementById(btn.dataset.tab + 'Form');
+                        if (targetForm) {
+                            targetForm.classList.add('active');
+                        } else {
+                            console.error(`Formulário alvo #${btn.dataset.tab + 'Form'} não encontrado.`);
+                        }
+                        if (recoverForm) recoverForm.classList.remove('active');
+                        if (tabsContainer) tabsContainer.style.display = 'flex';
+                    });
                 });
             }
 
             if (recoverLink && forms.length > 0 && tabsContainer && recoverForm) {
                 recoverLink.addEventListener('click', (e) => {
-                  e.preventDefault();
-                  forms.forEach(f => f.classList.remove('active'));
-                  tabsContainer.style.display = 'none';
-                  recoverForm.classList.add('active');
+                    e.preventDefault();
+                    forms.forEach(f => f.classList.remove('active'));
+                    tabsContainer.style.display = 'none';
+                    recoverForm.classList.add('active');
                 });
             }
 
             if (backToLoginLink && forms.length > 0 && tabsContainer && recoverForm) {
                 backToLoginLink.addEventListener('click', (e) => {
-                  e.preventDefault();
-                  recoverForm.classList.remove('active');
-                  tabsContainer.style.display = 'flex';
-                  const loginForm = document.getElementById('loginForm');
-                  const loginTab = authModal.querySelector('.tab-btn[data-tab="login"]');
-                  const registerTab = authModal.querySelector('.tab-btn[data-tab="register"]');
-                  if (loginForm) loginForm.classList.add('active');
-                  if (loginTab) loginTab.classList.add('active');
-                  if (registerTab) registerTab.classList.remove('active');
+                    e.preventDefault();
+                    recoverForm.classList.remove('active');
+                    tabsContainer.style.display = 'flex';
+                    const loginForm = document.getElementById('loginForm');
+                    const loginTab = authModal.querySelector('.tab-btn[data-tab="login"]');
+                    const registerTab = authModal.querySelector('.tab-btn[data-tab="register"]');
+                    if (loginForm) loginForm.classList.add('active');
+                    if (loginTab) loginTab.classList.add('active');
+                    if (registerTab) registerTab.classList.remove('active');
                 });
             }
             // --- Fim da Lógica Interna do Modal ---
 
         } else {
-             if (!authModal) console.warn("Modal de autenticação (#authModal) não encontrado.");
-             if (!closeModalBtn) console.warn("Botão de fechar modal (.close-modal) não encontrado.");
-             console.warn("Lógica principal do modal desativada.");
+            if (!authModal) console.warn("Modal de autenticação (#authModal) não encontrado.");
+            if (!closeModalBtn) console.warn("Botão de fechar modal (.close-modal) não encontrado.");
+            console.warn("Lógica principal do modal desativada.");
         }
         // --- FIM DO BLOCO DO MODAL ---
 

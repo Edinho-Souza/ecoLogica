@@ -26,4 +26,6 @@ public class Usuario {
     @Column(nullable = false)
     private String perfil; // "ADMIN", "USUARIO", "EMPRESA"
 
+    @Column(nullable = false, unique = true)
+    private String cpf; 
 }

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Empresa | ecoLogica</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="img/logo-aba-navegador.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/dashboard-common.css">
+    <link rel="stylesheet" href="css/emp-dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+</head>
+
+<body>
+
+
+    <header id="placeholder-header"></header>
+
+    <main>
+        <div id="placeholder-menu"></div>
+
+        <div class="content-wrapper user-dashboard">
+            <h1>Conta Empresarial</h1>
+
+            <div class="row g-4">
+                <div class="col-lg-8">
+
+                    <section class="user-profile-v2 mb-4">
+                        <div class="profile-v2-header">
+                            <img src="img/avatar-empresa-placeholder.png" alt="Logo da Empresa"
+                                class="profile-v2-avatar" id="company-avatar-display">
+                            <div class="profile-v2-greeting">
+                                <h2 class="profile-v2-welcome">Painel da Empresa:</h2>
+                                <p class="profile-v2-name" id="company-name">[Nome da Empresa]</p>
+                            </div>
+                        </div>
+                        <div class="profile-v2-content">
+                            <div class="profile-v2-info-group">
+                                <div class="profile-v2-info">
+                                    <strong class="profile-v2-label">E-mail:</strong>
+                                    <span id="company-email" class="profile-v2-value">[Email da Empresa]</span>
+                                </div>
+                                <div class="profile-v2-info">
+                                    <strong class="profile-v2-label">Endereço:</strong>
+                                    <span id="company-address" class="profile-v2-value">[Endereço não cadastrado]</span>
+                                </div>
+                                <div class="profile-v2-info">
+                                    <strong class="profile-v2-label">CNPJ:</strong>
+                                    <span id="company-cnpj" class="profile-v2-value">[CNPJ não cadastrado]</span>
+                                </div>
+                            </div>
+                            <div class="profile-v2-actions"
+                                style="display: flex; flex-wrap: wrap; gap: 10px; align-self: center;">
+
+                                <button class="btn btn-sm profile-v2-edit-btn" data-bs-toggle="modal"
+                                    data-bs-target="#materialsModal">
+                                    <i class="fas fa-recycle me-1"></i> Materiais Coletados
+                                </button>
+
+                                <button class="btn btn-sm profile-v2-edit-btn" data-bs-toggle="modal"
+                                    data-bs-target="#editProfileModal">
+                                    <i class="fas fa-pencil-alt me-1"></i> Editar Perfil
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-section history-section">
+                        <h2>Histórico de Coleta</h2>
+                        <p>Acompanhe a quantidade de material coletado através do nosso sistema!</p>
+                        <div class="history-graph-container">
+                            <canvas id="disposalHistoryChart" aria-label="Gráfico de histórico de descarte"></canvas>
+                            <p class="text-muted text-center mt-2">Gráfico da quantidade de
+                                material coletado por mês.</p>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-section collection-requests-section">
+                        <h3>Solicitações de Coleta</h3>
+                        <p class="text-muted small" style="margin-top: -0.5rem; margin-bottom: 1.5rem;">Usuários que
+                            registraram materiais para retirada.</p>
+
+                        <div id="collectionMap"
+                            style="height: 400px; margin-bottom: 1.5rem; border-radius: 8px; background-color: #e9e9e9;">
+                        </div>
+
+                        <div id="collection-requests-list">
+                            <p id="requests-placeholder" class="text-center text-muted mt-3">Carregando solicitações...
+                            </p>
+                        </div>
+                    </section>
+
+                </div>
+                <div class="col-lg-4">
+                    <section class="dashboard-section points-section">
+                        <h3>Pontos Gerados</h3>
+                        <div class="points-display">
+                            <p>Total de pontos que usuários<br>arrecadaram com sua empresa:</p>
+                            <span id="user-points-value" class="points-value">[XXX]</span>
+                            <span>pontos</span>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-section active-campaigns-section">
+                        <h3>Campanhas Ativas</h3>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><a href="[link-campanha-1].html">Campanha Recicla
+                                    Plástico</a>
+                            </li>
+                            <li class="list-group-item"><a href="[link-campanha-2].html">Desafio Lixo Zero</a>
+                            </li>
+                            <li class="list-group-item"><a href="[link-campanha-3].html">Coleta de
+                                    Eletrônicos</a></li>
+                            <li class="list-group-item"><a href="#" class="fw-bold">Ver todas as
+                                    campanhas...</a></li>
+                        </ul>
+                    </section>
+
+                    <section class="dashboard-section guidelines-section-v2">
+                        <h2>Orientações de Descarte</h2>
+                        <div class="guidelines-card-container">
+
+                            <div class="guideline-card">
+                                <div class="guideline-header" role="button" tabindex="0">
+                                    <div class="guideline-icon-title">
+                                        <i class="fas fa-recycle guideline-icon"></i>
+                                        <h3 class="guideline-title">Atitudes Simples</h3>
+                                    </div>
+                                    <i class="fas fa-chevron-down guideline-arrow"></i>
+                                </div>
+                                <div class="guideline-body">
+                                    <p>Pequenas mudanças no dia a dia fazem grande diferença. Separe seus
+                                        recicláveis
+                                        (plástico, papel, metal, vidro), limpe as embalagens e certifique-se de
+                                        que
+                                        estão secas. Isso facilita muito o processo de reciclagem!</p>
+                                </div>
+                            </div>
+
+                            <div class="guideline-card">
+                                <div class="guideline-header" role="button" tabindex="0">
+                                    <div class="guideline-icon-title">
+                                        <i class="fas fa-map-marker-alt guideline-icon"></i>
+                                        <h3 class="guideline-title">Destino Certo</h3>
+                                    </div>
+                                    <i class="fas fa-chevron-down guideline-arrow"></i>
+                                </div>
+                                <div class="guideline-body">
+                                    <p>Não misture lixo orgânico com recicláveis. Use os Pontos de Coleta
+                                        corretos
+                                        indicados em nosso mapa ou verifique os dias de coleta seletiva na sua
+                                        rua.
+                                        Descarte pilhas, baterias e eletrônicos em locais apropriados.</p>
+                                </div>
+                            </div>
+
+                            <div class="guideline-card">
+                                <div class="guideline-header" role="button" tabindex="0">
+                                    <div class="guideline-icon-title">
+                                        <i class="fas fa-globe-americas guideline-icon"></i>
+                                        <h3 class="guideline-title">Ajude o Planeta</h3>
+                                    </div>
+                                    <i class="fas fa-chevron-down guideline-arrow"></i>
+                                </div>
+                                <div class="guideline-body">
+                                    <p>Ao reciclar, você economiza recursos naturais, reduz a poluição e gera
+                                        renda para
+                                        catadores. Cada item conta! Incentive seus amigos e familiares a
+                                        participarem
+                                        também. Juntos, podemos fazer a diferença.</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </div>
+        <div id="placeholder-imagem-rodape"></div>
+        <div id="placeholder-redesocial"></div>
+    </main>
+
+    <footer id="placeholder-rodape"></footer>
+
+    <div id="placeholder-modal"></div>
+    <div id="placeholder-botao-topo"></div>
+
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Editar Perfil da Empresa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProfileForm" onsubmit="return false;">
+                        <div class="row">
+                            <div class="col-md-4 text-center d-flex flex-column align-items-center">
+                                <img src="img/avatar-empresa-placeholder.png" id="edit-profile-avatar-img"
+                                    class="profile-edit-avatar" alt="Logo">
+                                <label for="avatarUpload" class="btn btn-link btn-sm mt-2">
+                                    <i class="fas fa-upload me-1"></i> Trocar Logo
+                                </label>
+                                <input type="file" id="avatarUpload" class="d-none" accept="image/png, image/jpeg">
+                                <small class="d-block text-muted mt-1" style="font-size: 0.8rem;">JPG ou PNG, max
+                                    2MB.</small>
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="password-change-section">
+                                    <h6>Alterar Senha de Acesso</h6>
+                                    <div class="mb-3 form-group">
+                                        <label for="edit-current-password" class="form-label">Senha Atual</label>
+                                        <input type="password" class="form-control" id="edit-current-password"
+                                            placeholder="••••••••" autocomplete="current-password">
+                                    </div>
+                                    <div class="mb-3 form-group">
+                                        <label for="edit-new-password" class="form-label">Nova Senha</label>
+                                        <input type="password" class="form-control" id="edit-new-password"
+                                            placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                                    </div>
+                                    <div class="mb-3 form-group">
+                                        <label for="edit-confirm-password" class="form-label">Confirmar Nova
+                                            Senha</label>
+                                        <input type="password" class="form-control" id="edit-confirm-password"
+                                            placeholder="Repita a nova senha" autocomplete="new-password">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="edit-profile-feedback" class="mt-3 text-center"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="saveProfileChangesButton">Salvar Mudanças</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="materialsModal" tabindex="-1" aria-labelledby="materialsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="materialsModalLabel">Materiais Coletados</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <form id="registerMaterialForm" onsubmit="return false;">
+                        <div class="mb-3">
+                            <label class="form-label fs-6">Selecione os materiais que sua empresa coleta:</label>
+                            <p class="text-muted small">Esta lista será exibida aos usuários que procuram pontos de
+                                coleta.</p>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <div class="form-check fs-5 mb-2">
+                                        <input class="form-check-input" type="checkbox" value="plastico"
+                                            id="checkPlastico" name="materialColetado">
+                                        <label class="form-check-label" for="checkPlastico">Plástico</label>
+                                    </div>
+                                    <div class="form-check fs-5 mb-2">
+                                        <input class="form-check-input" type="checkbox" value="papel" id="checkPapel"
+                                            name="materialColetado">
+                                        <label class="form-check-label" for="checkPapel">Papel/Papelão</label>
+                                    </div>
+                                    <div class="form-check fs-5 mb-2">
+                                        <input class="form-check-input" type="checkbox" value="vidro" id="checkVidro"
+                                            name="materialColetado">
+                                        <label class="form-check-label" for="checkVidro">Vidro</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check fs-5 mb-2">
+                                        <input class="form-check-input" type="checkbox" value="metal" id="checkMetal"
+                                            name="materialColetado">
+                                        <label class="form-check-label" for="checkMetal">Metal</label>
+                                    </div>
+                                    <div class="form-check fs-5 mb-2">
+                                        <input class="form-check-input" type="checkbox" value="eletronico"
+                                            id="checkEletronico" name="materialColetado">
+                                        <label class="form-check-label" for="checkEletronico">Eletrônicos</label>
+                                    </div>
+                                    <div class="form-check fs-5 mb-2">
+                                        <input class="form-check-input" type="checkbox" value="oleo" id="checkOleo"
+                                            name="materialColetado">
+                                        <label class="form-check-label" for="checkOleo">Óleo de Cozinha Usado</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="materials-feedback" class="mt-3 text-center"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="saveMaterialsButton">Salvar Materiais</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/recicladora-dashboard.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/emp-map.js"></script>
+    <script src="js/main.js"></script>
+
+
+
+</body>
+
+</html>

@@ -1,5 +1,6 @@
 package br.com.ecologica.cadastro.usuarios.dto;
 
+import br.com.ecologica.validacao.ValidadorCPF;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -19,4 +20,11 @@ public class UsuarioRequest {
 
     @NotBlank(message = "O perfil é obrigatório")
     private String perfil;
+
+    @NotBlank(message = "O CPF é obrigatório")
+    private String cpf;
+
+    public boolean isCpfValido() {
+        return ValidadorCPF.isCPFValido(cpf);
+    }
 }

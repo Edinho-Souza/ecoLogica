@@ -10,6 +10,7 @@ public class EmpresaApoiadoraResponse {
     private String cnpj;
     private String contato;
     private boolean ativa;
+    private boolean aprovada;
 
     public static EmpresaApoiadoraResponse fromEntity(br.com.ecologica.cadastro.CadastroEmpresasApoiadoras empresa) {
         EmpresaApoiadoraResponse response = new EmpresaApoiadoraResponse();
@@ -18,6 +19,7 @@ public class EmpresaApoiadoraResponse {
         response.setCnpj(empresa.getCnpj());
         response.setContato(empresa.getContato());
         response.setAtiva(empresa.isAtiva());
+        response.setAprovada(empresa.isAprovada());
         return response;
     }
 }
