@@ -1,0 +1,378 @@
+/**
+ * @file admin-dashboard.js
+ * Gerencia as interatividades específicas da página de administração (admin.html),
+ * como modais, gráficos, tabelas e formulários.
+ */
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    console.log("admin-dashboard.js: Script carregado.");
+
+    // ===================================================================
+    // DADOS SIMULADOS E VARIÁVEIS DE PAGINAÇÃO (Atualizado com Logs)
+    // ===================================================================
+    let simulatedUsers = [
+        // Adicionando mais usuários para testar a paginação
+        { id: 1, name: "Sofia Terra", email: "terradasofia@ecologica.com", points: 150, status: "Ativo" },
+        { id: 2, name: "Carlos Rocha", email: "carlos@email.com", points: 1180, status: "Ativo" },
+        { id: 3, name: "Beatriz Farias", email: "bia.f@mail.net", points: 1250, status: "Ativo" },
+        { id: 4, name: "Mariana Silva", email: "mari.silva@provider.org", points: 1150, status: "Ativo" },
+        { id: 5, name: "Rafael Oliveira", email: "rafa.oli@sample.com", points: 1090, status: "Ativo" },
+        { id: 6, name: "Juliana Pereira", email: "juli.pereira@domain.net", points: 1050, status: "Ativo" },
+        { id: 7, name: "Usuário Inativo Teste", email: "inativo@mail.com", points: 20, status: "Inativo" },
+        { id: 8, name: "Fernando Lima", email: "fer.lima@mail.com", points: 980, status: "Ativo" },
+        { id: 9, name: "Patricia Souza", email: "paty@example.org", points: 950, status: "Ativo" },
+        { id: 10, name: "Ricardo Alves", email: "ricardo.a@provider.net", points: 910, status: "Ativo" },
+        { id: 11, name: "Camila Santos", email: "camila.s@domain.com", points: 880, status: "Ativo" },
+        { id: 12, name: "Outro Inativo", email: "outro@inativo.com", points: 5, status: "Inativo" },
+        { id: 13, name: "Lucas Mendes", email: "lucas.m@email.net", points: 850, status: "Ativo" }
+    ];
+    let filteredUserList = [...simulatedUsers]; // Lista que será exibida (inicialmente todos)
+    let currentPage = 1;
+    const itemsPerPage = 5; // Quantos usuários mostrar por página
+
+    let simulatedCampaigns = [
+         { id: 1, title: "Recicla Pomerode", startDate: "2025-09-01", endDate: "2025-09-22", description: "Mutirão...", image: "...", points: 200 },
+         { id: 2, title: "Plástico Zero", startDate: "2025-10-01", endDate: "2025-10-31", description: "Troque 2kg...", image: "...", points: null },
+    ];
+    let nextCampaignId = 3;
+
+    // *** DADOS SIMULADOS EXTRAS (para o modal de perfil) ***
+    const simulatedRecycled = Math.floor(Math.random() * 500) + 100;
+    const simulatedLastLogin = '2025-10-20 09:30:00'; 
+    // *** FIM DADOS SIMULADOS EXTRAS ***
+
+    let simulatedLogs = [
+        { id: 101, timestamp: "2025-10-26 14:30:00", user: "Sofia Terra", action: "Registro Material", details: "Plástico (Aprox. 2 sacolas)", points: "+50", company: "Recicladora Vale Limpo" },
+        { id: 102, timestamp: "2025-10-26 10:15:00", user: "Carlos Rocha", action: "Resgate Recompensa", details: "Ecobag ecoLogica", points: "-50", company: "" },
+        { id: 103, timestamp: "2025-10-25 18:00:00", user: "Beatriz Farias", action: "Registro Material", details: "Vidro (1 caixa)", points: "+70", company: "Cooperativa Bairro Verde" },
+        { id: 104, timestamp: "2025-10-25 09:05:00", user: "Sofia Terra", action: "Registro Material", details: "Metal (latas)", points: "+30", company: "Recicladora Vale Limpo" },
+        { id: 105, timestamp: "2025-10-24 16:20:00", user: "Rafael Oliveira", action: "Cadastro Newsletter", details: "", points: "+10", company: "" },
+        { id: 106, timestamp: "2025-10-24 11:00:00", user: "Mariana Silva", action: "Registro Material", details: "Óleo (2 garrafas)", points: "+40", company: "Recicladora Vale Limpo" },
+        { id: 107, timestamp: "2025-10-23 15:00:00", user: "Carlos Rocha", action: "Registro Material", details: "Papelão (3 caixas)", points: "+60", company: "Cooperativa Bairro Verde" },
+        { id: 108, timestamp: "2025-10-23 10:00:00", user: "Juliana Pereira", action: "Registro Material", details: "Eletrônico (1 celular)", points: "+100", company: "Recicladora Vale Limpo" },
+        { id: 109, timestamp: "2025-10-22 17:00:00", user: "Sofia Terra", action: "Resgate Recompensa", details: "Pacote Sementes", points: "-30", company: "" },
+        { id: 110, timestamp: "2025-10-22 13:00:00", user: "Beatriz Farias", action: "Registro Material", details: "Plástico (1 sacola grande)", points: "+45", company: "Cooperativa Bairro Verde" },
+        { id: 111, timestamp: "2025-10-21 08:30:00", user: "Carlos Rocha", action: "Registro Material", details: "Metal (Panelas velhas)", points: "+80", company: "MetalNorte Reciclagem" },
+    ];
+    let filteredLogList = [...simulatedLogs]; // Lista de logs a ser exibida
+    let currentLogPage = 1;
+    const logsPerPage = 5; // Quantos logs mostrar por página
+
+    // ===================================================================
+    // FUNÇÃO: GERENCIAMENTO DO MODAL "EDITAR PERFIL ADMIN"
+    // ===================================================================
+    const handleAdminProfileModal = () => { /* ... (código inalterado) ... */ 
+        const modalElement = document.getElementById('editAdminProfileModal');
+        if (!modalElement) { console.warn("Modal #editAdminProfileModal não encontrado."); return; }
+        const modalInstance = new bootstrap.Modal(modalElement);
+        const form = document.getElementById('editAdminProfileForm');
+        const saveButton = document.getElementById('saveAdminProfileChangesButton');
+        const feedbackDiv = document.getElementById('edit-admin-profile-feedback');
+        const avatarUploadInput = document.getElementById('adminAvatarUpload');
+        const avatarPreviewImg = document.getElementById('edit-admin-profile-avatar-img');
+        const currentPasswordInput = document.getElementById('edit-admin-current-password');
+        const newPasswordInput = document.getElementById('edit-admin-new-password');
+        const confirmPasswordInput = document.getElementById('edit-admin-confirm-password');
+        const modalNameDisplay = document.getElementById('modal-admin-name-display');
+        const modalEmailDisplay = document.getElementById('modal-admin-email-display');
+        const mainAvatarDisplay = document.getElementById('admin-avatar-display');
+        const mainNameDisplay = document.getElementById('admin-name-display');
+        const mainEmailDisplay = document.getElementById('admin-email-display');
+
+        modalElement.addEventListener('show.bs.modal', () => {
+            if (mainNameDisplay && modalNameDisplay) modalNameDisplay.textContent = mainNameDisplay.textContent;
+            if (mainEmailDisplay && modalEmailDisplay) modalEmailDisplay.textContent = mainEmailDisplay.textContent;
+            if (mainAvatarDisplay) avatarPreviewImg.src = mainAvatarDisplay.src;
+            currentPasswordInput.value = ''; newPasswordInput.value = ''; confirmPasswordInput.value = '';
+            avatarUploadInput.value = ''; feedbackDiv.textContent = ''; feedbackDiv.className = 'mt-3 text-center';
+            saveButton.disabled = false;
+        });
+        avatarUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 2 * 1024 * 1024) { feedbackDiv.textContent = 'Erro: A imagem deve ter no máximo 2MB.'; feedbackDiv.className = 'mt-3 text-center text-danger'; avatarUploadInput.value = ''; return; }
+                if (!['image/jpeg', 'image/png'].includes(file.type)) { feedbackDiv.textContent = 'Erro: Formato inválido. Use JPG ou PNG.'; feedbackDiv.className = 'mt-3 text-center text-danger'; avatarUploadInput.value = ''; return; }
+                const reader = new FileReader(); reader.onload = (e) => { avatarPreviewImg.src = e.target.result; feedbackDiv.textContent = ''; };
+                reader.onerror = () => { feedbackDiv.textContent = 'Erro ao ler a imagem.'; feedbackDiv.className = 'mt-3 text-center text-danger'; }; reader.readAsDataURL(file);
+            }
+        });
+        saveButton.addEventListener('click', () => {
+            feedbackDiv.textContent = ''; const currentPassword = currentPasswordInput.value; const newPassword = newPasswordInput.value; const confirmPassword = confirmPasswordInput.value; const newAvatarSrc = avatarPreviewImg.src;
+            if (newPassword || confirmPassword) {
+                if (newPassword.length < 6) { feedbackDiv.textContent = 'Erro: A nova senha deve ter pelo menos 6 caracteres.'; feedbackDiv.className = 'mt-3 text-center text-danger'; newPasswordInput.focus(); return; }
+                if (newPassword !== confirmPassword) { feedbackDiv.textContent = 'Erro: As novas senhas não coincidem.'; feedbackDiv.className = 'mt-3 text-center text-danger'; confirmPasswordInput.focus(); return; }
+            }
+            console.log("Simulando envio para backend:", { avatarChanged: mainAvatarDisplay ? newAvatarSrc !== mainAvatarDisplay.src : true, passwordChanged: !!newPassword });
+            feedbackDiv.textContent = 'Salvando alterações...'; feedbackDiv.className = 'mt-3 text-center text-info'; saveButton.disabled = true;
+            setTimeout(() => {
+                console.log("Simulação: Dados salvos com sucesso!"); if (mainAvatarDisplay) mainAvatarDisplay.src = newAvatarSrc;
+                feedbackDiv.textContent = 'Perfil atualizado com sucesso!'; feedbackDiv.className = 'mt-3 text-center text-success'; saveButton.disabled = false;
+                setTimeout(() => { modalInstance.hide(); }, 1500);
+            }, 1500);
+        });
+    }; // Fim handleAdminProfileModal
+
+    // ===================================================================
+    // FUNÇÃO: INICIALIZA OS GRÁFICOS DO ADMIN
+    // ===================================================================
+    const initAdminCharts = () => {
+        // ... (seu código existente dos gráficos, sem alterações) ...
+        console.log("Função initAdminCharts chamada.");
+        if (typeof Chart === 'undefined') { console.error("Chart.js não está carregado."); return; }
+        Chart.defaults.font.family = "'Open Sans', sans-serif"; Chart.defaults.color = '#555'; const meses = ['Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out'];
+        const companyCtx = document.getElementById('companyCollectionChart')?.getContext('2d');
+        if (companyCtx) { new Chart(companyCtx, { type: 'bar', data: { labels: ['Recicla Vale', 'Cooperativa Bairro', 'MetalNorte', 'Outra'], datasets: [{ label: 'Kg Coletado (Mês Atual)', data: [1250, 850, 1500, 400], backgroundColor: ['rgba(72, 143, 88, 0.7)', 'rgba(44, 88, 54, 0.7)', 'rgba(168, 208, 141, 0.7)', 'rgba(232, 122, 0, 0.7)'], borderColor: ['rgba(72, 143, 88, 1)', 'rgba(44, 88, 54, 1)', 'rgba(168, 208, 141, 1)', 'rgba(232, 122, 0, 1)'], borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, title: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} Kg` } } }, scales: { y: { grid: { display: false } }, x: { beginAtZero: true, title: { display: true, text: 'Kg Coletado' } } } } }); } else { console.warn("Canvas #companyCollectionChart não encontrado."); }
+        const totalUserCtx = document.getElementById('totalUserRecyclingChart')?.getContext('2d');
+        if (totalUserCtx) { const gradientFill = totalUserCtx.createLinearGradient(0, 0, 0, 150); gradientFill.addColorStop(0, 'rgba(232, 122, 0, 0.6)'); gradientFill.addColorStop(1, 'rgba(232, 122, 0, 0.05)'); new Chart(totalUserCtx, { type: 'line', data: { labels: meses, datasets: [{ label: 'Total Reciclado (Kg)', data: [650, 710, 750, 920, 880, 1050], fill: true, backgroundColor: gradientFill, borderColor: '#e87a00', borderWidth: 2, pointBackgroundColor: '#e87a00', pointRadius: 3, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Kg' } }, x: { grid: { display: false } } }, interaction: { intersect: false, mode: 'index' }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} Kg` } } } }); } else { console.warn("Canvas #totalUserRecyclingChart não encontrado."); }
+        const userGrowthCtx = document.getElementById('userGrowthChart')?.getContext('2d');
+        if (userGrowthCtx) { new Chart(userGrowthCtx, { type: 'line', data: { labels: meses, datasets: [{ label: 'Novos Usuários', data: [15, 22, 18, 30, 25, 35], borderColor: '#488f58', borderWidth: 2, pointBackgroundColor: '#488f58', pointRadius: 3, tension: 0.1 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Novos Cadastros' } }, x: { grid: { display: false } } }, interaction: { intersect: false, mode: 'index' }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} usuários` } } } }); } else { console.warn("Canvas #userGrowthChart não encontrado."); }
+        const visitorsCtx = document.getElementById('siteVisitorsChart')?.getContext('2d');
+        if (visitorsCtx) { new Chart(visitorsCtx, { type: 'bar', data: { labels: meses, datasets: [{ label: 'Visitantes Únicos', data: [1100, 1300, 1200, 1500, 1450, 1600], backgroundColor: 'rgba(0, 123, 255, 0.6)', borderColor: 'rgba(0, 123, 255, 1)', borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Visitantes' } }, x: { grid: { display: false } } }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} visitantes` } } } }); } else { console.warn("Canvas #siteVisitorsChart não encontrado."); }
+    }; // Fim initAdminCharts
+
+    // ===================================================================
+    // FUNÇÕES DE GERENCIAMENTO DE USUÁRIOS
+    // ===================================================================
+    const populateUserTable = () => {
+        // ... (seu código existente, sem alterações) ...
+        const tableBody = document.getElementById('user-table-body');
+        if (!tableBody) { console.warn("Tabela #user-table-body não encontrada."); return; }
+        tableBody.innerHTML = '';
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const usersToDisplay = filteredUserList.slice(startIndex, endIndex);
+        if (usersToDisplay.length === 0 && currentPage === 1) { tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Nenhum usuário encontrado com os filtros aplicados.</td></tr>'; renderPaginationControls(); return; }
+        if (usersToDisplay.length === 0 && currentPage > 1) { tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Nenhum usuário nesta página (${currentPage}).</td></tr>`; renderPaginationControls(); return; }
+        usersToDisplay.forEach(user => {
+            const statusBadgeClass = user.status === 'Ativo' ? 'bg-success' : 'bg-danger';
+            // ATUALIZADO: Adicionado data-bs-toggle/target para o botão "Ver Perfil"
+            const row = `<tr><td>${user.name}</td><td>${user.email}</td><td>${user.points}</td><td><span class="badge ${statusBadgeClass}">${user.status}</span></td><td><button class="btn btn-sm btn-outline-primary action-btn" data-user-id="${user.id}" data-action="view" title="Ver Perfil" data-bs-toggle="modal" data-bs-target="#userProfileModal"><i class="fas fa-eye"></i></button><button class="btn btn-sm btn-outline-secondary action-btn" data-user-id="${user.id}" data-action="points" title="Add/Rem Pontos"><i class="fas fa-coins"></i></button><button class="btn btn-sm btn-outline-warning action-btn" data-user-id="${user.id}" data-action="reset_pw" title="Resetar Senha"><i class="fas fa-key"></i></button><button class="btn btn-sm btn-outline-danger action-btn" data-user-id="${user.id}" data-action="toggle_status" title="${user.status === 'Ativo' ? 'Desativar' : 'Ativar'} Conta"><i class="fas ${user.status === 'Ativo' ? 'fa-user-slash' : 'fa-user-check'}"></i></button></td></tr>`;
+            tableBody.innerHTML += row;
+        });
+        renderPaginationControls();
+    };
+    const handleUserActionClick = (event) => {
+        // ... (seu código existente, sem alterações) ...
+        const button = event.target.closest('.action-btn');
+        if (!button) return;
+        event.preventDefault();
+        const userId = button.dataset.userId;
+        const action = button.dataset.action;
+        const userIndex = simulatedUsers.findIndex(u => u.id == userId);
+        if (userIndex === -1) { console.error(`Usuário ${userId} não encontrado no array original.`); return; }
+        const user = simulatedUsers[userIndex];
+        console.log(`Ação '${action}' para ${user.name}`);
+        
+        switch (action) {
+            case 'view':
+                // *** IMPLEMENTAÇÃO DO MODAL DE DETALHES ***
+                const modalElement = document.getElementById('userProfileModal');
+                if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                    
+                    // Preenche os dados no modal
+                    document.getElementById('modal-user-avatar').src = 'img/avatar-pessoa-ia.png'; // Avatar padrão
+                    document.getElementById('modal-user-name').textContent = user.name;
+                    
+                    const statusEl = document.getElementById('modal-user-status');
+                    statusEl.textContent = `Status: ${user.status}`;
+                    statusEl.className = `text-muted small ${user.status === 'Ativo' ? 'text-success' : 'text-danger'}`;
+                    
+                    document.getElementById('modal-user-id').textContent = user.id;
+                    document.getElementById('modal-user-email').textContent = user.email;
+                    document.getElementById('modal-user-points').textContent = user.points;
+                    
+                    // Dados simulados extras
+                    document.getElementById('modal-user-total-recycled').textContent = `${simulatedRecycled} Kg`;
+                    document.getElementById('modal-user-last-login').textContent = simulatedLastLogin;
+                    
+                    // Configura os botões de ação do modal para reexecutar a ação
+                    const statusBtn = document.getElementById('modal-toggle-status-btn');
+                    const resetPwBtn = document.getElementById('modal-reset-pw-btn');
+
+                    statusBtn.textContent = user.status === 'Ativo' ? 'Desativar Conta' : 'Ativar Conta';
+                    statusBtn.className = `btn btn-sm ${user.status === 'Ativo' ? 'btn-outline-danger' : 'btn-outline-success'}`;
+                    
+                    // Anexa o ID do usuário aos botões
+                    statusBtn.dataset.userId = userId;
+                    resetPwBtn.dataset.userId = userId;
+                    
+                    modal.show();
+                } else {
+                    alert(`(Simulação) Ver perfil de ${user.name}\nPontos: ${user.points}\nStatus: ${user.status}`);
+                }
+                break;
+                // *** FIM IMPLEMENTAÇÃO DO MODAL ***
+            case 'points': const pointsToAdd = prompt(`Ajustar pontos para ${user.name} (${user.points}). Digite (+/-):`, "0"); if (pointsToAdd !== null) { const points = parseInt(pointsToAdd); if (!isNaN(points)) { user.points += points; console.log(`Pontos atualizados para ${user.points}.`); handleUserSearchAndFilter(true); alert(`Pontos atualizados para ${user.points}.`); } else { alert("Valor inválido."); } } break;
+            case 'reset_pw': if (confirm(`Gerar nova senha para ${user.name}?`)) { console.log(`(Simulação) Senha resetada para ${user.name}.`); alert(`(Simulação) Nova senha gerada.`); } break;
+            case 'toggle_status': const newStatus = user.status === 'Ativo' ? 'Inativo' : 'Ativo'; if (confirm(`${newStatus === 'Inativo' ? 'DESATIVAR' : 'ATIVAR'} conta de ${user.name}?`)) { user.status = newStatus; console.log(`Status alterado para ${user.status}.`); handleUserSearchAndFilter(true); alert(`Conta ${newStatus === 'Inativo' ? 'desativada' : 'ativada'}.`); } break;
+            default: console.warn(`Ação desconhecida: ${action}`);
+        }
+    };
+    const renderPaginationControls = () => {
+        // ... (seu código existente, sem alterações) ...
+        const paginationNav = document.querySelector('.user-management-section nav[aria-label="Paginação de usuários"]');
+        if (!paginationNav) return;
+        const totalItems = filteredUserList.length; const totalPages = Math.ceil(totalItems / itemsPerPage);
+        const paginationUl = paginationNav.querySelector('.pagination'); paginationUl.innerHTML = '';
+        if (totalPages <= 1) { paginationNav.style.display = 'none'; return; } paginationNav.style.display = 'flex';
+        const prevLi = document.createElement('li'); prevLi.classList.add('page-item'); if (currentPage === 1) prevLi.classList.add('disabled'); prevLi.innerHTML = `<a class="page-link" href="#" data-page="prev">Anterior</a>`; paginationUl.appendChild(prevLi);
+        for (let i = 1; i <= totalPages; i++) { const pageLi = document.createElement('li'); pageLi.classList.add('page-item'); if (i === currentPage) pageLi.classList.add('active'); pageLi.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`; paginationUl.appendChild(pageLi); }
+        const nextLi = document.createElement('li'); nextLi.classList.add('page-item'); if (currentPage === totalPages) nextLi.classList.add('disabled'); nextLi.innerHTML = `<a class="page-link" href="#" data-page="next">Próximo</a>`; paginationUl.appendChild(nextLi);
+    };
+    const handleUserSearchAndFilter = (redrawOnly = false) => {
+        // ... (seu código existente, sem alterações) ...
+        const searchInput = document.getElementById('userSearchInput'); const statusFilter = document.getElementById('userStatusFilter'); const searchButton = document.getElementById('user-search-button'); const tableBody = document.getElementById('user-table-body');
+        if (!searchInput || !statusFilter || !searchButton || !tableBody) { console.warn("Elementos de filtro/busca de usuários ou tbody não encontrados."); return; }
+        const filterUsers = () => { const searchTerm = searchInput.value.toLowerCase().trim(); const selectedStatus = statusFilter.value.toLowerCase(); console.log(`Filtrando usuários: Termo='${searchTerm}', Status='${selectedStatus}'`); filteredUserList = simulatedUsers.filter(user => { const nameMatch = user.name.toLowerCase().includes(searchTerm); const emailMatch = user.email.toLowerCase().includes(searchTerm); const statusMatch = (selectedStatus === '') || (user.status.toLowerCase() === selectedStatus); return (nameMatch || emailMatch) && statusMatch; }); console.log("Usuários filtrados:", filteredUserList); currentPage = 1; populateUserTable(); };
+        if (!searchButton.dataset.listenerAdded) { searchButton.addEventListener('click', filterUsers); tableBody.addEventListener('click', handleUserActionClick); searchButton.dataset.listenerAdded = 'true'; /* Real-time filter listeners commented out */ }
+        if (redrawOnly) { console.log("Redesenhando tabela com filtros atuais após ação..."); filterUsers(); }
+    };
+    const handlePagination = () => {
+        // ... (seu código existente, sem alterações) ...
+         const paginationNav = document.querySelector('.user-management-section nav[aria-label="Paginação de usuários"]');
+        if (!paginationNav) { console.warn("Paginação de usuários não encontrada."); return; }
+        paginationNav.addEventListener('click', (event) => { const link = event.target.closest('.page-link'); if (!link || link.closest('.page-item').classList.contains('disabled') || link.closest('.page-item').classList.contains('active')) { event.preventDefault(); return; } event.preventDefault(); const targetPage = link.dataset.page; const totalItems = filteredUserList.length; const totalPages = Math.ceil(totalItems / itemsPerPage); let newPage = currentPage; if (targetPage === 'prev') { newPage = Math.max(1, currentPage - 1); } else if (targetPage === 'next') { newPage = Math.min(totalPages, currentPage + 1); } else { newPage = parseInt(targetPage); } if (newPage !== currentPage) { currentPage = newPage; console.log(`Nova página (Usuários): ${currentPage}`); populateUserTable(); } });
+    };
+
+    // ===================================================================
+    // FUNÇÕES DE AÇÃO DO MODAL DE PERFIL (NOVO)
+    // ===================================================================
+    document.addEventListener('click', (event) => {
+        // Escuta os botões de ação DENTRO do modal de perfil do usuário
+        const modalBtn = event.target.closest('#modal-reset-pw-btn, #modal-toggle-status-btn');
+        if (modalBtn) {
+            const userId = modalBtn.dataset.userId;
+            const action = modalBtn.dataset.action;
+            const userIndex = simulatedUsers.findIndex(u => u.id == userId);
+            if (userIndex === -1) return;
+            const user = simulatedUsers[userIndex]; 
+
+            // Reusa a lógica de confirmação e atualização da função principal
+            if (action === 'reset_pw') {
+                if (confirm(`Gerar nova senha para ${user.name}?`)) { 
+                    console.log(`[Modal] Senha resetada para ${user.name}.`);
+                    alert(`(Simulação) Nova senha gerada.`);
+                    handleUserSearchAndFilter(true); // Redesenha a tabela
+                }
+            } else if (action === 'toggle_status') {
+                const newStatus = user.status === 'Ativo' ? 'Inativo' : 'Ativo';
+                if (confirm(`${newStatus === 'Inativo' ? 'DESATIVAR' : 'ATIVAR'} conta de ${user.name}?`)) { 
+                    user.status = newStatus; 
+                    console.log(`[Modal] Status alterado para ${user.status}.`);
+                    alert(`Conta ${newStatus === 'Inativo' ? 'desativada' : 'ativada'}.`);
+                    handleUserSearchAndFilter(true); // Redesenha a tabela
+                }
+            }
+        }
+    });
+
+    // ===================================================================
+    // *** NOVAS FUNÇÕES PARA LOGS ***
+    // ===================================================================
+    const populateLogTable = () => {
+        const tableBody = document.getElementById('log-table-body');
+        if (!tableBody) { console.warn("Tabela #log-table-body não encontrada."); return; }
+        tableBody.innerHTML = '';
+        const startIndex = (currentLogPage - 1) * logsPerPage; const endIndex = startIndex + logsPerPage;
+        const logsToDisplay = filteredLogList.slice(startIndex, endIndex); // Usa filteredLogList
+        if (logsToDisplay.length === 0 && currentLogPage === 1) { tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Nenhum log encontrado com os filtros aplicados.</td></tr>'; renderLogPaginationControls(); return; }
+        if (logsToDisplay.length === 0 && currentLogPage > 1) { tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Nenhum log nesta página (${currentLogPage}).</td></tr>`; renderLogPaginationControls(); return; }
+        logsToDisplay.forEach(log => {
+            const date = new Date(log.timestamp); const formattedDate = date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const pointsClass = log.points.startsWith('+') ? 'text-success' : (log.points.startsWith('-') ? 'text-danger' : '');
+            const row = `<tr><td>${formattedDate}</td><td>${log.user}</td><td>${log.action}</td><td>${log.details || '-'}</td><td class="${pointsClass}">${log.points}</td><td>${log.company || '-'}</td></tr>`;
+            tableBody.innerHTML += row;
+        });
+        renderLogPaginationControls();
+    };
+    const renderLogPaginationControls = () => {
+        const paginationNav = document.querySelector('.activity-logs-section nav[aria-label="Paginação de logs"]');
+        if (!paginationNav) return;
+        const totalItems = filteredLogList.length; const totalPages = Math.ceil(totalItems / logsPerPage);
+        const paginationUl = paginationNav.querySelector('.pagination'); if (!paginationUl) return; paginationUl.innerHTML = '';
+        if (totalPages <= 1) { paginationNav.style.display = 'none'; return; } paginationNav.style.display = 'flex';
+        const prevLi = document.createElement('li'); prevLi.classList.add('page-item'); if (currentLogPage === 1) prevLi.classList.add('disabled'); prevLi.innerHTML = `<a class="page-link" href="#" data-page="prev">Anterior</a>`; paginationUl.appendChild(prevLi);
+        for (let i = 1; i <= totalPages; i++) { const pageLi = document.createElement('li'); pageLi.classList.add('page-item'); if (i === currentLogPage) pageLi.classList.add('active'); pageLi.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`; paginationUl.appendChild(pageLi); }
+        const nextLi = document.createElement('li'); nextLi.classList.add('page-item'); if (currentLogPage === totalPages) nextLi.classList.add('disabled'); nextLi.innerHTML = `<a class="page-link" href="#" data-page="next">Próximo</a>`; paginationUl.appendChild(nextLi);
+    };
+    const handleLogSearchAndFilter = (redrawOnly = false) => {
+        const userInput = document.querySelector('.activity-logs-section input[placeholder*="Usuário"]');
+        const companyInput = document.querySelector('.activity-logs-section input[placeholder*="Empresa"]');
+        const startDateInput = document.querySelector('.activity-logs-section input[type="date"][placeholder="Data Início"]');
+        const endDateInput = document.querySelector('.activity-logs-section input[type="date"][placeholder="Data Fim"]');
+        const logTableBody = document.getElementById('log-table-body');
+        if (!userInput || !companyInput || !startDateInput || !endDateInput || !logTableBody) { console.warn("Elementos de filtro/busca de logs ou tbody não encontrados."); return; }
+        const applyFilters = () => {
+            const userTerm = userInput.value.toLowerCase().trim(); const companyTerm = companyInput.value.toLowerCase().trim();
+            const startDate = startDateInput.value ? new Date(startDateInput.value + 'T00:00:00') : null;
+            const endDate = endDateInput.value ? new Date(endDateInput.value + 'T23:59:59') : null;
+            console.log(`Filtrando logs: Usuário='${userTerm}', Empresa='${companyTerm}', Start='${startDate}', End='${endDate}'`);
+            filteredLogList = simulatedLogs.filter(log => { // Atualiza filteredLogList (global para logs)
+                const logDate = new Date(log.timestamp); if (isNaN(logDate)) return false;
+                const userMatch = !userTerm || log.user.toLowerCase().includes(userTerm);
+                const companyMatch = !companyTerm || (log.company && log.company.toLowerCase().includes(companyTerm));
+                const startDateMatch = !startDate || isNaN(startDate) || logDate >= startDate;
+                const endDateMatch = !endDate || isNaN(endDate) || logDate <= endDate;
+                return userMatch && companyMatch && startDateMatch && endDateMatch;
+            });
+            console.log("Logs filtrados:", filteredLogList); currentLogPage = 1; populateLogTable();
+        };
+        if (!userInput.dataset.listenerAdded) {
+             userInput.addEventListener('input', applyFilters); companyInput.addEventListener('input', applyFilters);
+             startDateInput.addEventListener('change', applyFilters); endDateInput.addEventListener('change', applyFilters);
+             userInput.dataset.listenerAdded = 'true';
+        }
+         if (redrawOnly) { console.log("Redesenhando tabela de logs com filtros atuais..."); applyFilters(); }
+    };
+    const handleLogPagination = () => {
+        const paginationNav = document.querySelector('.activity-logs-section nav[aria-label="Paginação de logs"]');
+        if (!paginationNav) { console.warn("Elemento de paginação de logs não encontrado."); return; }
+        paginationNav.addEventListener('click', (event) => {
+            const link = event.target.closest('.page-link'); if (!link || link.closest('.page-item').classList.contains('disabled') || link.closest('.page-item').classList.contains('active')) { event.preventDefault(); return; }
+            event.preventDefault(); // *** PREVINE SCROLL ***
+            const targetPage = link.dataset.page; const totalItems = filteredLogList.length; const totalPages = Math.ceil(totalItems / logsPerPage); let newPage = currentLogPage;
+            if (targetPage === 'prev') { newPage = Math.max(1, currentLogPage - 1); } else if (targetPage === 'next') { newPage = Math.min(totalPages, currentLogPage + 1); } else { newPage = parseInt(targetPage); }
+            if (newPage !== currentLogPage) { currentLogPage = newPage; console.log(`Logs - Nova página: ${currentLogPage}`); populateLogTable(); }
+        });
+    };
+    // *** FIM FUNÇÕES PARA LOGS ***
+
+    // ===================================================================
+    // FUNÇÃO: GERENCIA O FORMULÁRIO "ADICIONAR/EDITAR CAMPANHA"
+    // ===================================================================
+    const handleCampaignForm = () => {
+        // ... (seu código existente, sem alterações) ...
+        const form = document.getElementById('addCampaignForm');
+        const campaignListDiv = document.getElementById('current-campaigns-list');
+        if (!form || !campaignListDiv) { console.warn("Form/lista de campanha não encontrados."); return; }
+        const renderCampaignList = () => { campaignListDiv.innerHTML = ''; if (simulatedCampaigns.length === 0) { campaignListDiv.innerHTML = '<p class="text-muted small ms-2">Nenhuma campanha cadastrada.</p>'; return; } simulatedCampaigns.forEach(campaign => { const listItem = `<a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" data-campaign-id="${campaign.id}">${campaign.title}<div><span class="badge bg-secondary rounded-pill me-1" data-action="edit"><i class="fas fa-pencil-alt fa-xs"></i></span><span class="badge bg-danger rounded-pill" data-action="delete"><i class="fas fa-trash-alt fa-xs"></i></span></div></a>`; campaignListDiv.innerHTML += listItem; }); };
+        form.addEventListener('submit', (event) => { event.preventDefault(); const campaignData = { id: null, title: document.getElementById('campaignTitle').value.trim(), startDate: document.getElementById('campaignStartDate').value, endDate: document.getElementById('campaignEndDate').value, description: document.getElementById('campaignDescription').value.trim(), image: document.getElementById('campaignImage').value.trim(), points: parseInt(document.getElementById('campaignPoints').value) || null }; if (!campaignData.title || !campaignData.description) { alert("Título e Descrição são obrigatórios."); return; } console.log("Simulando salvamento...", campaignData); alert("(Simulação) Salvando..."); setTimeout(() => { campaignData.id = nextCampaignId++; simulatedCampaigns.push(campaignData); alert("Campanha adicionada!"); form.reset(); renderCampaignList(); }, 1000); });
+        campaignListDiv.addEventListener('click', (event) => { const actionBadge = event.target.closest('.badge[data-action]'); if (!actionBadge) return; event.preventDefault(); const listItem = actionBadge.closest('.list-group-item'); if (!listItem) return; const campaignId = listItem.dataset.campaignId; const action = actionBadge.dataset.action; const campaign = simulatedCampaigns.find(c => c.id == campaignId); if (!campaign) return; if (action === 'edit') { console.log(`Editando: ${campaign.title}`); document.getElementById('campaignTitle').value = campaign.title; document.getElementById('campaignStartDate').value = campaign.startDate || ''; document.getElementById('campaignEndDate').value = campaign.endDate || ''; document.getElementById('campaignDescription').value = campaign.description; document.getElementById('campaignImage').value = campaign.image || ''; document.getElementById('campaignPoints').value = campaign.points || ''; const campaignSection = form.closest('.add-campaign-section'); if (campaignSection) { campaignSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); } else { form.scrollIntoView({ behavior: 'smooth', block: 'start' }); } } else if (action === 'delete') { if (confirm(`Excluir "${campaign.title}"?`)) { console.log(`Excluindo ID ${campaignId}`); simulatedCampaigns = simulatedCampaigns.filter(c => c.id != campaignId); renderCampaignList(); } } });
+        renderCampaignList();
+    };
+
+    // ===================================================================
+    // CHAMADAS DE INICIALIZAÇÃO (Atualizado com Logs)
+    // ===================================================================
+
+    handleAdminProfileModal();
+    initAdminCharts();
+
+    // Usuários
+    populateUserTable(); // Popula usuários (página 1 de todos)
+    handleUserSearchAndFilter(); // Configura filtros/busca/ações de usuários
+    handlePagination(); // Configura paginação de usuários
+
+    // Logs
+    populateLogTable(); // Popula logs (página 1 de todos)
+    handleLogSearchAndFilter(); // Configura filtros de logs
+    handleLogPagination(); // Configura paginação de logs
+
+    // Campanhas
+    handleCampaignForm();
+
+    // Chamar outras funções de inicialização aqui
+
+}); // Fim do DOMContentLoaded
