@@ -61,6 +61,42 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentLogPage = 1;
     const logsPerPage = 5; // Quantos logs mostrar por página
 
+    // *** NOVO: DADOS E VARIÁVEIS PARA CONFIGURAÇÕES ***
+    const DEFAULT_SETTINGS = {
+        pointsKgPlastico: 50,
+        pointsKgPapel: 30,
+        pointsNewsletter: 10,
+        settingTelegramLink: "https://t.me/+Fsirxfskk-MyOTRh",
+        settingFacebookLink: "",
+        settingInstagramLink: "",
+        settingContactEmail: "contato@ecologica.com",
+        settingContactPhone: "(00) 1234-5678"
+    };
+
+    let currentSettings = {};
+
+    // Função para carregar configurações do localStorage ou usar padrão
+    const loadSettings = () => {
+        const storedSettings = localStorage.getItem('ecoLogica_Settings');
+        if (storedSettings) {
+            try {
+                currentSettings = JSON.parse(storedSettings);
+                // Garante que todas as chaves padrão existam, mesmo que salvas anteriormente sem elas
+                currentSettings = { ...DEFAULT_SETTINGS, ...currentSettings };
+            } catch (e) {
+                console.error("Erro ao carregar configurações do localStorage:", e);
+                currentSettings = { ...DEFAULT_SETTINGS }; // Usa padrão em caso de erro
+            }
+        } else {
+            currentSettings = { ...DEFAULT_SETTINGS }; // Usa padrão se não houver nada salvo
+        }
+        console.log("Configurações carregadas:", currentSettings);
+    };
+
+    // Carrega as configurações assim que o script começa
+    loadSettings();
+    // *** FIM NOVO ***
+
     // ===================================================================
     // FUNÇÃO: GERENCIAMENTO DO MODAL "EDITAR PERFIL ADMIN"
     // ===================================================================
@@ -342,6 +378,142 @@ document.addEventListener('DOMContentLoaded', () => {
     // *** FIM FUNÇÕES PARA LOGS ***
 
     // ===================================================================
+    // FUNÇÃO: GERENCIA O FORMULÁRIO "SISTEMA DE PONTOS"
+    // ===================================================================
+    const handlePointsSystemForm = () => {
+        const form = document.getElementById('pointsSystemForm');
+        if (!form) { console.warn("Formulário #pointsSystemForm não encontrado."); return; }
+
+        const plasticoInput = document.getElementById('pointsKgPlastico');
+        const papelInput = document.getElementById('pointsKgPapel');
+        const newsletterInput = document.getElementById('pointsNewsletter');
+        // Adicionar inputs para outros materiais aqui
+
+        // --- Função para preencher o formulário com os valores atuais ---
+        const populateForm = () => {
+            if (plasticoInput) plasticoInput.value = currentSettings.pointsKgPlastico || 0;
+            if (papelInput) papelInput.value = currentSettings.pointsKgPapel || 0;
+            if (newsletterInput) newsletterInput.value = currentSettings.pointsNewsletter || 0;
+            // Preencher outros inputs aqui
+        };
+
+        // --- Listener para salvar os valores ---
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            console.log("Salvando configurações do sistema de pontos...");
+
+            // Atualiza o objeto currentSettings
+            currentSettings.pointsKgPlastico = parseInt(plasticoInput.value) || 0;
+            currentSettings.pointsKgPapel = parseInt(papelInput.value) || 0;
+            currentSettings.pointsNewsletter = parseInt(newsletterInput.value) || 0;
+            // Atualizar outros valores aqui
+
+            // Salva no localStorage
+            try {
+                localStorage.setItem('ecoLogica_Settings', JSON.stringify(currentSettings));
+                console.log("Configurações de pontos salvas:", currentSettings);
+                alert("Valores de pontos atualizados com sucesso!");
+            } catch (e) {
+                console.error("Erro ao salvar configurações de pontos:", e);
+                alert("Erro ao salvar as configurações.");
+            }
+        });
+
+        // --- Listener para ajuste manual (exemplo simples) ---
+        const manualAdjustGroup = form.nextElementSibling.nextElementSibling; // Encontra a div do ajuste manual
+        if (manualAdjustGroup) {
+            const emailInput = manualAdjustGroup.querySelector('input[type="email"]');
+            const pointsInput = manualAdjustGroup.querySelector('input[type="number"]');
+            const applyButton = manualAdjustGroup.querySelector('button');
+
+            if (applyButton && emailInput && pointsInput) {
+                applyButton.addEventListener('click', () => {
+                    const email = emailInput.value.trim();
+                    const points = parseInt(pointsInput.value);
+
+                    if (!email || isNaN(points)) {
+                        alert("Por favor, insira um email válido e a quantidade de pontos.");
+                        return;
+                    }
+
+                    // Encontra o usuário
+                    const userIndex = simulatedUsers.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+
+                    if (userIndex === -1) {
+                        alert(`Usuário com email "${email}" não encontrado.`);
+                        return;
+                    }
+
+                    simulatedUsers[userIndex].points += points;
+                    console.log(`(Ajuste Manual) Pontos de ${simulatedUsers[userIndex].name} atualizados para ${simulatedUsers[userIndex].points}.`);
+                    alert(`Pontos de ${simulatedUsers[userIndex].name} ajustados para ${simulatedUsers[userIndex].points}.`);
+                    handleUserSearchAndFilter(true); // Atualiza a tabela de usuários principal
+                    emailInput.value = ''; // Limpa os campos
+                    pointsInput.value = '';
+                });
+            }
+        }
+
+        // Preenche o formulário com os valores carregados inicialmente
+        populateForm();
+    };
+
+    // ===================================================================
+    // FUNÇÃO: GERENCIA O FORMULÁRIO "CONFIGURAÇÕES GERAIS"
+    // ===================================================================
+    const handleSiteSettingsForm = () => {
+        const form = document.getElementById('siteSettingsForm');
+        if (!form) { console.warn("Formulário #siteSettingsForm não encontrado."); return; }
+
+        const telegramInput = document.getElementById('settingTelegramLink');
+        const facebookInput = document.getElementById('settingFacebookLink');
+        const instagramInput = document.getElementById('settingInstagramLink');
+        const emailInput = document.getElementById('settingContactEmail');
+        const phoneInput = document.getElementById('settingContactPhone');
+        // Adicionar outros inputs de configuração aqui
+
+        // --- Função para preencher o formulário ---
+        const populateForm = () => {
+            if (telegramInput) telegramInput.value = currentSettings.settingTelegramLink || '';
+            if (facebookInput) facebookInput.value = currentSettings.settingFacebookLink || '';
+            if (instagramInput) instagramInput.value = currentSettings.settingInstagramLink || '';
+            if (emailInput) emailInput.value = currentSettings.settingContactEmail || '';
+            if (phoneInput) phoneInput.value = currentSettings.settingContactPhone || '';
+            // Preencher outros
+        };
+
+        // --- Listener para salvar ---
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            console.log("Salvando configurações gerais...");
+
+            // Atualiza o objeto currentSettings
+            currentSettings.settingTelegramLink = telegramInput.value.trim();
+            currentSettings.settingFacebookLink = facebookInput.value.trim();
+            currentSettings.settingInstagramLink = instagramInput.value.trim();
+            currentSettings.settingContactEmail = emailInput.value.trim();
+            currentSettings.settingContactPhone = phoneInput.value.trim();
+            // Atualizar outros
+
+            // Salva no localStorage
+            try {
+                localStorage.setItem('ecoLogica_Settings', JSON.stringify(currentSettings));
+                console.log("Configurações gerais salvas:", currentSettings);
+                alert("Configurações gerais atualizadas com sucesso!");
+                // ATENÇÃO: Para que links no rodapé (carregado via JS) sejam atualizados
+                // seria necessário recarregar o rodapé ou ter uma lógica mais complexa
+                // no main.js para ler essas configurações ao montar o rodapé.
+            } catch (e) {
+                console.error("Erro ao salvar configurações gerais:", e);
+                alert("Erro ao salvar as configurações.");
+            }
+        });
+
+        // Preenche o formulário inicialmente
+        populateForm();
+    };
+
+    // ===================================================================
     // FUNÇÃO: GERENCIA O FORMULÁRIO "ADICIONAR/EDITAR CAMPANHA"
     // ===================================================================
     const handleCampaignForm = () => {
@@ -464,6 +636,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Campanhas
     handleCampaignForm();
+
+    // *** NOVAS CHAMADAS PARA CONFIGURAÇÕES ***
+    handlePointsSystemForm(); // Ativa formulário Sistema de Pontos
+    handleSiteSettingsForm(); // Ativa formulário Configurações Gerais
 
     // Chamar outras funções de inicialização aqui
 
