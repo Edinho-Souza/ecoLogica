@@ -9,53 +9,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const campaignListContainer = document.getElementById('campaign-list-container');
     const campaignsLoadingMsg = document.getElementById('campaigns-loading');
 
-    // --- Dados Simulados de Campanhas ---
-    const simulatedCampaignData = [
+    // ==========================================================
+    // *** ALTERAÇÃO AQUI: CARREGAR DADOS DO LOCALSTORAGE ***
+    // ==========================================================
+    let storedCampaigns = localStorage.getItem('ecoLogica_Campaigns');
+    
+    const simulatedCampaignData = storedCampaigns ? JSON.parse(storedCampaigns) : [
+        // Se o localStorage estiver vazio (primeiro acesso), use um padrão
         {
             id: 1,
-            title: "Recicla Pomerode",
+            title: "Recicla Pomerode (Padrão)",
             description: "Mutirão de eletrônicos Dia 22/09 na Praça Central. Pontos extras: +200 pontos para quem levar pilhas e baterias.",
             image: "https://picsum.photos/400/250?random=10",
             startDate: "2025-09-01",
             endDate: "2025-09-22",
             points: 200
         },
-        {
-            id: 2,
-            title: "Plástico Zero",
-            description: "Troque 2kg de plástico limpo e ganhe pontos em dobro até o fim do mês.",
-            image: "https://picsum.photos/400/250?random=11",
-            startDate: "2025-10-01",
-            endDate: "2025-10-31",
-            points: null // Pontos em dobro, não um valor fixo
-        },
-        {
-            id: 3,
-            title: "Eco na Escola",
-            description: "Escolas participantes competem pelo título de “Escola Mais Sustentável de 2025”.",
-            image: "https://picsum.photos/400/250?random=12",
-            startDate: "2025-08-15",
-            endDate: "2025-11-30",
-            points: 500 // Exemplo de prêmio
-        },
-        {
-            id: 4,
-            title: "Metal Premiado",
-            description: "Traga suas latinhas de alumínio e concorra a prêmios incríveis!",
-            image: "https://picsum.photos/400/250?random=13",
-            startDate: "2025-11-01",
-            endDate: "2025-11-15",
-            points: 50
-        }
-        // Adicione mais campanhas simuladas aqui
+        // Adicione mais padrões se necessário
     ];
+    // ==========================================================
+
 
     /**
      * Formata uma string de data (YYYY-MM-DD) para DD/MM/YYYY.
      * @param {string} dateString
      * @returns {string} Data formatada ou string vazia.
      */
-    const formatDate = (dateString) => {
+    const formatDate = (dateString) => { /* ... (função inalterada) ... */
         if (!dateString) return '';
         try {
             const [year, month, day] = dateString.split('-');
@@ -71,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {object} campaign - Objeto da campanha.
      * @returns {string} String HTML do card.
      */
-    const createCampaignCardHTML = (campaign) => {
+    const createCampaignCardHTML = (campaign) => { /* ... (função inalterada) ... */
         const formattedStart = formatDate(campaign.startDate);
         const formattedEnd = formatDate(campaign.endDate);
         const dateText = (formattedStart && formattedEnd) ? `De ${formattedStart} a ${formattedEnd}` : 'Datas não informadas';
@@ -101,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             campaignsLoadingMsg.style.display = 'none'; // Esconde "Carregando..."
             campaignListContainer.innerHTML = ''; // Limpa container
 
+            // *** ALTERAÇÃO: Usa simulatedCampaignData (que agora vem do localStorage) ***
             if (simulatedCampaignData.length > 0) {
                 simulatedCampaignData.forEach(campaign => {
                     campaignListContainer.innerHTML += createCampaignCardHTML(campaign);

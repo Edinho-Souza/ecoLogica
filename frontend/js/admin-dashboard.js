@@ -31,15 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1;
     const itemsPerPage = 5; // Quantos usuários mostrar por página
 
-    let simulatedCampaigns = [
-         { id: 1, title: "Recicla Pomerode", startDate: "2025-09-01", endDate: "2025-09-22", description: "Mutirão...", image: "...", points: 200 },
-         { id: 2, title: "Plástico Zero", startDate: "2025-10-01", endDate: "2025-10-31", description: "Troque 2kg...", image: "...", points: null },
+    let storedCampaigns = localStorage.getItem('ecoLogica_Campaigns');
+    let simulatedCampaigns = storedCampaigns ? JSON.parse(storedCampaigns) : [
+        // Se o localStorage estiver vazio, use as campanhas padrão
+        { id: 1, title: "Recicla Pomerode", startDate: "2025-09-01", endDate: "2025-09-22", description: "Mutirão...", image: "https://picsum.photos/400/250?random=10", points: 200 },
+        { id: 2, title: "Plástico Zero", startDate: "2025-10-01", endDate: "2025-10-31", description: "Troque 2kg...", image: "https://picsum.photos/400/250?random=11", points: null },
     ];
-    let nextCampaignId = 3;
+    let nextCampaignId = simulatedCampaigns.length > 0 ? Math.max(...simulatedCampaigns.map(c => c.id)) + 1 : 3;
 
     // *** DADOS SIMULADOS EXTRAS (para o modal de perfil) ***
     const simulatedRecycled = Math.floor(Math.random() * 500) + 100;
-    const simulatedLastLogin = '2025-10-20 09:30:00'; 
+    const simulatedLastLogin = '2025-10-20 09:30:00';
     // *** FIM DADOS SIMULADOS EXTRAS ***
 
     let simulatedLogs = [
@@ -59,10 +61,46 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentLogPage = 1;
     const logsPerPage = 5; // Quantos logs mostrar por página
 
+    // *** NOVO: DADOS E VARIÁVEIS PARA CONFIGURAÇÕES ***
+    const DEFAULT_SETTINGS = {
+        pointsKgPlastico: 50,
+        pointsKgPapel: 30,
+        pointsNewsletter: 10,
+        settingTelegramLink: "https://t.me/+Fsirxfskk-MyOTRh",
+        settingFacebookLink: "",
+        settingInstagramLink: "",
+        settingContactEmail: "contato@ecologica.com",
+        settingContactPhone: "(00) 1234-5678"
+    };
+
+    let currentSettings = {};
+
+    // Função para carregar configurações do localStorage ou usar padrão
+    const loadSettings = () => {
+        const storedSettings = localStorage.getItem('ecoLogica_Settings');
+        if (storedSettings) {
+            try {
+                currentSettings = JSON.parse(storedSettings);
+                // Garante que todas as chaves padrão existam, mesmo que salvas anteriormente sem elas
+                currentSettings = { ...DEFAULT_SETTINGS, ...currentSettings };
+            } catch (e) {
+                console.error("Erro ao carregar configurações do localStorage:", e);
+                currentSettings = { ...DEFAULT_SETTINGS }; // Usa padrão em caso de erro
+            }
+        } else {
+            currentSettings = { ...DEFAULT_SETTINGS }; // Usa padrão se não houver nada salvo
+        }
+        console.log("Configurações carregadas:", currentSettings);
+    };
+
+    // Carrega as configurações assim que o script começa
+    loadSettings();
+    // *** FIM NOVO ***
+
     // ===================================================================
     // FUNÇÃO: GERENCIAMENTO DO MODAL "EDITAR PERFIL ADMIN"
     // ===================================================================
-    const handleAdminProfileModal = () => { /* ... (código inalterado) ... */ 
+    const handleAdminProfileModal = () => { /* ... (código inalterado) ... */
         const modalElement = document.getElementById('editAdminProfileModal');
         if (!modalElement) { console.warn("Modal #editAdminProfileModal não encontrado."); return; }
         const modalInstance = new bootstrap.Modal(modalElement);
@@ -163,47 +201,47 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userIndex === -1) { console.error(`Usuário ${userId} não encontrado no array original.`); return; }
         const user = simulatedUsers[userIndex];
         console.log(`Ação '${action}' para ${user.name}`);
-        
+
         switch (action) {
             case 'view':
                 // *** IMPLEMENTAÇÃO DO MODAL DE DETALHES ***
                 const modalElement = document.getElementById('userProfileModal');
                 if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
                     const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-                    
+
                     // Preenche os dados no modal
                     document.getElementById('modal-user-avatar').src = 'img/avatar-pessoa-ia.png'; // Avatar padrão
                     document.getElementById('modal-user-name').textContent = user.name;
-                    
+
                     const statusEl = document.getElementById('modal-user-status');
                     statusEl.textContent = `Status: ${user.status}`;
                     statusEl.className = `text-muted small ${user.status === 'Ativo' ? 'text-success' : 'text-danger'}`;
-                    
+
                     document.getElementById('modal-user-id').textContent = user.id;
                     document.getElementById('modal-user-email').textContent = user.email;
                     document.getElementById('modal-user-points').textContent = user.points;
-                    
+
                     // Dados simulados extras
                     document.getElementById('modal-user-total-recycled').textContent = `${simulatedRecycled} Kg`;
                     document.getElementById('modal-user-last-login').textContent = simulatedLastLogin;
-                    
+
                     // Configura os botões de ação do modal para reexecutar a ação
                     const statusBtn = document.getElementById('modal-toggle-status-btn');
                     const resetPwBtn = document.getElementById('modal-reset-pw-btn');
 
                     statusBtn.textContent = user.status === 'Ativo' ? 'Desativar Conta' : 'Ativar Conta';
                     statusBtn.className = `btn btn-sm ${user.status === 'Ativo' ? 'btn-outline-danger' : 'btn-outline-success'}`;
-                    
+
                     // Anexa o ID do usuário aos botões
                     statusBtn.dataset.userId = userId;
                     resetPwBtn.dataset.userId = userId;
-                    
+
                     modal.show();
                 } else {
                     alert(`(Simulação) Ver perfil de ${user.name}\nPontos: ${user.points}\nStatus: ${user.status}`);
                 }
                 break;
-                // *** FIM IMPLEMENTAÇÃO DO MODAL ***
+            // *** FIM IMPLEMENTAÇÃO DO MODAL ***
             case 'points': const pointsToAdd = prompt(`Ajustar pontos para ${user.name} (${user.points}). Digite (+/-):`, "0"); if (pointsToAdd !== null) { const points = parseInt(pointsToAdd); if (!isNaN(points)) { user.points += points; console.log(`Pontos atualizados para ${user.points}.`); handleUserSearchAndFilter(true); alert(`Pontos atualizados para ${user.points}.`); } else { alert("Valor inválido."); } } break;
             case 'reset_pw': if (confirm(`Gerar nova senha para ${user.name}?`)) { console.log(`(Simulação) Senha resetada para ${user.name}.`); alert(`(Simulação) Nova senha gerada.`); } break;
             case 'toggle_status': const newStatus = user.status === 'Ativo' ? 'Inativo' : 'Ativo'; if (confirm(`${newStatus === 'Inativo' ? 'DESATIVAR' : 'ATIVAR'} conta de ${user.name}?`)) { user.status = newStatus; console.log(`Status alterado para ${user.status}.`); handleUserSearchAndFilter(true); alert(`Conta ${newStatus === 'Inativo' ? 'desativada' : 'ativada'}.`); } break;
@@ -231,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const handlePagination = () => {
         // ... (seu código existente, sem alterações) ...
-         const paginationNav = document.querySelector('.user-management-section nav[aria-label="Paginação de usuários"]');
+        const paginationNav = document.querySelector('.user-management-section nav[aria-label="Paginação de usuários"]');
         if (!paginationNav) { console.warn("Paginação de usuários não encontrada."); return; }
         paginationNav.addEventListener('click', (event) => { const link = event.target.closest('.page-link'); if (!link || link.closest('.page-item').classList.contains('disabled') || link.closest('.page-item').classList.contains('active')) { event.preventDefault(); return; } event.preventDefault(); const targetPage = link.dataset.page; const totalItems = filteredUserList.length; const totalPages = Math.ceil(totalItems / itemsPerPage); let newPage = currentPage; if (targetPage === 'prev') { newPage = Math.max(1, currentPage - 1); } else if (targetPage === 'next') { newPage = Math.min(totalPages, currentPage + 1); } else { newPage = parseInt(targetPage); } if (newPage !== currentPage) { currentPage = newPage; console.log(`Nova página (Usuários): ${currentPage}`); populateUserTable(); } });
     };
@@ -247,19 +285,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const action = modalBtn.dataset.action;
             const userIndex = simulatedUsers.findIndex(u => u.id == userId);
             if (userIndex === -1) return;
-            const user = simulatedUsers[userIndex]; 
+            const user = simulatedUsers[userIndex];
 
             // Reusa a lógica de confirmação e atualização da função principal
             if (action === 'reset_pw') {
-                if (confirm(`Gerar nova senha para ${user.name}?`)) { 
+                if (confirm(`Gerar nova senha para ${user.name}?`)) {
                     console.log(`[Modal] Senha resetada para ${user.name}.`);
                     alert(`(Simulação) Nova senha gerada.`);
                     handleUserSearchAndFilter(true); // Redesenha a tabela
                 }
             } else if (action === 'toggle_status') {
                 const newStatus = user.status === 'Ativo' ? 'Inativo' : 'Ativo';
-                if (confirm(`${newStatus === 'Inativo' ? 'DESATIVAR' : 'ATIVAR'} conta de ${user.name}?`)) { 
-                    user.status = newStatus; 
+                if (confirm(`${newStatus === 'Inativo' ? 'DESATIVAR' : 'ATIVAR'} conta de ${user.name}?`)) {
+                    user.status = newStatus;
                     console.log(`[Modal] Status alterado para ${user.status}.`);
                     alert(`Conta ${newStatus === 'Inativo' ? 'desativada' : 'ativada'}.`);
                     handleUserSearchAndFilter(true); // Redesenha a tabela
@@ -320,11 +358,11 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Logs filtrados:", filteredLogList); currentLogPage = 1; populateLogTable();
         };
         if (!userInput.dataset.listenerAdded) {
-             userInput.addEventListener('input', applyFilters); companyInput.addEventListener('input', applyFilters);
-             startDateInput.addEventListener('change', applyFilters); endDateInput.addEventListener('change', applyFilters);
-             userInput.dataset.listenerAdded = 'true';
+            userInput.addEventListener('input', applyFilters); companyInput.addEventListener('input', applyFilters);
+            startDateInput.addEventListener('change', applyFilters); endDateInput.addEventListener('change', applyFilters);
+            userInput.dataset.listenerAdded = 'true';
         }
-         if (redrawOnly) { console.log("Redesenhando tabela de logs com filtros atuais..."); applyFilters(); }
+        if (redrawOnly) { console.log("Redesenhando tabela de logs com filtros atuais..."); applyFilters(); }
     };
     const handleLogPagination = () => {
         const paginationNav = document.querySelector('.activity-logs-section nav[aria-label="Paginação de logs"]');
@@ -340,6 +378,142 @@ document.addEventListener('DOMContentLoaded', () => {
     // *** FIM FUNÇÕES PARA LOGS ***
 
     // ===================================================================
+    // FUNÇÃO: GERENCIA O FORMULÁRIO "SISTEMA DE PONTOS"
+    // ===================================================================
+    const handlePointsSystemForm = () => {
+        const form = document.getElementById('pointsSystemForm');
+        if (!form) { console.warn("Formulário #pointsSystemForm não encontrado."); return; }
+
+        const plasticoInput = document.getElementById('pointsKgPlastico');
+        const papelInput = document.getElementById('pointsKgPapel');
+        const newsletterInput = document.getElementById('pointsNewsletter');
+        // Adicionar inputs para outros materiais aqui
+
+        // --- Função para preencher o formulário com os valores atuais ---
+        const populateForm = () => {
+            if (plasticoInput) plasticoInput.value = currentSettings.pointsKgPlastico || 0;
+            if (papelInput) papelInput.value = currentSettings.pointsKgPapel || 0;
+            if (newsletterInput) newsletterInput.value = currentSettings.pointsNewsletter || 0;
+            // Preencher outros inputs aqui
+        };
+
+        // --- Listener para salvar os valores ---
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            console.log("Salvando configurações do sistema de pontos...");
+
+            // Atualiza o objeto currentSettings
+            currentSettings.pointsKgPlastico = parseInt(plasticoInput.value) || 0;
+            currentSettings.pointsKgPapel = parseInt(papelInput.value) || 0;
+            currentSettings.pointsNewsletter = parseInt(newsletterInput.value) || 0;
+            // Atualizar outros valores aqui
+
+            // Salva no localStorage
+            try {
+                localStorage.setItem('ecoLogica_Settings', JSON.stringify(currentSettings));
+                console.log("Configurações de pontos salvas:", currentSettings);
+                alert("Valores de pontos atualizados com sucesso!");
+            } catch (e) {
+                console.error("Erro ao salvar configurações de pontos:", e);
+                alert("Erro ao salvar as configurações.");
+            }
+        });
+
+        // --- Listener para ajuste manual (exemplo simples) ---
+        const manualAdjustGroup = form.nextElementSibling.nextElementSibling; // Encontra a div do ajuste manual
+        if (manualAdjustGroup) {
+            const emailInput = manualAdjustGroup.querySelector('input[type="email"]');
+            const pointsInput = manualAdjustGroup.querySelector('input[type="number"]');
+            const applyButton = manualAdjustGroup.querySelector('button');
+
+            if (applyButton && emailInput && pointsInput) {
+                applyButton.addEventListener('click', () => {
+                    const email = emailInput.value.trim();
+                    const points = parseInt(pointsInput.value);
+
+                    if (!email || isNaN(points)) {
+                        alert("Por favor, insira um email válido e a quantidade de pontos.");
+                        return;
+                    }
+
+                    // Encontra o usuário
+                    const userIndex = simulatedUsers.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+
+                    if (userIndex === -1) {
+                        alert(`Usuário com email "${email}" não encontrado.`);
+                        return;
+                    }
+
+                    simulatedUsers[userIndex].points += points;
+                    console.log(`(Ajuste Manual) Pontos de ${simulatedUsers[userIndex].name} atualizados para ${simulatedUsers[userIndex].points}.`);
+                    alert(`Pontos de ${simulatedUsers[userIndex].name} ajustados para ${simulatedUsers[userIndex].points}.`);
+                    handleUserSearchAndFilter(true); // Atualiza a tabela de usuários principal
+                    emailInput.value = ''; // Limpa os campos
+                    pointsInput.value = '';
+                });
+            }
+        }
+
+        // Preenche o formulário com os valores carregados inicialmente
+        populateForm();
+    };
+
+    // ===================================================================
+    // FUNÇÃO: GERENCIA O FORMULÁRIO "CONFIGURAÇÕES GERAIS"
+    // ===================================================================
+    const handleSiteSettingsForm = () => {
+        const form = document.getElementById('siteSettingsForm');
+        if (!form) { console.warn("Formulário #siteSettingsForm não encontrado."); return; }
+
+        const telegramInput = document.getElementById('settingTelegramLink');
+        const facebookInput = document.getElementById('settingFacebookLink');
+        const instagramInput = document.getElementById('settingInstagramLink');
+        const emailInput = document.getElementById('settingContactEmail');
+        const phoneInput = document.getElementById('settingContactPhone');
+        // Adicionar outros inputs de configuração aqui
+
+        // --- Função para preencher o formulário ---
+        const populateForm = () => {
+            if (telegramInput) telegramInput.value = currentSettings.settingTelegramLink || '';
+            if (facebookInput) facebookInput.value = currentSettings.settingFacebookLink || '';
+            if (instagramInput) instagramInput.value = currentSettings.settingInstagramLink || '';
+            if (emailInput) emailInput.value = currentSettings.settingContactEmail || '';
+            if (phoneInput) phoneInput.value = currentSettings.settingContactPhone || '';
+            // Preencher outros
+        };
+
+        // --- Listener para salvar ---
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            console.log("Salvando configurações gerais...");
+
+            // Atualiza o objeto currentSettings
+            currentSettings.settingTelegramLink = telegramInput.value.trim();
+            currentSettings.settingFacebookLink = facebookInput.value.trim();
+            currentSettings.settingInstagramLink = instagramInput.value.trim();
+            currentSettings.settingContactEmail = emailInput.value.trim();
+            currentSettings.settingContactPhone = phoneInput.value.trim();
+            // Atualizar outros
+
+            // Salva no localStorage
+            try {
+                localStorage.setItem('ecoLogica_Settings', JSON.stringify(currentSettings));
+                console.log("Configurações gerais salvas:", currentSettings);
+                alert("Configurações gerais atualizadas com sucesso!");
+                // ATENÇÃO: Para que links no rodapé (carregado via JS) sejam atualizados
+                // seria necessário recarregar o rodapé ou ter uma lógica mais complexa
+                // no main.js para ler essas configurações ao montar o rodapé.
+            } catch (e) {
+                console.error("Erro ao salvar configurações gerais:", e);
+                alert("Erro ao salvar as configurações.");
+            }
+        });
+
+        // Preenche o formulário inicialmente
+        populateForm();
+    };
+
+    // ===================================================================
     // FUNÇÃO: GERENCIA O FORMULÁRIO "ADICIONAR/EDITAR CAMPANHA"
     // ===================================================================
     const handleCampaignForm = () => {
@@ -348,8 +522,98 @@ document.addEventListener('DOMContentLoaded', () => {
         const campaignListDiv = document.getElementById('current-campaigns-list');
         if (!form || !campaignListDiv) { console.warn("Form/lista de campanha não encontrados."); return; }
         const renderCampaignList = () => { campaignListDiv.innerHTML = ''; if (simulatedCampaigns.length === 0) { campaignListDiv.innerHTML = '<p class="text-muted small ms-2">Nenhuma campanha cadastrada.</p>'; return; } simulatedCampaigns.forEach(campaign => { const listItem = `<a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" data-campaign-id="${campaign.id}">${campaign.title}<div><span class="badge bg-secondary rounded-pill me-1" data-action="edit"><i class="fas fa-pencil-alt fa-xs"></i></span><span class="badge bg-danger rounded-pill" data-action="delete"><i class="fas fa-trash-alt fa-xs"></i></span></div></a>`; campaignListDiv.innerHTML += listItem; }); };
-        form.addEventListener('submit', (event) => { event.preventDefault(); const campaignData = { id: null, title: document.getElementById('campaignTitle').value.trim(), startDate: document.getElementById('campaignStartDate').value, endDate: document.getElementById('campaignEndDate').value, description: document.getElementById('campaignDescription').value.trim(), image: document.getElementById('campaignImage').value.trim(), points: parseInt(document.getElementById('campaignPoints').value) || null }; if (!campaignData.title || !campaignData.description) { alert("Título e Descrição são obrigatórios."); return; } console.log("Simulando salvamento...", campaignData); alert("(Simulação) Salvando..."); setTimeout(() => { campaignData.id = nextCampaignId++; simulatedCampaigns.push(campaignData); alert("Campanha adicionada!"); form.reset(); renderCampaignList(); }, 1000); });
-        campaignListDiv.addEventListener('click', (event) => { const actionBadge = event.target.closest('.badge[data-action]'); if (!actionBadge) return; event.preventDefault(); const listItem = actionBadge.closest('.list-group-item'); if (!listItem) return; const campaignId = listItem.dataset.campaignId; const action = actionBadge.dataset.action; const campaign = simulatedCampaigns.find(c => c.id == campaignId); if (!campaign) return; if (action === 'edit') { console.log(`Editando: ${campaign.title}`); document.getElementById('campaignTitle').value = campaign.title; document.getElementById('campaignStartDate').value = campaign.startDate || ''; document.getElementById('campaignEndDate').value = campaign.endDate || ''; document.getElementById('campaignDescription').value = campaign.description; document.getElementById('campaignImage').value = campaign.image || ''; document.getElementById('campaignPoints').value = campaign.points || ''; const campaignSection = form.closest('.add-campaign-section'); if (campaignSection) { campaignSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); } else { form.scrollIntoView({ behavior: 'smooth', block: 'start' }); } } else if (action === 'delete') { if (confirm(`Excluir "${campaign.title}"?`)) { console.log(`Excluindo ID ${campaignId}`); simulatedCampaigns = simulatedCampaigns.filter(c => c.id != campaignId); renderCampaignList(); } } });
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            console.log("Formulário de campanha submetido.");
+
+            // Coleta os dados
+            const campaignData = {
+                // ... (coleta de dados) ...
+                id: null,
+                title: document.getElementById('campaignTitle').value.trim(),
+                // ... (resto dos campos) ...
+                startDate: document.getElementById('campaignStartDate').value,
+                endDate: document.getElementById('campaignEndDate').value,
+                description: document.getElementById('campaignDescription').value.trim(),
+                image: document.getElementById('campaignImage').value.trim(),
+                points: parseInt(document.getElementById('campaignPoints').value) || null
+            };
+
+            // Validação e Simulação
+            if (!campaignData.title || !campaignData.description) {
+                alert("Título e Descrição são obrigatórios.");
+                return;
+            }
+
+            // 1. Adiciona a campanha ao array simulado
+            campaignData.id = nextCampaignId++;
+            simulatedCampaigns.push(campaignData);
+
+            // 2. SALVA NO LOCALSTORAGE para que campanhas.html possa ler
+            try {
+                localStorage.setItem('ecoLogica_Campaigns', JSON.stringify(simulatedCampaigns));
+                console.log("Campanhas salvas no localStorage.");
+            } catch (e) {
+                console.error("Erro ao salvar no localStorage:", e);
+            }
+
+            // Limpa o formulário e atualiza a lista
+            form.reset();
+            renderCampaignList();
+
+            alert("Campanha adicionada com sucesso!");
+
+        });
+
+        // --- Listener para cliques na lista (editar/excluir - delegação) ---
+        campaignListDiv.addEventListener('click', (event) => {
+            const actionBadge = event.target.closest('.badge[data-action]');
+            if (!actionBadge) return;
+            event.preventDefault();
+
+            const listItem = actionBadge.closest('.list-group-item');
+            if (!listItem) return;
+            const campaignId = listItem.dataset.campaignId;
+            const action = actionBadge.dataset.action;
+            const campaign = simulatedCampaigns.find(c => c.id == campaignId);
+
+            if (!campaign) return;
+
+            if (action === 'edit') {
+                // ... (código de edição, sem alterações) ...
+                console.log(`Editando: ${campaign.title}`);
+                document.getElementById('campaignTitle').value = campaign.title;
+                document.getElementById('campaignStartDate').value = campaign.startDate || '';
+                document.getElementById('campaignEndDate').value = campaign.endDate || '';
+                document.getElementById('campaignDescription').value = campaign.description;
+                document.getElementById('campaignImage').value = campaign.image || '';
+                document.getElementById('campaignPoints').value = campaign.points || '';
+                const campaignSection = form.closest('.add-campaign-section');
+                if (campaignSection) { campaignSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+                else { form.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+            } else if (action === 'delete') {
+                if (confirm(`Tem certeza que deseja excluir a campanha "${campaign.title}"?`)) {
+                    console.log(`(Simulação) Excluindo campanha ID ${campaignId}`);
+
+                    // 1. Filtra o array, removendo a campanha
+                    simulatedCampaigns = simulatedCampaigns.filter(c => c.id != campaignId);
+
+                    // *** 2. ATUALIZA O LOCALSTORAGE (ESSENCIAL!) ***
+                    try {
+                        localStorage.setItem('ecoLogica_Campaigns', JSON.stringify(simulatedCampaigns));
+                        console.log("Campanhas atualizadas no localStorage após exclusão.");
+                    } catch (e) {
+                        console.error("Erro ao salvar no localStorage após exclusão:", e);
+                    }
+                    // *** FIM DA ATUALIZAÇÃO ***
+
+                    // 3. Re-renderiza a lista na página de admin
+                    renderCampaignList();
+                    alert("Campanha excluída com sucesso!"); // Feedback opcional
+                }
+            }
+        });
         renderCampaignList();
     };
 
@@ -372,6 +636,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Campanhas
     handleCampaignForm();
+
+    // *** NOVAS CHAMADAS PARA CONFIGURAÇÕES ***
+    handlePointsSystemForm(); // Ativa formulário Sistema de Pontos
+    handleSiteSettingsForm(); // Ativa formulário Configurações Gerais
 
     // Chamar outras funções de inicialização aqui
 

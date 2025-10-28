@@ -10,6 +10,40 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     // ===================================================================
+    // *** NOVO: CARREGAMENTO DE CONFIGURAÇÕES GLOBAIS ***
+    // ===================================================================
+    const DEFAULT_SETTINGS = { // Padrões caso localStorage esteja vazio
+        settingTelegramLink: "https://t.me/+Fsirxfskk-MyOTRh",
+        settingFacebookLink: "#", // Usar '#' como padrão se vazio
+        settingInstagramLink: "#",
+        settingContactEmail: "contato@ecologica.com",
+        settingContactPhone: "(00) 1234-5678"
+    };
+    let currentSettings = {};
+
+    const loadGlobalSettings = () => {
+        const storedSettings = localStorage.getItem('ecoLogica_Settings');
+        if (storedSettings) {
+            try {
+                currentSettings = JSON.parse(storedSettings);
+                console.log("main.js - loadGlobalSettings: Dados LIDOS do localStorage:", currentSettings);
+                currentSettings = { ...DEFAULT_SETTINGS, ...currentSettings };
+            } catch (e) {
+                console.error("Erro ao carregar configurações globais:", e);
+                currentSettings = { ...DEFAULT_SETTINGS };
+            }
+        } else {
+            console.log("main.js - loadGlobalSettings: Nenhum dado no localStorage, usando padrões.");
+            currentSettings = { ...DEFAULT_SETTINGS };
+        }
+    };
+
+    // Carrega as configurações GLOBAIS primeiro
+    loadGlobalSettings();
+    // *** FIM NOVO ***
+    // ===================================================================
+
+    // ===================================================================
     // FUNÇÕES DE UTILIDADE
     // ===================================================================
 
@@ -87,14 +121,45 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (!response.ok) throw new Error(`[ERRO 404] Arquivo não encontrado: ${filePath}`);
                 return response.text();
             })
+
             .then(html => {
                 elemento.innerHTML = html;
+
+                if (elementId === 'placeholder-rodape') {
+                    console.log('Atualizando conteúdo dinâmico do rodapé...');
+                    const emailSpan = document.getElementById('footer-contact-email');
+                    const phoneSpan = document.getElementById('footer-contact-phone');
+
+                    console.log("main.js - carregarHTML: Valor de email a ser aplicado:", currentSettings.settingContactEmail);
+                    console.log("main.js - carregarHTML: Valor de telefone a ser aplicado:", currentSettings.settingContactPhone);
+
+                    if (emailSpan) emailSpan.textContent = currentSettings.settingContactEmail || DEFAULT_SETTINGS.settingContactEmail;
+                    if (phoneSpan) phoneSpan.textContent = currentSettings.settingContactPhone || DEFAULT_SETTINGS.settingContactPhone;
+
+                    console.log("main.js - carregarHTML: emailSpan.textContent APÓS atualização:", emailSpan?.textContent);
+                    console.log("main.js - carregarHTML: phoneSpan.textContent APÓS atualização:", phoneSpan?.textContent);
+
+                }
+                // Atualiza links de redes sociais (se estiverem em outro placeholder)
+                if (elementId === 'placeholder-redesocial') {
+                    console.log('Atualizando links de redes sociais...');
+                    // Use IDs se você os adicionou, ou seletores mais específicos
+                    const telegramLink = document.querySelector('#placeholder-redesocial a[aria-label="Telegram"]');
+                    const facebookLink = document.querySelector('#placeholder-redesocial a[aria-label="Facebook"]');
+                    const instagramLink = document.querySelector('#placeholder-redesocial a[aria-label="Instagram"]');
+
+                    if (telegramLink) telegramLink.href = currentSettings.settingTelegramLink || DEFAULT_SETTINGS.settingTelegramLink;
+                    if (facebookLink) facebookLink.href = currentSettings.settingFacebookLink || DEFAULT_SETTINGS.settingFacebookLink;
+                    if (instagramLink) instagramLink.href = currentSettings.settingInstagramLink || DEFAULT_SETTINGS.settingInstagramLink;
+                }
+
                 // Log de verificação (mantido para garantir que o ID do span seja encontrado)
                 if (elementId === 'placeholder-header') {
                     console.log('carregarHTML: CONTEÚDO DO HEADER INJETADO em #placeholder-header.');
                     console.log('carregarHTML: Verificando #userAuthSpan LOGO APÓS injeção:', document.getElementById('userAuthSpan'));
                 }
             })
+
             .catch(error => {
                 // Erros de fetch (404, rede) ainda serão mostrados
                 console.error(`carregarHTML: Erro ao carregar ${filePath} para #${elementId}:`, error);
