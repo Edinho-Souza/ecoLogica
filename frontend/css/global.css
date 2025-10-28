@@ -1,0 +1,934 @@
+/* ==========================================================================
+   1. CONFIGURAÇÕES GLOBAIS E ESTILOS BASE
+   ========================================================================== */
+
+:root {
+    --page-padding: 50px;
+    --ranking-height-desktop: 400px;
+}
+
+/* Fonte padrão e reset básico */
+body {
+    font-family: 'Open Sans', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: #4f4f4f;
+    background-color: #fefcf0;
+}
+
+/* Container de Conteúdo Principal */
+.content-wrapper {
+    max-width: 1350px;
+    margin: 50px auto;
+    padding: 0 50px;
+    box-sizing: border-box;
+    margin-bottom: -10px;
+}
+
+.content-wrapper h1 {
+    font-size: 29px;
+    font-weight: bold !important;
+}
+
+
+/* ==========================================================================
+   2. COMPONENTES REUTILIZÁVEIS
+   ========================================================================== */
+
+/* --- Seção: Banner (Carrossel) --- */
+.carousel-caption {
+    bottom: auto;
+    top: 150px;
+    left: 200px;
+    text-align: left;
+}
+
+.carousel-caption h3,
+.carousel-caption p {
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.7);
+}
+
+/* --- Botões Customizados (Laranja) --- */
+.btn-custom {
+    background-color: #e87a00;
+    color: #fefcf0;
+    border: none;
+    border-radius: 0;
+    padding: 10px 15px;
+    font-weight: normal;
+    height: 46px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.btn-custom:hover {
+    background-color: #cf6b00;
+    color: #fefcf0;
+}
+
+/* --- Botão do Banner --- */
+.btn-banner {
+    background-color: #e87a00;
+    color: #fefcf0;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+    transition: all 0.2s ease-out;
+}
+
+.btn-banner:hover {
+    background-color: #cf6b00;
+    color: #fefcf0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Botão Voltar ao Topo --- */
+#back-to-top {
+    position: fixed;
+    right: 2rem;
+    bottom: 2rem;
+    z-index: 1000;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: none;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+#back-to-top:hover {
+    transform: scale(1.1);
+}
+
+#back-to-top svg {
+    width: 40px;
+    height: 40px;
+    fill: #a8d08d;
+}
+
+/* --- Modal de Autenticação --- */
+.auth-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.split-modal {
+    display: flex;
+    width: 90%;
+    max-width: 700px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-left {
+    flex: 1;
+    background-color: #2c5836;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-left img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.modal-right {
+    flex: 1;
+    background-color: #f5edd6;
+    padding: 30px 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+    position: relative;
+    transition: height 0.3s ease-in-out;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #e87a00;
+}
+
+.auth-tabs {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px 0;
+    border: none;
+    background-color: #e3e3e3;
+    color: #2c5836;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.tab-btn.active {
+    background-color: #2c5836;
+    color: #fefcf0;
+}
+
+.modal-form {
+    display: none;
+    flex-direction: column;
+    gap: 15px;
+
+}
+
+.modal-form.active {
+    display: flex;
+}
+
+.modal-form input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.modal-form button {
+    background-color: #e87a00;
+    color: #fefcf0;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.modal-form button:hover {
+    background-color: #cf6b00;
+}
+
+.form-extra {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.form-extra label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.form-extra a {
+    white-space: nowrap;
+}
+
+.form-extra input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.recover-link {
+    color: #488f58;
+    text-decoration: none;
+}
+
+.recover-link:hover {
+    text-decoration: underline;
+}
+
+/* --- NOVO: Estilos para o formulário de recuperação de senha --- */
+
+.modal-right .form-title {
+    font-size: 1.5rem;
+    /* 24px */
+    color: #4f4f4f;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.modal-right .form-description {
+    font-size: 0.9rem;
+    /* 14.4px */
+    color: #6c757d;
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.modal-right .back-to-login-link {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    color: #488f58;
+    /* Verde do seu site */
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.modal-right .back-to-login-link:hover {
+    text-decoration: underline;
+}
+
+
+/* ==========================================================================
+   3. CABEÇALHO E NAVEGAÇÃO
+   ========================================================================== */
+
+/* --- Estrutura das Barras --- */
+.top-bar {
+    background-color: #fefcf0;
+    color: #2c5836;
+    text-align: center;
+    padding: 5px 0;
+    font-weight: 600;
+}
+
+.main-bar {
+    background-color: #2c5836;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 50px;
+    gap: 4px;
+    height: 46px;
+    position: relative;
+}
+
+.secondary-bar {
+    background-color: #488f58;
+    padding: 0 35px;
+    height: 46px;
+    z-index: 15;
+}
+
+/* --- Links de Navegação --- */
+.secondary-bar .navbar-nav button {
+    display: block;
+    width: 100%;
+    margin-bottom: 5px;
+    color: #fefcf0;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+.secondary-bar .navbar-nav button:hover {
+    text-decoration: underline;
+}
+
+.navbar-nav .nav-link.btn {
+    color: #fefcf0;
+}
+
+.navbar-nav .nav-link.btn:hover {
+    color: #e87a00;
+}
+
+/* --- Barra de Pesquisa (Desktop) --- */
+.search-box {
+    width: 0;
+    height: 35px;
+    background-color: #fefcf0;
+    overflow: hidden;
+    transition: width 0.3s;
+    align-items: center;
+    margin-right: 0px;
+    border-radius: 10px;
+    display: none;
+}
+
+.search-box input {
+    border: 0px;
+    border-radius: 4px;
+    padding: 5px 10px;
+    width: 100%;
+    outline: none;
+    font-size: 14px;
+    background-color: #fefcf0;
+}
+
+/* --- Menu Mobile (Offcanvas) --- */
+.navbar-toggler {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.navbar-toggler svg {
+    fill: #fefcf0;
+}
+
+.offcanvas {
+    background-color: #488f58;
+}
+
+.offcanvas-header {
+    background-color: #2c5836;
+}
+
+.offcanvas-header .btn-close {
+    filter: invert(1);
+}
+
+.offcanvas-body .nav-link {
+    color: #fefcf0;
+    font-size: 1.2rem;
+    padding: 15px 15px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    text-align: left;
+    transition: background-color 0.2s;
+}
+
+.offcanvas-body .nav-link:hover {
+    background-color: #2c5836;
+    text-decoration: none;
+}
+
+.btn-auth-offcanvas {
+    width: 100%;
+    border-radius: 8px !important;
+    text-align: center;
+    padding: 10px 15px !important;
+    font-size: 1.1rem;
+    height: auto !important;
+    margin-bottom: 10px;
+}
+
+.offcanvas-search-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.offcanvas-search-form .form-control {
+    flex-grow: 1;
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+
+.offcanvas-search-form .offcanvas-search-btn {
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 991.98px) {
+    .secondary-bar {
+        padding: 0 0px;
+        /* Reduz o padding para o MOBILE */
+    }
+}
+
+/* --- Seção: Parceiros (Reutilizada em index.html e institucional.html) --- */
+.partners-section {
+    padding: 50px 0 25px 0;
+    background-color: #fefcf0;
+}
+
+.partners-title {
+    font-size: 29px;
+    font-weight: bold !important;
+    color: #4f4f4f;
+    margin-bottom: 40px;
+}
+
+.logo-slider-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-slider {
+    overflow: hidden;
+    position: relative;
+    width: 90%;
+}
+
+.logo-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.logo-item {
+    width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.logo-item img {
+    max-width: 150px;
+    height: 80px;
+    object-fit: contain;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.logo-item img:hover {
+    opacity: 1;
+}
+
+.slider-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background-color: #2c5836;
+    color: #fefcf0;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.slider-arrow:hover {
+    background-color: #e87a00;
+}
+
+.slider-arrow.prev {
+    left: 10px;
+}
+
+.slider-arrow.next {
+    right: 10px;
+}
+
+/* --- Seções: Imagens Full-Width --- */
+.fullwidth-image-section {
+    width: 100%;
+    margin: 30px 0 0 0;
+    padding: 0;
+}
+
+.fullwidth-image-section img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.fullwidth-image-section2 {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.fullwidth-image-section2 img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 50px;
+}
+
+/* ==========================================================================
+   SEÇÃO DE REDES SOCIAIS
+   ========================================================================== */
+
+.social-section {
+    background-color: #488f58;
+    color: white;
+    text-align: center;
+    padding: 0rem 0 0rem 0;
+    /* removi o valor negativo, que causava erro */
+    font-family: Arial, sans-serif;
+}
+
+.social-section h3 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    /* permite quebrar linha em telas menores */
+}
+
+.social-icons a {
+    color: white;
+    font-size: 1.8rem;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.social-icons a:hover {
+    transform: scale(1.2);
+    color: #e87a00;
+}
+
+/* Tablets */
+@media (max-width: 992px) {
+    .social-section h3 {
+        font-size: 1.1rem;
+    }
+
+    .social-icons a {
+        font-size: 1.6rem;
+    }
+
+    .social-section {
+        padding: 1rem 0 0rem 0;
+    }
+}
+
+/* Celulares */
+@media (max-width: 768px) {
+    .social-icons {
+        gap: 1.5rem;
+    }
+
+    .social-icons a {
+        font-size: 1.5rem;
+    }
+
+    .social-section {
+        padding: 1rem 0 0rem 0;
+    }
+}
+
+
+/* Celulares muito pequenos */
+@media (max-width: 480px) {
+    .social-section h3 {
+        font-size: 1rem;
+    }
+
+    .social-icons a {
+        font-size: 1.4rem;
+    }
+
+    .social-section {
+        padding: 1rem 0 0rem 0;
+    }
+}
+
+/* ==========================================================================
+   5. RODAPÉ
+   ========================================================================== */
+
+footer {
+    background-color: #488f58;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.footer-top {
+    padding: 2rem 0;
+}
+
+.footer-container {
+    max-width: 1350px;
+    margin: 0 auto;
+    padding: 0 50px;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    text-align: left;
+    justify-content: center;
+    gap: 4rem;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-logo img {
+    width: 100px;
+    height: auto;
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-column h4 {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.footer-column a {
+    color: white;
+    text-decoration: none;
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+}
+
+.footer-column a:hover {
+    text-decoration: underline;
+}
+
+.footer-contact h4 {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.footer-contact p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+}
+
+.footer-bottom {
+    background-color: #2c5836;
+    padding: 1rem 0;
+    font-size: 0.85rem;
+    position: relative;
+}
+
+.footer-bottom .footer-container {
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+}
+
+/* ==========================================================================
+   5.1 RODAPÉ - RESPONSIVIDADE E MENU COLAPSÁVEL
+   ========================================================================== */
+
+/* Estilos para o novo botão e lista (desktop) */
+.footer-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: white;
+    font-family: Arial, sans-serif;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-toggle h4 {
+    margin: 0;
+    /* Remove a margem original do h4 */
+}
+
+.footer-arrow {
+    display: none;
+    /* A seta fica escondida em telas grandes */
+}
+
+.footer-links-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0 0;
+    /* Pequena margem para separar do título */
+}
+
+.footer-links-list li a {
+    display: block;
+    /* Garante que o link ocupe a linha toda */
+}
+
+
+/* ==========================================================================
+   5.1 RODAPÉ - RESPONSIVIDADE E MENU COLAPSÁVEL (VERSÃO CORRIGIDA)
+   ========================================================================== */
+
+/* A mágica acontece aqui (para telas de até 768px, como celulares) */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        gap: 1.5rem;
+    }
+
+    .footer-logo {
+        align-self: center;
+        margin-bottom: 1rem;
+    }
+
+    /* MUDANÇA 1: A regra agora se aplica SÓ às colunas de menu */
+    .footer-column {
+        width: 100%;
+        align-items: flex-start !important;
+        text-align: left !important;
+    }
+
+    /* MUDANÇA 2: Nova regra SÓ para a seção de contato */
+    .footer-contact {
+        width: 100%;
+        text-align: center;
+        /* Centraliza o texto */
+    }
+
+    .footer-toggle {
+        cursor: pointer;
+        padding-bottom: 0.5rem;
+    }
+
+    .footer-arrow {
+        display: inline-block;
+        font-size: 0.8rem;
+        transition: transform 0.3s ease;
+    }
+
+    .footer-links-list {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.4s ease-out;
+        padding-left: 0;
+    }
+
+    .footer-links-list.active {
+        max-height: 100px;
+        transition: max-height 0.4s ease-in;
+        margin-top: 10px;
+    }
+
+    .footer-toggle.active .footer-arrow {
+        transform: rotate(90deg);
+    }
+}
+
+
+
+
+/* ==========================================================================
+   6. RESPONSIVIDADE (MEDIA QUERIES)
+   ========================================================================== */
+
+/* --- Telas grandes (Desktops - 992px e acima) --- */
+@media (min-width: 992px) {
+    .search-box {
+        display: flex !important;
+    }
+
+    .secondary-bar .navbar-nav {
+        flex-direction: row;
+        gap: 20px;
+    }
+
+    .secondary-bar .navbar-nav button {
+        display: inline-block;
+        width: auto;
+        margin: 0;
+        text-align: center;
+    }
+}
+
+/* --- Telas médias e pequenas (Tablets e abaixo - até 991.98px) --- */
+@media (max-width: 991.98px) {
+    .btn-custom.btn-auth {
+        padding: 10px 10px;
+    }
+}
+
+/* --- Telas pequenas (Celulares - até 768px) --- */
+@media (max-width: 768px) {
+
+    /* Modal de Autenticação */
+    .split-modal {
+        flex-direction: column;
+    }
+
+    .modal-left,
+    .modal-right {
+        width: 100%;
+    }
+
+    .modal-left {
+        height: 200px;
+    }
+}
+
+/* --- Telas extra pequenas (Parceiros - até 767.98px) --- */
+@media (max-width: 767.98px) {
+    .logo-slider {
+        width: 200px;
+    }
+
+    .slider-arrow.prev {
+        left: 40px;
+    }
+
+    .slider-arrow.next {
+        right: 40px;
+    }
+}
+
+/* ==========================================================================
+   ESTILOS DA LOGO SOBREPOSTA (VERSÃO SIMPLIFICADA)
+   ========================================================================== */
+
+/* 1. Prepara a barra de navegação para ser a "mãe" da logo */
+.secondary-bar {
+    position: relative;
+    /* Essencial para o posicionamento absoluto da logo */
+}
+
+/* 2. Estiliza o contêiner da logo (SEM FUNDO, SOMBRA, ANIMAÇÃO) */
+.navbar-logo-container {
+    position: absolute;
+    top: 0px;
+    left: 20px;
+    /* <<< MUDANÇA AQUI: Diminuímos o valor para mover para a esquerda */
+    z-index: 20;
+}
+
+/* 3. Define o tamanho da imagem da logo */
+.navbar-logo-img {
+    height: 65px;
+    width: auto;
+}
+
+
+/* --- Responsividade para a logo em telas menores --- */
+@media (max-width: 991.98px) {
+    .navbar-logo-container {
+        top: 0px;
+        left: 15px;
+        /* <<< MUDANÇA AQUI: Também diminuímos o valor para o mobile */
+    }
+
+    .navbar-logo-img {
+        height: 70px;
+    }
+}

@@ -1,0 +1,81 @@
+/* ==========================================================================
+   ESTILOS ESPECÍFICOS DO DASHBOARD DA EMPRESA (empRecicladora.html)
+   ========================================================================== */
+
+/* --- Container da lista com scroll --- */
+#collection-requests-list {
+  max-height: 450px;
+  overflow-y: auto;
+  padding-right: 10px;
+  margin-right: -10px;
+}
+
+/* --- Card de cada solicitação --- */
+.request-item {
+  background-color: #f7f4e0;
+  border: 1px solid #e0d9c4;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.request-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0d9c4;
+  font-size: 1rem;
+}
+
+.request-item-date {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #488f58;
+}
+
+.request-item-body p {
+  font-size: 0.9rem;
+  color: #4f4f4f;
+  line-height: 1.5;
+  margin-bottom: 0.25rem;
+}
+
+.request-item-body p strong {
+  color: #333;
+}
+
+.request-item-body p em {
+  color: #6c757d;
+}
+
+.request-item .btn-success {
+  background-color: #488f58;
+  border-color: #488f58;
+  --bs-btn-bg: #488f58;
+  --bs-btn-border-color: #488f58;
+  --bs-btn-hover-bg: #3a7547;
+  --bs-btn-hover-border-color: #3a7547;
+  font-size: 0.85rem;
+}
+
+/* --- Barra de Scroll Customizada --- */
+#collection-requests-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+#collection-requests-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+#collection-requests-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+#collection-requests-list::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}

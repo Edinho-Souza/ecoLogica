@@ -1,0 +1,314 @@
+/* ==========================================================================
+   ESTILOS ESPECÍFICOS DO DASHBOARD DE USUÁRIO (usuario.html)
+   ========================================================================== */
+
+/* --- Seção Perfil (V1 - se ainda existir) --- */
+.user-profile-section .profile-details {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-details p {
+  margin-bottom: 0.5em;
+}
+
+/* --- Seção Orientações (V1 - Accordion) --- */
+.guidelines-section .accordion-button {
+  font-weight: 600;
+  color: #488f58;
+}
+
+.guidelines-section .accordion-button:not(.collapsed) {
+  background-color: #e9f5e9;
+  color: #2c5836;
+}
+
+.guidelines-section .accordion-button:focus {
+  box-shadow: none;
+  border-color: rgba(0, 0, 0, .125);
+}
+
+.guidelines-section .accordion-body {
+  background-color: #fdfcf5;
+}
+
+/* --- Seção Cadastro de Material --- */
+.register-material-section .form-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* --- Modal de Resgate --- */
+#redeemModal .list-group-item {
+  cursor: pointer;
+}
+
+#redeemModal .list-group-item.selected {
+  background-color: #d1e7dd;
+  font-weight: bold;
+}
+
+#redeemModal .list-group-item.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f8f9fa;
+}
+
+/* --- Modal de Resgate (Estilos V2) --- */
+#redeemModal .list-group-item {
+  cursor: pointer;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+#redeemModal .list-group-item.selected {
+  background-color: #e9f5e9;
+  font-weight: normal;
+  border-left: 4px solid #488f58;
+  padding-left: calc(1.25rem - 4px);
+}
+
+.redeem-item-img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+}
+
+.redeem-item-details {
+  font-size: 1rem;
+  color: #333;
+}
+
+.redeem-points-badge {
+  background-color: #488f58 !important;
+  color: white;
+  font-size: 0.8rem;
+  padding: 0.4em 0.7em;
+  min-width: 80px;
+  text-align: center;
+}
+
+.redeem-item-image-link {
+  position: relative;
+  display: block;
+  width: 50px;
+  height: 50px;
+  margin-right: 1rem;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: zoom-in;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.redeem-item-image-link::before {
+  content: "\f065";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 11px;
+  height: 11px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: #fefcf0;
+  font-size: 0.4rem;
+  border-radius: 3px;
+  z-index: 15;
+  transition: background-color 0.2s ease;
+}
+
+.redeem-item-image-link:hover::before {
+  background-color: rgba(72, 143, 88, 0.8);
+}
+
+.redeem-item-image-link .redeem-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+  padding: 3px;
+}
+
+.redeem-item-image-link:hover .redeem-item-img {
+  transform: scale(1.05);
+}
+
+/* --- Ajuste de Cor Botões (Verdes) --- */
+.register-material-section #registerMaterialForm button[type="submit"] {
+  background-color: #488f58;
+  border-color: #488f58;
+  color: #fefcf0;
+}
+
+.register-material-section #registerMaterialForm button[type="submit"]:hover {
+  background-color: #3a7547;
+  border-color: #3a7547;
+  color: #fefcf0;
+}
+
+.points-section button[data-bs-target="#redeemModal"] {
+  background-color: #488f58;
+  border-color: #488f58;
+  color: #fefcf0;
+  --bs-btn-bg: #488f58;
+  --bs-btn-border-color: #488f58;
+  --bs-btn-hover-bg: #3a7547;
+  --bs-btn-hover-border-color: #3a7547;
+  --bs-btn-active-bg: #3a7547;
+  --bs-btn-active-border-color: #3a7547;
+  --bs-btn-disabled-bg: #488f58;
+  --bs-btn-disabled-border-color: #488f58;
+}
+
+.points-section button[data-bs-target="#redeemModal"]:hover {
+  background-color: #3a7547;
+  border-color: #3a7547;
+  color: #fefcf0;
+}
+
+.collection-points-section #collectionPointSearchForm button[type="submit"] {
+  background-color: #488f58;
+  border-color: #488f58;
+  color: #fefcf0;
+  --bs-btn-bg: #488f58;
+  --bs-btn-border-color: #488f58;
+  --bs-btn-hover-bg: #3a7547;
+  --bs-btn-hover-border-color: #3a7547;
+  --bs-btn-active-bg: #3a7547;
+  --bs-btn-active-border-color: #3a7547;
+  --bs-btn-disabled-bg: #488f58;
+  --bs-btn-disabled-border-color: #488f58;
+}
+
+.collection-points-section #collectionPointSearchForm button[type="submit"]:hover {
+  background-color: #3a7547;
+  border-color: #3a7547;
+  color: #fefcf0;
+}
+
+/* --- Reordenamento Mobile --- */
+@media (max-width: 991.98px) {
+  .user-dashboard .row.g-4 {
+    display: flex;
+    flex-direction: column;
+    --bs-gutter-y: 0;
+    gap: 0;
+  }
+
+  .user-dashboard .row.g-4>.col-lg-8,
+  .user-dashboard .row.g-4>.col-lg-4,
+  .user-dashboard .row.g-4>.col-lg-8>.row,
+  .user-dashboard .row.g-4>.col-lg-8>.row>.col-lg-6 {
+    display: contents;
+  }
+
+  .user-dashboard .user-profile-v2,
+  .user-dashboard .points-section,
+  .user-dashboard .history-section,
+  .user-dashboard .register-material-section,
+  .user-dashboard .collection-points-section,
+  .user-dashboard .guidelines-section-v2 {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .user-dashboard .user-profile-v2 {
+    order: 1;
+  }
+
+  .user-dashboard .points-section {
+    order: 2;
+  }
+
+  .user-dashboard .history-section {
+    order: 3;
+  }
+
+  .user-dashboard .register-material-section {
+    order: 4;
+  }
+
+  .user-dashboard .collection-points-section {
+    order: 5;
+  }
+
+  .user-dashboard .guidelines-section-v2 {
+    order: 6;
+  }
+
+  .user-dashboard .active-campaigns-section {
+    order: 7;
+    margin-bottom: 0;
+  }
+}
+
+/* --- Resultados de Coleta (Matchmaking) --- */
+.company-results-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.company-result-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background-color: #f7f4e0;
+    padding: 12px 15px;
+    border-radius: 6px;
+    border: 1px solid #e0d9c4;
+}
+
+.company-result-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.company-result-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    line-height: 1.3;
+}
+
+.company-result-info strong {
+    color: #333;
+    font-size: 1rem;
+}
+
+.company-result-info small {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.company-result-item .btn-success {
+    flex-shrink: 0;
+    background-color: #488f58;
+    border-color: #488f58;
+    --bs-btn-bg: #488f58;
+    --bs-btn-border-color: #488f58;
+    --bs-btn-hover-bg: #3a7547;
+    --bs-btn-hover-border-color: #3a7547;
+}

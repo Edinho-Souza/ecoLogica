@@ -158,16 +158,93 @@ document.addEventListener('DOMContentLoaded', () => {
     // LISTENERS DE EVENTOS (Formulários, Modais, Cards)
     // ===================================================================
 
-    // --- Lógica para Cadastro de Material ---
-    const registerMaterialForm = document.getElementById('registerMaterialForm');
-    if (registerMaterialForm) {
+// --- Lógica para Cadastro de Material (Fluxo de 2 Etapas) ---
+    const registerMaterialSection = document.querySelector('.register-material-section');
+    if (registerMaterialSection) {
+        const formStep = document.getElementById('material-form-step');
+        const resultsStep = document.getElementById('material-results-step');
+        const registerMaterialForm = document.getElementById('registerMaterialForm');
+        const resultsList = document.getElementById('company-results-list');
+        const resultsSubtitle = document.getElementById('results-subtitle');
+        const backButton = document.getElementById('back-to-material-form');
+
+        // --- Evento: Clicar em "Encontrar Empresas" (Passo 1) ---
         registerMaterialForm.addEventListener('submit', (event) => {
             event.preventDefault();
-            const materialType = document.getElementById('materialType').value;
+            
+            const materialTypeEl = document.getElementById('materialType');
+            const materialType = materialTypeEl.value;
+            const materialTypeText = materialTypeEl.options[materialTypeEl.selectedIndex].text;
             const quantity = document.getElementById('materialQuantity').value;
-            console.log(`Material registrado: Tipo=${materialType}, Quantidade=${quantity}`);
-            alert("Material registrado com sucesso (simulação)!");
-            registerMaterialForm.reset();
+
+            console.log(`Buscando empresas para: Tipo=${materialType}, Quantidade=${quantity}`);
+            
+            // Simulação de "Matchmaking" no Backend
+            // Aqui, o backend filtraria empresas pelo endereço do usuário e pelo 'materialType'
+            const simulatedCompanyResults = [
+                { id: 1, name: "Recicladora Vale Limpo", eta: "Coleta em até 2 dias úteis.", avatar: "img/avatar-empresa-placeholder.png" },
+                { id: 2, name: "Cooperativa Bairro Verde", eta: "Coleta às sextas-feiras.", avatar: "img/avatar-empresa-placeholder.png" },
+                // (Uma empresa que não coleta este material não apareceria aqui)
+            ];
+
+            // Limpa a lista antiga (caso haja)
+            resultsList.innerHTML = '<p class="text-center text-muted">Buscando...</p>';
+
+            // Atualiza o subtítulo
+            resultsSubtitle.textContent = `Para coletar ${materialTypeText} (${quantity})...`;
+
+            // Transição de tela
+            formStep.style.display = 'none';
+            resultsStep.style.display = 'block';
+
+            // Simula o tempo de busca
+            setTimeout(() => {
+                // Limpa o "Buscando..."
+                resultsList.innerHTML = '';
+
+                // Popula a lista com os resultados simulados
+                if (simulatedCompanyResults.length > 0) {
+                    simulatedCompanyResults.forEach(company => {
+                        const companyCardHTML = `
+                            <div class="company-result-item">
+                                <img src="${company.avatar}" alt="Logo da ${company.name}" class="company-result-avatar">
+                                <div class="company-result-info">
+                                    <strong>${company.name}</strong>
+                                    <small>${company.eta}</small>
+                                </div>
+                                <button class="btn btn-sm btn-success" data-company-id="${company.id}">Solicitar</button>
+                            </div>
+                        `;
+                        resultsList.innerHTML += companyCardHTML;
+                    });
+                } else {
+                    resultsList.innerHTML = '<p class="text-center text-danger">Nenhuma empresa encontrada que colete este material em seu endereço.</p>';
+                }
+            }, 1000); // 1 segundo de simulação
+        });
+
+        // --- Evento: Clicar em "Solicitar" (Passo 2) ---
+        // Usamos delegação de evento, pois os botões são criados dinamicamente
+        resultsList.addEventListener('click', (event) => {
+            if (event.target.tagName === 'BUTTON' && event.target.dataset.companyId) {
+                const companyId = event.target.dataset.companyId;
+                const companyName = event.target.closest('.company-result-item').querySelector('strong').textContent;
+                
+                console.log(`Solicitação enviada para a Empresa ID: ${companyId} (${companyName})`);
+                
+                // Desabilita todos os botões e mostra feedback
+                resultsList.querySelectorAll('button').forEach(btn => btn.disabled = true);
+                event.target.textContent = 'Solicitado!';
+                
+                resultsList.innerHTML += '<p class="text-center text-success fw-bold mt-3">Solicitação enviada com sucesso!</p>';
+            }
+        });
+
+        // --- Evento: Clicar em "Registrar outro material" (Voltar) ---
+        backButton.addEventListener('click', () => {
+            resultsStep.style.display = 'none';
+            formStep.style.display = 'block';
+            registerMaterialForm.reset(); // Limpa o formulário
         });
     }
 
