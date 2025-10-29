@@ -653,9 +653,9 @@ footer {
     font-family: Arial, sans-serif;
 }
 
-.footer-top {
+/*.footer-top {
     padding: 2rem 0;
-}
+}*/
 
 .footer-container {
     max-width: 1350px;
@@ -674,6 +674,8 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 20px;
+
 }
 
 .footer-logo img {
@@ -684,6 +686,8 @@ footer {
 .footer-column {
     display: flex;
     flex-direction: column;
+    margin-bottom: 20px;
+    margin: 20px;
 }
 
 .footer-column h4 {
@@ -783,6 +787,7 @@ footer {
     .footer-logo {
         align-self: center;
         margin-bottom: 1rem;
+        margin-top: 1rem;
     }
 
     /* MUDANÇA 1: A regra agora se aplica SÓ às colunas de menu */
@@ -797,6 +802,8 @@ footer {
         width: 100%;
         text-align: center;
         /* Centraliza o texto */
+        margin-bottom: 2rem;
+        margin-top: -1rem;
     }
 
     .footer-toggle {
@@ -827,8 +834,6 @@ footer {
         transform: rotate(90deg);
     }
 }
-
-
 
 
 /* ==========================================================================
