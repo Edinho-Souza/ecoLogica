@@ -1,5 +1,6 @@
 package br.com.ecologica.cadastro.empresasrecicladoras.dto;
 
+import br.com.ecologica.cadastro.CadastroTipoMateriais;
 import lombok.Data;
 
 @Data
@@ -17,7 +18,9 @@ public class EmpresaRecicladoraResponse {
         response.setId(empresa.getId());
         response.setNomeEmpresa(empresa.getNomeEmpresa());
         response.setCidade(empresa.getCidade());
-        response.setTipoMaterial(empresa.getTipoMaterial()); // Certifique-se que esse getter existe
+        response.setTipoMaterial(empresa.getTiposMateriais().stream().map(CadastroTipoMateriais::getNomeTipo).reduce((a, b) -> a + ", " + b).orElse("")
+);
+
         response.setAtiva(empresa.isAtiva());
         response.setAprovada(empresa.isAprovada());
         return response;
