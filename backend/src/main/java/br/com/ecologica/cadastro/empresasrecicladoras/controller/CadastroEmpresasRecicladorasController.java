@@ -1,12 +1,13 @@
 package br.com.ecologica.cadastro.empresasrecicladoras.controller;
 
+import br.com.ecologica.cadastro.empresasrecicladoras.dto.EmpresaRecicladoraResponse;
+import br.com.ecologica.cadastro.empresasrecicladoras.service.CadastroEmpresasRecicladorasService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import br.com.ecologica.cadastro.CadastroEmpresasRecicladoras;
-import br.com.ecologica.cadastro.empresasrecicladoras.service.CadastroEmpresasRecicladorasService;
-
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/empresas-recicladoras")
@@ -16,22 +17,19 @@ public class CadastroEmpresasRecicladorasController {
     private CadastroEmpresasRecicladorasService service;
 
     @GetMapping
-    public List<CadastroEmpresasRecicladoras> listarTodas() {
-        return service.listarTodas();
+    public ResponseEntity<List<EmpresaRecicladoraResponse>> listarTodas() {
+        List<EmpresaRecicladoraResponse> lista = service.listarTodas()
+                .stream()
+                .map(EmpresaRecicladoraResponse::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/{id}")
-    public CadastroEmpresasRecicladoras buscarPorId(@PathVariable Long id) {
-        return service.buscarPorId(id).orElse(null);
-    }
-
-    @PostMapping
-    public CadastroEmpresasRecicladoras criar(@RequestBody CadastroEmpresasRecicladoras empresa) {
-        return service.salvar(empresa);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deletar(@PathVariable Long id) {
-        service.deletar(id);
+    public ResponseEntity<EmpresaRecicladoraResponse> buscarPorId(@PathVariable Long id) {
+        return service.buscarPorId(id)
+                .map(EmpresaRecicladoraResponse::fromEntity) 
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

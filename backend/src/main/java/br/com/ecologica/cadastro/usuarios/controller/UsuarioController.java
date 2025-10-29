@@ -7,9 +7,10 @@ import br.com.ecologica.cadastro.usuarios.service.UsuarioService;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -18,31 +19,21 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @GetMapping
-    public List<Usuario> listarUsuarios() {
-        return usuarioService.listarTodos();
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder; 
 
-    @GetMapping("/{id}")
-    public Usuario buscarUsuario(@PathVariable Long id) {
-        return usuarioService.buscarPorId(id);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deletarUsuario(@PathVariable Long id) {
-        usuarioService.deletar(id);
-    }
-    
     @PostMapping
-    public UsuarioResponse criarUsuario(@Valid @RequestBody UsuarioRequest request) {
+    public ResponseEntity<UsuarioResponse> criarUsuario(@Valid @RequestBody UsuarioRequest request) {
         Usuario usuario = new Usuario();
         usuario.setNome(request.getNome());
         usuario.setEmail(request.getEmail());
-        usuario.setSenha(request.getSenha());
+        usuario.setSenha(passwordEncoder.encode(request.getSenha())); 
         usuario.setPerfil(request.getPerfil());
+        usuario.setCpf(request.getCpf());
 
         Usuario salvo = usuarioService.salvar(usuario);
-        return usuarioService.converterParaResponse(salvo);
+        UsuarioResponse response = usuarioService.converterParaResponse(salvo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 }
