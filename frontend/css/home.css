@@ -50,7 +50,7 @@
     align-items: center;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     background: #fefcf0;
 }
 
@@ -275,7 +275,7 @@
     text-align: left;
     gap: 20px;
     min-height: 280px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 .news-box h2,
@@ -343,11 +343,6 @@
     background-color: #cf6b00;
 }
 
-/* --- Ajuste Fino do Banner --- */
-#bannerCarousel {
-    margin-top: -0.6px;
-}
-
 /* --- Responsividade da Página Inicial --- */
 @media (max-width: 991.98px) {
     .ranking-container {
@@ -358,37 +353,5 @@
     .ranking-content-wrapper {
         text-align: left;
         margin-top: 0;
-    }
-}
-
-@media (max-width: 768px) {
-
-    /* Banner/Carrossel */
-    .carousel-item {
-        height: 250px;
-    }
-
-    .carousel-item img {
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .carousel-caption {
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        text-align: center;
-        bottom: auto;
-        right: auto;
-    }
-
-    .carousel-caption h3 {
-        font-size: 1.6rem;
-    }
-
-    .carousel-caption p {
-        font-size: 1rem;
-        margin-bottom: 1rem;
     }
 }

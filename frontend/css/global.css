@@ -39,8 +39,8 @@ body {
 /* --- Seção: Banner (Carrossel) --- */
 .carousel-caption {
     bottom: auto;
-    top: 150px;
-    left: 200px;
+    top: 15vh;
+    left: 15vw;
     text-align: left;
 }
 
@@ -85,6 +85,11 @@ body {
     color: #fefcf0;
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Ajuste Fino do Banner --- */
+#bannerCarousel {
+    margin-top: -0.6px;
 }
 
 /* --- Botão Voltar ao Topo --- */
@@ -868,6 +873,34 @@ footer {
 
 /* --- Telas pequenas (Celulares - até 768px) --- */
 @media (max-width: 768px) {
+
+    /* --- CORREÇÃO DO BANNER MOBILE --- */
+    .carousel-caption {
+        left: 0;
+        right: 0;
+        bottom: 40px;
+        text-align: center;
+        top: auto;
+        padding-bottom: 0;
+        /* Remove padding desnecessário na parte inferior */
+    }
+
+    .carousel-caption h3 {
+        font-size: 26px;
+        /* Diminui o tamanho da fonte para mobile */
+    }
+
+    .carousel-caption p {
+        font-size: 15px;
+        /* Diminui a fonte da descrição */
+    }
+
+    /* Regra para o botão ficar centralizado, se precisar */
+    .carousel-caption a.btn-banner {
+        /* Garante que o botão seja tratado como bloco para centralizar com margin */
+        display: inline-block;
+        margin-top: 0px;
+    }
 
     /* Modal de Autenticação */
     .split-modal {
