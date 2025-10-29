@@ -15,7 +15,7 @@ public class MaterialResponse {
         MaterialResponse response = new MaterialResponse();
         response.setId(material.getId());
         response.setNomeMaterial(material.getNomeMaterial());
-        response.setTipoMaterial(material.getTipoMaterial());
+        response.setTipoMaterial(material.getTipoMaterial() != null ? material.getTipoMaterial().getNomeTipo() : null);
         response.setDescricao(material.getDescricao());
         response.setReciclavel(material.isReciclavel());
         return response;
