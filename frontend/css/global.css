@@ -87,6 +87,11 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
+/* --- Ajuste Fino do Banner --- */
+#bannerCarousel {
+    margin-top: -0.6px;
+}
+
 /* --- Botão Voltar ao Topo --- */
 #back-to-top {
     position: fixed;

@@ -50,7 +50,7 @@
     align-items: center;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     background: #fefcf0;
 }
 
@@ -275,7 +275,7 @@
     text-align: left;
     gap: 20px;
     min-height: 280px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 .news-box h2,
