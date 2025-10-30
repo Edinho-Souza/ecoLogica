@@ -11,16 +11,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/login")
 public class LoginController {
 
-    @Autowired
-    private LoginService loginService;
+	@Autowired
+	private LoginService loginService;
 
-    @PostMapping
-    public ResponseEntity<String> login(@RequestBody UsuarioLogin login) {
-        String token = loginService.autenticar(login.getEmail(), login.getSenha());
-        if (token != null) {
-            return ResponseEntity.ok(token);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
-        }
-    }
+	@PostMapping
+	public ResponseEntity<String> login(@RequestBody UsuarioLogin login) {
+		String token = loginService.autenticar(login.getEmail(), login.getSenha());
+		if (token != null) {
+			return ResponseEntity.ok(token);
+		} else {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
+		}
+	}
 }

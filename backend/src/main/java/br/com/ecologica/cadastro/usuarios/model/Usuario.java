@@ -9,7 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Usuario {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,8 +23,8 @@ public class Usuario {
     private String senha;
 
     @Column(nullable = false)
-    private String perfil; // "ADMIN", "USUARIO", "EMPRESA"
+    private String perfil; // ADMIN, USUARIO, EMPRESA
 
     @Column(nullable = false, unique = true)
-    private String cpf; 
+    private String cpf;
 }

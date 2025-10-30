@@ -1,6 +1,7 @@
 package br.com.ecologica.cadastro.beneficios.controller;
 
 import br.com.ecologica.cadastro.beneficios.dto.BeneficioResponse;
+
 import br.com.ecologica.cadastro.beneficios.service.CadastroBeneficiosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +19,12 @@ public class CadastroBeneficiosController {
 
     @GetMapping
     public ResponseEntity<List<BeneficioResponse>> listarTodos() {
-        List<BeneficioResponse> lista = service.listarTodos()
+        return ResponseEntity.ok(
+            service.listarTodos()
                 .stream()
                 .map(BeneficioResponse::fromEntity)
-                .collect(Collectors.toList()); 
-        return ResponseEntity.ok(lista);
+                .collect(Collectors.toList())
+        );
     }
 
     @GetMapping("/{id}")
@@ -31,5 +33,6 @@ public class CadastroBeneficiosController {
                 .map(BeneficioResponse::fromEntity)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
+  }
 }
+
