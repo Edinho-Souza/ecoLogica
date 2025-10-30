@@ -1,4 +1,3 @@
-
 package br.com.ecologica.login.model;
 
 import lombok.Data;
