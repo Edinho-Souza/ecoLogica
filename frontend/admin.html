@@ -296,12 +296,34 @@
                                 <input type="number" class="form-control form-control-sm" id="pointsKgPlastico"
                                     value="50">
                             </div>
+
                             <div class="mb-2">
-                                <label for="pointsKgPapel" class="form-label">Pontos por Kg de Papel</label>
+                                <label for="pointsKgPapel" class="form-label">Pontos por Kg de Papel/Papelão</label>
                                 <input type="number" class="form-control form-control-sm" id="pointsKgPapel" value="30">
                             </div>
-                            <div class="mb-3">
-                                <label for="pointsNewsletter" class="form-label">Pontos por Cadastro Newsletter</label>
+
+                            <div class="mb-2">
+                                <label for="pointsKgVidro" class="form-label">Pontos por Kg de Vidro</label>
+                                <input type="number" class="form-control form-control-sm" id="pointsKgVidro" value="20">
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="pointsKgMetal" class="form-label">Pontos por Kg de Metal</label>
+                                <input type="number" class="form-control form-control-sm" id="pointsKgMetal" value="40">
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="pointsLtOleo" class="form-label">Pontos por Litro de Óleo Usado</label>
+                                <input type="number" class="form-control form-control-sm" id="pointsLtOleo" value="60">
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="pointsUndEletronico" class="form-label">Pontos por Unid. Eletrônico</label>
+                                <input type="number" class="form-control form-control-sm" id="pointsUndEletronico"
+                                    value="100">
+                            </div>
+                            <div class="mb-3"> <label for="pointsNewsletter" class="form-label">Pontos por Cadastro
+                                    Newsletter</label>
                                 <input type="number" class="form-control form-control-sm" id="pointsNewsletter"
                                     value="10">
                             </div>
@@ -309,7 +331,7 @@
                         </form>
                         <hr>
                         <h6>Ajuste Manual</h6>
-                        <div class="input-group input-group-sm mb-1">
+                        <div class="input-group input-group-sm mb-1" id="manualAdjustGroup">
                             <input type="email" class="form-control" placeholder="Email do usuário">
                             <input type="number" class="form-control" placeholder="Pontos (+/-)">
                             <button class="btn btn-outline-secondary" type="button">Aplicar</button>
@@ -334,7 +356,7 @@
 
                     <section class="dashboard-section company-list-section mb-4">
                         <h3>Empresas Recicladoras</h3>
-                        <div class="list-group list-group-flush company-list-scrollable">
+                        <div class="list-group list-group-flush company-list-scrollable" id="recycler-company-list">
                             <a href="#"
                                 class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                                 Recicladora Vale Limpo <span class="badge bg-secondary rounded-pill"><i
@@ -353,7 +375,7 @@
 
                     <section class="dashboard-section company-list-section mb-4">
                         <h3>Empresas Apoiadoras</h3>
-                        <div class="list-group list-group-flush company-list-scrollable">
+                        <div class="list-group list-group-flush company-list-scrollable" id="supporter-company-list">
                             <a href="#"
                                 class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                                 Supermercado Econômico <span class="badge bg-secondary rounded-pill"><i

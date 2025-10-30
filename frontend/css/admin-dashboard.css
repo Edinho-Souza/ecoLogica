@@ -426,3 +426,46 @@
         text-align: center;
     }
 }
+
+/* --- Modal Editar Perfil --- */
+
+#editAdminProfileModal .modal-content,
+#editProfileModal .modal-content {
+    background-color: #fefcf0;
+    border: none;
+}
+
+#editAdminProfileModal .modal-header,
+#editProfileModal .modal-header {
+    background-color: #f7f4e0;
+    border-bottom: 1px solid #e0d9c4;
+}
+
+#editAdminProfileModal .modal-title,
+#editProfileModal .modal-title {
+    color: #2c5836;
+    font-weight: 600;
+}
+
+/* --- Estilo do Botão Principal --- */
+
+#saveAdminProfileChangesButton,
+#saveProfileChangesButton {
+    background-color: #488f58 !important;
+    border-color: #488f58 !important;
+    --bs-btn-bg: #488f58 !important;
+    --bs-btn-border-color: #488f58 !important;
+    --bs-btn-color: #fefcf0 !important;
+    --bs-btn-hover-bg: #3a7547 !important;
+    --bs-btn-hover-border-color: #3a7547 !important;
+    --bs-btn-hover-color: #fefcf0 !important;
+    --bs-btn-active-bg: #3a7547 !important;
+    --bs-btn-active-border-color: #3a7547 !important;
+}
+
+/* --- Estilo do Botão Secundário (Cancelar) --- */
+#editAdminProfileModal .modal-footer .btn-secondary {
+    color: #555;
+    background-color: #e9ecef;
+    border-color: #ccc;
+}

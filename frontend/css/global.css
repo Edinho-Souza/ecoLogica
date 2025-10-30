@@ -571,8 +571,7 @@ body {
     background-color: #488f58;
     color: white;
     text-align: center;
-    padding: 0rem 0 0rem 0;
-    /* removi o valor negativo, que causava erro */
+    padding: 0rem 0 1.2rem 0;
     font-family: Arial, sans-serif;
 }
 
@@ -669,7 +668,7 @@ footer {
     box-sizing: border-box;
     display: flex;
     flex-wrap: wrap;
-    align-items: stretch;
+    /*align-items: stretch;*/
     text-align: left;
     justify-content: center;
     gap: 4rem;
@@ -692,7 +691,8 @@ footer {
     display: flex;
     flex-direction: column;
     margin-bottom: 20px;
-    margin: 20px;
+    
+
 }
 
 .footer-column h4 {
@@ -786,11 +786,13 @@ footer {
         flex-direction: column;
         align-items: flex-start;
         text-align: left;
-        gap: 1.5rem;
+        gap: 0px;
     }
 
     .footer-logo {
-        align-self: center;
+        align-self: auto;
+        width: 100%;
+        justify-content: center;
         margin-bottom: 1rem;
         margin-top: 1rem;
     }
