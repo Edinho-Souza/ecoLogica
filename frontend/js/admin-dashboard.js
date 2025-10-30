@@ -65,12 +65,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const DEFAULT_SETTINGS = {
         pointsKgPlastico: 50,
         pointsKgPapel: 30,
+        pointsKgVidro: 20, // <-- ADICIONADO
+        pointsKgMetal: 40, // <-- ADICIONADO
+        pointsLtOleo: 60, // <-- ADICIONADO
+        pointsUndEletronico: 100, // <-- ADICIONADO
         pointsNewsletter: 10,
+        // ... (resto das configurações)
         settingTelegramLink: "https://t.me/+Fsirxfskk-MyOTRh",
         settingFacebookLink: "",
         settingInstagramLink: "",
         settingContactEmail: "contato@ecologica.com",
-        settingContactPhone: "(00) 1234-5678"
+        settingContactPhone: "(00) 1234-5678" // <-- Verifique se este já foi adicionado
     };
 
     let currentSettings = {};
@@ -95,6 +100,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Carrega as configurações assim que o script começa
     loadSettings();
+    // *** FIM NOVO ***
+
+    // *** NOVO: DADOS E VARIÁVEIS PARA EMPRESAS ***
+    let simulatedRecyclers = []; // Empresas Recicladoras
+    let simulatedSupporters = []; // Empresas Apoiadoras
+    let nextCompanyId = 1; // Para simular IDs únicos para todas as empresas
+
+    // Função para carregar empresas do localStorage ou usar exemplos
+    const loadCompanies = () => {
+        const storedRecyclers = localStorage.getItem('ecoLogica_Recyclers');
+        const storedSupporters = localStorage.getItem('ecoLogica_Supporters');
+
+        simulatedRecyclers = storedRecyclers ? JSON.parse(storedRecyclers) : [
+            // Exemplos iniciais se localStorage vazio
+            { id: 1001, name: "Recicladora Vale Limpo", email: "contato@valelimpo.com", type: "recicladora", cnpj: "11.111.111/0001-11", address: "Rua Industrial, 1000" },
+            { id: 1002, name: "Cooperativa Bairro Verde", email: "coop@bairroverde.org", type: "recicladora", cnpj: "22.222.222/0001-22", address: "Av. Central, 500" }
+        ];
+        simulatedSupporters = storedSupporters ? JSON.parse(storedSupporters) : [
+            // Exemplos iniciais se localStorage vazio
+            { id: 2001, name: "Supermercado Econômico", email: "mkt@economico.com", type: "apoiadora", cnpj: "33.333.333/0001-33", address: "Rua Principal, 100" },
+            { id: 2002, name: "Loja VerdesFolhas", email: "contato@verdesfolhas.com", type: "apoiadora", cnpj: "44.444.444/0001-44", address: "Rua das Vitrines, 20" }
+        ];
+
+        // Calcula o próximo ID baseado nos IDs existentes
+        const allIds = [...simulatedRecyclers, ...simulatedSupporters].map(c => c.id);
+        nextCompanyId = allIds.length > 0 ? Math.max(...allIds) + 1 : 1;
+
+        console.log("Empresas Recicladoras carregadas:", simulatedRecyclers);
+        console.log("Empresas Apoiadoras carregadas:", simulatedSupporters);
+    };
+
+    // Carrega as empresas ao iniciar
+    loadCompanies();
     // *** FIM NOVO ***
 
     // ===================================================================
@@ -378,23 +416,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // *** FIM FUNÇÕES PARA LOGS ***
 
     // ===================================================================
-    // FUNÇÃO: GERENCIA O FORMULÁRIO "SISTEMA DE PONTOS"
+    // FUNÇÃO: GERENCIA O FORMULÁRIO "SISTEMA DE PONTOS" (ATUALIZADA)
     // ===================================================================
     const handlePointsSystemForm = () => {
         const form = document.getElementById('pointsSystemForm');
         if (!form) { console.warn("Formulário #pointsSystemForm não encontrado."); return; }
 
+        // Seleciona TODOS os inputs
         const plasticoInput = document.getElementById('pointsKgPlastico');
         const papelInput = document.getElementById('pointsKgPapel');
+        const vidroInput = document.getElementById('pointsKgVidro'); // <-- ADICIONADO
+        const metalInput = document.getElementById('pointsKgMetal'); // <-- ADICIONADO
+        const oleoInput = document.getElementById('pointsLtOleo'); // <-- ADICIONADO
+        const eletronicoInput = document.getElementById('pointsUndEletronico'); // <-- ADICIONADO
         const newsletterInput = document.getElementById('pointsNewsletter');
-        // Adicionar inputs para outros materiais aqui
 
         // --- Função para preencher o formulário com os valores atuais ---
         const populateForm = () => {
             if (plasticoInput) plasticoInput.value = currentSettings.pointsKgPlastico || 0;
             if (papelInput) papelInput.value = currentSettings.pointsKgPapel || 0;
+            if (vidroInput) vidroInput.value = currentSettings.pointsKgVidro || 0; // <-- ADICIONADO
+            if (metalInput) metalInput.value = currentSettings.pointsKgMetal || 0; // <-- ADICIONADO
+            if (oleoInput) oleoInput.value = currentSettings.pointsLtOleo || 0; // <-- ADICIONADO
+            if (eletronicoInput) eletronicoInput.value = currentSettings.pointsUndEletronico || 0; // <-- ADICIONADO
             if (newsletterInput) newsletterInput.value = currentSettings.pointsNewsletter || 0;
-            // Preencher outros inputs aqui
         };
 
         // --- Listener para salvar os valores ---
@@ -405,8 +450,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Atualiza o objeto currentSettings
             currentSettings.pointsKgPlastico = parseInt(plasticoInput.value) || 0;
             currentSettings.pointsKgPapel = parseInt(papelInput.value) || 0;
+            currentSettings.pointsKgVidro = parseInt(vidroInput.value) || 0; // <-- ADICIONADO
+            currentSettings.pointsKgMetal = parseInt(metalInput.value) || 0; // <-- ADICIONADO
+            currentSettings.pointsLtOleo = parseInt(oleoInput.value) || 0; // <-- ADICIONADO
+            currentSettings.pointsUndEletronico = parseInt(eletronicoInput.value) || 0; // <-- ADICIONADO
             currentSettings.pointsNewsletter = parseInt(newsletterInput.value) || 0;
-            // Atualizar outros valores aqui
 
             // Salva no localStorage
             try {
@@ -419,8 +467,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- Listener para ajuste manual (exemplo simples) ---
-        const manualAdjustGroup = form.nextElementSibling.nextElementSibling; // Encontra a div do ajuste manual
+        // --- Listener para ajuste manual (código inalterado) ---
+        const manualAdjustGroup = document.getElementById('manualAdjustGroup');
+
         if (manualAdjustGroup) {
             const emailInput = manualAdjustGroup.querySelector('input[type="email"]');
             const pointsInput = manualAdjustGroup.querySelector('input[type="number"]');
@@ -452,6 +501,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     pointsInput.value = '';
                 });
             }
+        } else {
+            console.warn("Elemento #manualAdjustGroup não encontrado."); // Avisa se o ID estiver faltando
         }
 
         // Preenche o formulário com os valores carregados inicialmente
@@ -618,6 +669,230 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ===================================================================
+    // FUNÇÃO: RENDERIZA LISTAS DE EMPRESAS (Atualizada com Ação de Edição)
+    // ===================================================================
+    const renderCompanyList = (listElementSelector, companyArray) => {
+        const listElement = document.querySelector(listElementSelector);
+        if (!listElement) {
+            console.warn(`Elemento da lista de empresas não encontrado: ${listElementSelector}`);
+            return;
+        }
+        listElement.innerHTML = ''; // Limpa a lista
+
+        if (companyArray.length === 0) {
+            listElement.innerHTML = '<li class="list-group-item text-muted small">Nenhuma empresa cadastrada.</li>';
+            return;
+        }
+
+        companyArray.forEach(company => {
+            const listItem = `
+            <a href="#" class="list-group-item list-group-item-action py-1 px-2 d-flex justify-content-between align-items-center" data-company-id="${company.id}" data-company-type="${company.type}">
+                ${company.name}
+                <span class="badge bg-secondary rounded-pill" data-action="edit" title="Editar"><i class="fas fa-pencil-alt fa-xs"></i></span>
+            </a>`;
+            listElement.innerHTML += listItem;
+        });
+
+        // Adiciona listener de clique para a lista (se ainda não tiver)
+        // Usamos um handler separado para evitar duplicidade
+        if (!listElement.dataset.listenerAdded) {
+            listElement.addEventListener('click', handleCompanyListClick);
+            listElement.dataset.listenerAdded = 'true';
+        }
+    };
+
+
+
+    // Seletores específicos para as listas no HTML
+    const recyclerListSelector = '#recycler-company-list';
+    const supporterListSelector = '#supporter-company-list';
+    // *** FIM NOVAS FUNÇÕES ***
+
+    // ===================================================================
+    // *** NOVO: Handler de Clique para Listas de Empresas (CORRIGIDO) ***
+    // ===================================================================
+    const handleCompanyListClick = (event) => {
+        // 1. Encontra o link <a> pai que foi clicado
+        const listItem = event.target.closest('a.list-group-item');
+
+        // Se o clique não foi em um item da lista, não faz nada
+        if (!listItem) return;
+
+        // 2. PREVINE O SCROLL (AÇÃO PADRÃO DO LINK '#') IMEDIATAMENTE
+        event.preventDefault();
+
+        // 3. Agora, verifica se o clique foi especificamente no badge de ação
+        const actionBadge = event.target.closest('.badge[data-action]');
+
+        // 4. Se o clique foi no badge (edição)
+        if (actionBadge) {
+            const companyId = listItem.dataset.companyId;
+            const companyType = listItem.dataset.companyType;
+            const action = actionBadge.dataset.action;
+
+            // Encontra a empresa no array correto
+            let company;
+            if (companyType === 'recicladora') {
+                company = simulatedRecyclers.find(c => c.id == companyId);
+            } else {
+                company = simulatedSupporters.find(c => c.id == companyId);
+            }
+
+            if (!company) {
+                console.error("Empresa não encontrada para edição.");
+                return;
+            }
+
+            if (action === 'edit') {
+                console.log("Modo de Edição:", company);
+
+                // Pega os elementos do formulário
+                const form = document.getElementById('addCompanyForm');
+                const h3 = form.closest('.add-company-section').querySelector('h3');
+                const submitButton = form.querySelector('button[type="submit"]');
+
+                // Preenche o formulário
+                document.getElementById('companyName').value = company.name;
+                document.getElementById('companyEmail').value = company.email;
+                document.getElementById('companyType').value = company.type;
+                document.getElementById('companyCNPJ').value = company.cnpj || '';
+                document.getElementById('companyAddress').value = company.address || '';
+
+                // Armazena o ID da empresa que está sendo editada
+                form.dataset.editingId = company.id;
+
+                // Altera a UI do formulário para "Modo Edição"
+                h3.textContent = "Editar Empresa";
+                submitButton.textContent = "Salvar Alterações";
+                submitButton.classList.remove('btn-success');
+                submitButton.classList.add('btn-primary');
+
+                // Desabilita a troca de tipo
+                document.getElementById('companyType').disabled = true;
+
+                // Rola até o formulário
+                form.closest('.add-company-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        } else {
+            // 5. Se o clique foi no nome (não no badge), o scroll já foi prevenido
+            // e nenhuma outra ação é necessária.
+            console.log("Clicou no nome da empresa, scroll prevenido.");
+        }
+    };
+
+    // ===================================================================
+    // *** NOVO: Helper para Resetar Formulário da Empresa ***
+    // ===================================================================
+    const resetCompanyForm = () => {
+        const form = document.getElementById('addCompanyForm');
+        if (!form) return;
+
+        const h3 = form.closest('.add-company-section').querySelector('h3');
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        form.reset(); // Limpa os campos
+        delete form.dataset.editingId; // Remove o ID de edição
+
+        // Restaura a UI do formulário para "Modo Cadastro"
+        h3.textContent = "Cadastrar Nova Empresa";
+        submitButton.textContent = "Cadastrar Empresa";
+        submitButton.classList.remove('btn-primary'); // Remove cor azul
+        submitButton.classList.add('btn-success'); // Adiciona cor verde
+
+        // Habilita a troca de tipo
+        document.getElementById('companyType').disabled = false;
+    };
+
+    // ===================================================================
+    // FUNÇÃO: GERENCIA FORMULÁRIO "CADASTRAR/EDITAR EMPRESA" (Atualizada)
+    // ===================================================================
+    const handleAddCompanyForm = () => {
+        const form = document.getElementById('addCompanyForm');
+        if (!form) { console.warn("Formulário #addCompanyForm não encontrado."); return; }
+
+        const nameInput = document.getElementById('companyName');
+        const emailInput = document.getElementById('companyEmail');
+        const typeSelect = document.getElementById('companyType');
+        const cnpjInput = document.getElementById('companyCNPJ');
+        const addressInput = document.getElementById('companyAddress');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            // Verifica se está em modo de edição
+            const editingId = form.dataset.editingId ? parseInt(form.dataset.editingId) : null;
+
+            // Coleta os dados
+            const companyData = {
+                id: editingId || nextCompanyId, // Usa ID existente ou o próximo ID
+                name: nameInput.value.trim(),
+                email: emailInput.value.trim(),
+                type: typeSelect.value, // Tipo (mesmo desabilitado, o valor é lido)
+                cnpj: cnpjInput.value.trim(),
+                address: addressInput.value.trim()
+            };
+
+            // Validação básica
+            if (!companyData.name || !companyData.email || !companyData.type) {
+                alert("Nome, Email e Tipo são obrigatórios.");
+                return;
+            }
+
+            try {
+                if (editingId) {
+                    // --- MODO DE EDIÇÃO ---
+                    console.log("Salvando edições para ID:", editingId);
+                    let arrayToUpdate, index;
+                    if (companyData.type === 'recicladora') {
+                        arrayToUpdate = simulatedRecyclers;
+                        index = arrayToUpdate.findIndex(c => c.id === editingId);
+                    } else {
+                        arrayToUpdate = simulatedSupporters;
+                        index = arrayToUpdate.findIndex(c => c.id === editingId);
+                    }
+
+                    if (index > -1) {
+                        arrayToUpdate[index] = companyData; // Atualiza o objeto no array
+                    } else {
+                        throw new Error("ID da empresa para edição não encontrado nos arrays.");
+                    }
+
+                } else {
+                    // --- MODO DE CRIAÇÃO ---
+                    console.log("Cadastrando nova empresa:", companyData);
+                    if (companyData.type === 'recicladora') {
+                        simulatedRecyclers.push(companyData);
+                    } else if (companyData.type === 'apoiadora') {
+                        simulatedSupporters.push(companyData);
+                    }
+                    nextCompanyId++; // Incrementa o ID apenas na criação
+                }
+
+                // Salva AMBOS os arrays atualizados no localStorage
+                localStorage.setItem('ecoLogica_Recyclers', JSON.stringify(simulatedRecyclers));
+                localStorage.setItem('ecoLogica_Supporters', JSON.stringify(simulatedSupporters));
+                console.log("Listas de empresas salvas no localStorage.");
+
+                // Atualiza a lista visual correspondente
+                if (companyData.type === 'recicladora') {
+                    renderCompanyList(recyclerListSelector, simulatedRecyclers);
+                } else {
+                    renderCompanyList(supporterListSelector, simulatedSupporters);
+                }
+
+                resetCompanyForm(); // Reseta o formulário para o modo "Cadastrar"
+                alert(`Empresa ${editingId ? 'atualizada' : 'cadastrada'} com sucesso!`);
+
+            } catch (e) {
+                console.error("Erro ao salvar empresa:", e);
+                alert("Erro ao salvar a empresa.");
+            }
+        });
+    };
+
+    // *** FIM NOVA FUNÇÃO ***
+
+    // ===================================================================
     // CHAMADAS DE INICIALIZAÇÃO (Atualizado com Logs)
     // ===================================================================
 
@@ -637,9 +912,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Campanhas
     handleCampaignForm();
 
-    // *** NOVAS CHAMADAS PARA CONFIGURAÇÕES ***
-    handlePointsSystemForm(); // Ativa formulário Sistema de Pontos
-    handleSiteSettingsForm(); // Ativa formulário Configurações Gerais
+    // Configurações Sidebar
+    handlePointsSystemForm();
+    handleSiteSettingsForm();
+
+    // Empresas
+    handleAddCompanyForm();
+    renderCompanyList(recyclerListSelector, simulatedRecyclers);
+    renderCompanyList(supporterListSelector, simulatedSupporters);
+
 
     // Chamar outras funções de inicialização aqui
 
