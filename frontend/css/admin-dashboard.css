@@ -28,6 +28,7 @@
 }
 
 .admin-dashboard .btn-sm {
+    margin-top: auto;
     padding: 0.25rem 0.5rem;
     font-size: 0.8rem;
 }
@@ -80,10 +81,10 @@
 }
 
 .admin-profile-welcome {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 400;
+    opacity: 0.9;
     margin: 0;
-    color: #fefcf0;
 }
 
 .admin-profile-content {
@@ -98,12 +99,20 @@
 
 .admin-profile-content p {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 1rem;
+    color: #333;
 }
 
 .admin-profile-content strong {
     color: #555;
     font-weight: 600;
+}
+
+.admin-profile-info-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-grow: 1;
 }
 
 /* ==========================================================================
