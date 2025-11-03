@@ -7,15 +7,12 @@
   margin-bottom: 1.5em;
   padding-bottom: 0.5em;
   border-bottom: 2px solid #e87a00;
-  /* Linha laranja abaixo do título */
 }
 
 .dashboard-section {
   background-color: #fff;
-  /* Fundo branco para as seções */
   padding: 25px;
   margin-bottom: 2rem;
-  /* Espaço entre as seções */
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
