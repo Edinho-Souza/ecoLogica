@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cnpj: "12.345.678/0001-99",
             // Simula um total de pontos gerados por usuários (um número maior)
             points: Math.floor(Math.random() * 7000) + 1500, // Ex: 1500 a 8500
-            avatar: "img/avatar-empresa-placeholder.png"
+            avatar: "img/avatar/avatar-emp.png"
         };
 
         // Preenche o perfil principal com IDs da EMPRESA
