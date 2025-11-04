@@ -79,6 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let currentSettings = {};
+    let isAddingNewPoint = false; // Flag para saber se estamos no modo de adição.
+    let tempNewMarker = null; // Para guardar o marcador temporário de adição.
+
 
     // Função para carregar configurações do localStorage ou usar padrão
     const loadSettings = () => {
@@ -133,6 +136,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Carrega as empresas ao iniciar
     loadCompanies();
+    // *** FIM NOVO ***
+
+    // ===================================================================
+    // *** NOVO: DADOS E VARIÁVEIS PARA PONTOS DE COLETA (ADICIONAR AQUI) ***
+    // ===================================================================
+
+    let simulatedCollectionPoints = [
+        { id: 1, name: "EcoPonto Centro", lat: -26.9179, lng: -49.0740, type: "Geral", isActive: true },
+        { id: 2, name: "Recicla Eletrônicos Velha", lat: -26.9050, lng: -49.0700, type: "Eletrônicos", isActive: true },
+        { id: 3, name: "Ponto Sul (Temporário)", lat: -26.9300, lng: -49.0900, type: "Plástico/Papel", isActive: false }
+    ];
+    let nextPointId = simulatedCollectionPoints.length + 1;
+    let fullMapInstance = null;
+
     // *** FIM NOVO ***
 
     // ===================================================================
@@ -892,6 +909,216 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // *** FIM NOVA FUNÇÃO ***
 
+
+
+    // Atualiza a lista lateral de pontos de coleta (HTML)
+    const renderPointsList = () => {
+        const listElement = document.querySelector('.collection-points-management-section .list-group-flush');
+        if (!listElement) return;
+
+        listElement.innerHTML = ''; // Limpa
+
+        simulatedCollectionPoints.forEach(point => {
+            const itemClass = point.isActive ? '' : 'text-muted'; // Ponto inativo fica cinza
+            const listItem = `
+            <a href="#" class="list-group-item list-group-item-action py-1 px-2 d-flex justify-content-between align-items-center ${itemClass}" 
+               data-point-id="${point.id}">
+                ${point.name}
+                <span class="badge bg-secondary rounded-pill" data-action="edit-point" title="Editar Ponto"><i class="fas fa-pencil-alt fa-xs"></i></span>
+            </a>`;
+            listElement.innerHTML += listItem;
+        });
+    };
+
+    // Listener para o botão "Abrir Editor de Mapa"
+    const handleMapEditorButton = () => {
+        const button = document.querySelector('.collection-points-management-section .btn-info');
+        if (button) {
+            // Remove a chamada de alerta e conecta ao modal
+            button.dataset.bsToggle = "modal";
+            button.dataset.bsTarget = "#mapEditorModal";
+        }
+    };
+    // *** FIM NOVA FUNÇÃO ***
+
+    const initFullMapEditor = () => {
+        const mapContainerId = 'full-map-container';
+
+        if (typeof L === 'undefined') return;
+
+        // Inicializa o mapa SOMENTE se ainda não foi inicializado
+        if (!fullMapInstance) {
+            fullMapInstance = L.map(mapContainerId, {
+                scrollWheelZoom: true,
+                zoomControl: true, // Garante que o zoom apareça
+            }).setView([-26.918, -49.075], 14);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(fullMapInstance);
+
+            fullMapInstance.on('click', handleMapClickForNewPoint);
+
+            // *** CORREÇÃO: Chamamos a função para adicionar os pinos ao NOVO mapa ***
+            renderCollectionPointsOnFullMap();
+            // **********************************************************************
+
+        } else {
+            // Se já existe, apenas garante que ele se redesenhe (e re-adicionamos os pontos)
+            fullMapInstance.invalidateSize();
+            // *** Chamamos a função de renderização novamente para garantir que os pinos apareçam ***
+            renderCollectionPointsOnFullMap();
+        }
+    };
+
+    // Função helper para listar pontos no modal E RENDERIZAR MARCADORES NO MAPA GRANDE
+    const renderCollectionPointsOnFullMap = () => {
+        if (!fullMapInstance) return;
+
+        // 1. LIMPA OS MARCADORES ANTERIORES NO MAPA GRANDE
+        fullMapInstance.eachLayer((layer) => {
+            if (layer instanceof L.Marker) {
+                fullMapInstance.removeLayer(layer);
+            }
+        });
+
+        const listContainer = document.querySelector('#mapEditorModal .modal-points-list-scrollable');
+        if (listContainer) listContainer.innerHTML = ''; // Limpa a lista
+
+        simulatedCollectionPoints.forEach(point => {
+            const statusColor = point.isActive ? '#488f58' : '#e74c3c';
+
+            // --- ADICIONA MARCADOR AO MAPA GRANDE ---
+            const customIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<i class="fas fa-map-marker-alt" style="color: ${statusColor}; font-size: 24px;"></i>`,
+                iconSize: [24, 41],
+                iconAnchor: [12, 41]
+            });
+
+            const marker = L.marker([point.lat, point.lng], { icon: customIcon }).addTo(fullMapInstance);
+
+            // Adicionar pop-up se desejar
+            marker.bindPopup(`<b>${point.name}</b><br>Status: ${point.isActive ? 'Ativo' : 'Inativo'}`);
+            // FIM ADICIONA MARCADOR AO MAPA GRANDE
+
+            // Renderizar o item na lista lateral do modal
+            if (listContainer) {
+                listContainer.innerHTML += `
+                <a href="#" class="list-group-item list-group-item-action list-group-item-sm d-flex justify-content-between align-items-center">
+                    ${point.name} 
+                    <span style="color:${statusColor}"><i class="fas fa-edit me-1"></i></span>
+                </a>
+            `;
+            }
+        });
+    };
+
+
+
+    /**
+     * Renderiza os pontos de coleta (simulados) no mapa pequeno (mini-mapa).
+     * AGORA USANDO OS ÍCONES CUSTOMIZADOS DO MAPA GRANDE.
+     * @param {L.Map} targetMapInstance - A instância do mapa onde os pontos serão renderizados.
+     */
+    const renderCollectionPointsOnMiniMap = (targetMapInstance) => {
+        if (typeof L === 'undefined' || !targetMapInstance) return;
+
+        // Limpa marcadores existentes
+        targetMapInstance.eachLayer((layer) => {
+            if (layer instanceof L.Marker) {
+                targetMapInstance.removeLayer(layer);
+            }
+        });
+
+        simulatedCollectionPoints.forEach(point => {
+            // Lógica de Ícone Customizado: (Copiada do renderCollectionPointsOnFullMap)
+            const statusColor = point.isActive ? '#488f58' : '#e74c3c';
+
+            const customIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<i class="fas fa-map-marker-alt" style="color: ${statusColor}; font-size: 24px;"></i>`,
+                iconSize: [24, 41],
+                iconAnchor: [12, 41]
+            });
+            // Fim da Lógica de Ícone Customizado
+
+            L.marker([point.lat, point.lng], { icon: customIcon }) // Usa o ícone customizado
+                .addTo(targetMapInstance)
+                .bindPopup(`<b>${point.name}</b>`);
+        });
+    };
+
+    // ===================================================================
+    // INICIALIZAÇÃO DOS MAPAS (Lado direito e Modal)
+    // ===================================================================
+
+    const initAdminMaps = () => {
+        // ESSA PARTE NÃO PODE SER OMITIDA!
+        if (typeof L === 'undefined') { //
+            console.error("Leaflet não carregado. Verifique o link do script."); //
+            return; //
+        }
+
+        // --- Mapa lateral (preview pequeno) ---
+        const miniMapDiv = document.getElementById('mini-map-placeholder'); //
+        if (miniMapDiv) { //
+            miniMapDiv.innerHTML = ""; //
+            const miniMap = L.map(miniMapDiv, { //
+                zoomControl: false, //
+                attributionControl: false //
+            }).setView([-26.9179, -49.0740], 13); //
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(miniMap); //
+
+            // >>> MUDANÇA MAIS IMPORTANTE: Chama a função que renderiza todos os pontos
+            renderCollectionPointsOnMiniMap(miniMap);
+
+            // Ajusta o zoom para caber todos os pontos
+            if (simulatedCollectionPoints.length > 0) {
+                // L.LatLngBounds precisa ser usada, mas garanta que 'L' esteja acessível
+                const bounds = new L.LatLngBounds(simulatedCollectionPoints.map(p => [p.lat, p.lng]));
+                miniMap.fitBounds(bounds, { padding: [5, 5] });
+            }
+            // <<< FIM DA MUDANÇA
+
+        } else {
+            console.warn("Div #mini-map-placeholder não encontrada."); //
+        }
+    };
+
+    // ===================================================================
+    // *** NOVO: Handler para o Modal do Editor de Mapas ***
+    // ===================================================================
+
+    const handleMapEditorModal = () => {
+        const mapEditorModal = document.getElementById('mapEditorModal');
+
+        if (mapEditorModal) {
+            // Usa o evento que dispara APÓS o modal estar visível
+            mapEditorModal.addEventListener('shown.bs.modal', () => {
+                console.log("Modal de Editor de Mapas totalmente visível. Inicializando/Redimensionando mapa...");
+
+                // Chama a função que cria/atualiza o mapa
+                initFullMapEditor();
+
+                // ESSENCIAL: Garante o redimensionamento forçado se a instância existir
+                if (fullMapInstance) {
+                    fullMapInstance.invalidateSize();
+                    console.log("Leaflet invalidateSize() chamado.");
+                }
+            });
+        }
+    };
+
+
+
+
+
+
+
+
+
     // ===================================================================
     // CHAMADAS DE INICIALIZAÇÃO (Atualizado com Logs)
     // ===================================================================
@@ -921,6 +1148,14 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCompanyList(recyclerListSelector, simulatedRecyclers);
     renderCompanyList(supporterListSelector, simulatedSupporters);
 
+    // Pontos de Coleta
+    renderPointsList();
+    handleMapEditorButton();
+
+
+    // Chama a inicialização dos mapas
+    initAdminMaps();
+    handleMapEditorModal();
 
     // Chamar outras funções de inicialização aqui
 

@@ -511,3 +511,47 @@
         text-align: center;
     }
 }
+
+/* ==========================================================================
+   8. ESTILOS DO EDITOR DE MAPAS (NOVO)
+   ========================================================================== */
+
+/* Define uma altura grande para o mapa dentro do modal */
+.full-map-container {
+    height: 400px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+/* Garante que a lista de pontos no modal tenha um scroll se for muito longa */
+.modal-points-list-scrollable {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+/* ==========================================================================
+   9. CORREÇÃO ESSENCIAL PARA ITENS DO LEAFLET EM MODAIS (ADICIONAR ESTE BLOCO)
+   ========================================================================== */
+
+/* Garante que os marcadores e imagens do Leaflet sejam carregados */
+/* e não sejam afetados por regras CSS globais como max-width */
+.leaflet-container img,
+.leaflet-container .leaflet-marker-icon,
+.leaflet-container .leaflet-marker-shadow {
+    max-width: none !important;
+    height: auto !important;
+}
+
+/* Garante que o container do Leaflet não tenha overflow ou problemas de z-index */
+.leaflet-pane {
+    z-index: 400;
+    /* Um z-index alto para o Leaflet */
+}
+
+/* Garante que os botões de zoom sejam visíveis no modal */
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+    font: bold 18px 'Lucida Console', Monaco, monospace;
+    text-indent: 1px;
+}
