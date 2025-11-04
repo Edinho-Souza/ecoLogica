@@ -267,11 +267,10 @@ body {
     text-decoration: underline;
 }
 
-/* --- NOVO: Estilos para o formulário de recuperação de senha --- */
+/* --- Formulário de recuperação de senha --- */
 
 .modal-right .form-title {
     font-size: 1.5rem;
-    /* 24px */
     color: #4f4f4f;
     font-weight: bold;
     text-align: center;
@@ -280,7 +279,6 @@ body {
 
 .modal-right .form-description {
     font-size: 0.9rem;
-    /* 14.4px */
     color: #6c757d;
     text-align: center;
     line-height: 1.5;
@@ -292,7 +290,6 @@ body {
     text-align: center;
     margin-top: 10px;
     color: #488f58;
-    /* Verde do seu site */
     text-decoration: none;
     font-size: 0.9rem;
 }
@@ -451,7 +448,6 @@ body {
 @media (max-width: 991.98px) {
     .secondary-bar {
         padding: 0 0px;
-        /* Reduz o padding para o MOBILE */
     }
 }
 
@@ -587,7 +583,6 @@ body {
     align-items: center;
     gap: 2rem;
     flex-wrap: wrap;
-    /* permite quebrar linha em telas menores */
 }
 
 .social-icons a {
@@ -657,10 +652,6 @@ footer {
     font-family: Arial, sans-serif;
 }
 
-/*.footer-top {
-    padding: 2rem 0;
-}*/
-
 .footer-container {
     max-width: 1350px;
     margin: 0 auto;
@@ -668,7 +659,6 @@ footer {
     box-sizing: border-box;
     display: flex;
     flex-wrap: wrap;
-    /*align-items: stretch;*/
     text-align: left;
     justify-content: center;
     gap: 4rem;
@@ -679,7 +669,6 @@ footer {
     align-items: center;
     justify-content: center;
     margin-bottom: 20px;
-
 }
 
 .footer-logo img {
@@ -691,8 +680,6 @@ footer {
     display: flex;
     flex-direction: column;
     margin-bottom: 20px;
-    
-
 }
 
 .footer-column h4 {
@@ -755,24 +742,20 @@ footer {
 
 .footer-toggle h4 {
     margin: 0;
-    /* Remove a margem original do h4 */
 }
 
 .footer-arrow {
     display: none;
-    /* A seta fica escondida em telas grandes */
 }
 
 .footer-links-list {
     list-style: none;
     padding: 0;
     margin: 0.5rem 0 0 0;
-    /* Pequena margem para separar do título */
 }
 
 .footer-links-list li a {
     display: block;
-    /* Garante que o link ocupe a linha toda */
 }
 
 
@@ -780,7 +763,7 @@ footer {
    5.1 RODAPÉ - RESPONSIVIDADE E MENU COLAPSÁVEL (VERSÃO CORRIGIDA)
    ========================================================================== */
 
-/* A mágica acontece aqui (para telas de até 768px, como celulares) */
+/* Para telas de até 768px, como celulares */
 @media (max-width: 768px) {
     .footer-container {
         flex-direction: column;
@@ -797,18 +780,15 @@ footer {
         margin-top: 1rem;
     }
 
-    /* MUDANÇA 1: A regra agora se aplica SÓ às colunas de menu */
     .footer-column {
         width: 100%;
         align-items: flex-start !important;
         text-align: left !important;
     }
 
-    /* MUDANÇA 2: Nova regra SÓ para a seção de contato */
     .footer-contact {
         width: 100%;
         text-align: center;
-        /* Centraliza o texto */
         margin-bottom: 2rem;
         margin-top: -1rem;
     }
@@ -876,7 +856,6 @@ footer {
 /* --- Telas pequenas (Celulares - até 768px) --- */
 @media (max-width: 768px) {
 
-    /* --- CORREÇÃO DO BANNER MOBILE --- */
     .carousel-caption {
         left: 0;
         right: 0;
@@ -884,22 +863,17 @@ footer {
         text-align: center;
         top: auto;
         padding-bottom: 0;
-        /* Remove padding desnecessário na parte inferior */
     }
 
     .carousel-caption h3 {
         font-size: 26px;
-        /* Diminui o tamanho da fonte para mobile */
     }
 
     .carousel-caption p {
         font-size: 15px;
-        /* Diminui a fonte da descrição */
     }
 
-    /* Regra para o botão ficar centralizado, se precisar */
     .carousel-caption a.btn-banner {
-        /* Garante que o botão seja tratado como bloco para centralizar com margin */
         display: inline-block;
         margin-top: 0px;
     }
@@ -938,22 +912,17 @@ footer {
    ESTILOS DA LOGO SOBREPOSTA (VERSÃO SIMPLIFICADA)
    ========================================================================== */
 
-/* 1. Prepara a barra de navegação para ser a "mãe" da logo */
 .secondary-bar {
     position: relative;
-    /* Essencial para o posicionamento absoluto da logo */
 }
 
-/* 2. Estiliza o contêiner da logo (SEM FUNDO, SOMBRA, ANIMAÇÃO) */
 .navbar-logo-container {
     position: absolute;
     top: 0px;
     left: 20px;
-    /* <<< MUDANÇA AQUI: Diminuímos o valor para mover para a esquerda */
     z-index: 20;
 }
 
-/* 3. Define o tamanho da imagem da logo */
 .navbar-logo-img {
     height: 65px;
     width: auto;
@@ -965,7 +934,6 @@ footer {
     .navbar-logo-container {
         top: 0px;
         left: 15px;
-        /* <<< MUDANÇA AQUI: Também diminuímos o valor para o mobile */
     }
 
     .navbar-logo-img {

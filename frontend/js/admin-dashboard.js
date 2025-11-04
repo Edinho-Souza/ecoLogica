@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
 
                     // Preenche os dados no modal
-                    document.getElementById('modal-user-avatar').src = 'img/avatar-pessoa-ia.png'; // Avatar padrão
+                    document.getElementById('modal-user-avatar').src = 'img/avatar/avatar-user.png'; // Avatar padrão
                     document.getElementById('modal-user-name').textContent = user.name;
 
                     const statusEl = document.getElementById('modal-user-status');
