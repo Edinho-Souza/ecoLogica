@@ -246,30 +246,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Lógica de Salvar (submit)
-        if (form) {
-            form.addEventListener('submit', (event) => {
-                event.preventDefault();
+// Lógica de Salvar (submit)
+if (form) {
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
 
-                const newPoint = {
-                    id: nextPointId++,
-                    name: document.getElementById('pointName').value.trim(),
-                    lat: parseFloat(document.getElementById('pointLat').value),
-                    lng: parseFloat(document.getElementById('pointLng').value),
-                    type: document.getElementById('pointType').value.trim(),
-                    isActive: document.getElementById('pointIsActive').checked
-                };
-                simulatedCollectionPoints.push(newPoint);
-                saveCollectionPoints();
-                alert(`Ponto '${newPoint.name}' cadastrado com sucesso!`);
-                renderCollectionPointsOnFullMap();
-                renderPointsList();
-                setTimeout(() => {
-                    initAdminMaps(); // Recarrega o mini-mapa lateral
-                }, 50);
-
-                resetFormAndMarker(); // Esta função limpa o formulário e o pino temporário
-            });
+        // NOVO: Verifica se é edição (se o ID escondido foi preenchido)
+        const editingId = document.getElementById('pointId').value ? parseInt(document.getElementById('pointId').value) : null;
+        const newPointData = {
+            // Se for novo, usa nextPointId++, senão usa o ID existente
+            id: editingId || nextPointId++, 
+            name: document.getElementById('pointName').value.trim(),
+            lat: parseFloat(document.getElementById('pointLat').value),
+            lng: parseFloat(document.getElementById('pointLng').value),
+            type: document.getElementById('pointType').value.trim(),
+            isActive: document.getElementById('pointIsActive').checked
+        };
+        
+        if (editingId) {
+            // MODO EDIÇÃO: Encontra o ponto e o substitui
+            const index = simulatedCollectionPoints.findIndex(p => p.id === editingId);
+            if (index !== -1) {
+                simulatedCollectionPoints[index] = newPointData;
+                alert(`Ponto '${newPointData.name}' atualizado com sucesso!`);
+            }
+        } else {
+            // MODO CRIAÇÃO: Adiciona um novo ponto
+            simulatedCollectionPoints.push(newPointData);
+            alert(`Ponto '${newPointData.name}' cadastrado com sucesso!`);
         }
+
+        saveCollectionPoints(); // Salva no localStorage (Função já existente)
+        renderCollectionPointsOnFullMap();
+        renderPointsList();
+        
+        // Recarrega o mini-mapa lateral
+        setTimeout(() => {
+            initAdminMaps(); 
+        }, 50);
+
+        resetFormAndMarker(); // Esta função limpa o formulário e o pino temporário
+    });
+}
 
     };
 
@@ -988,14 +1006,71 @@ document.addEventListener('DOMContentLoaded', () => {
         simulatedCollectionPoints.forEach(point => {
             const itemClass = point.isActive ? '' : 'text-muted'; // Ponto inativo fica cinza
             const listItem = `
-            <a href="#" class="list-group-item list-group-item-action py-1 px-2 d-flex justify-content-between align-items-center ${itemClass}" 
-               data-point-id="${point.id}">
-                ${point.name}
-                <span class="badge bg-secondary rounded-pill" data-action="edit-point" title="Editar Ponto"><i class="fas fa-pencil-alt fa-xs"></i></span>
-            </a>`;
+<a href="#" class="list-group-item list-group-item-action py-1 px-2 d-flex justify-content-between align-items-center ${itemClass}" 
+   data-point-id="${point.id}">
+    ${point.name}
+    <span>
+        <span class="badge bg-secondary rounded-pill me-1" data-action="edit-point" title="Editar Ponto"><i class="fas fa-pencil-alt fa-xs"></i></span>
+        <span class="badge bg-danger rounded-pill" data-action="delete-point" title="Excluir Ponto"><i class="fas fa-trash-alt fa-xs"></i></span> 
+    </span>
+</a>`;
             listElement.innerHTML += listItem;
         });
     };
+
+    // *** NOVO: Handler de Clique para Listas de Pontos de Coleta ***
+    const handlePointsListClick = (event) => {
+        const listItem = event.target.closest('a.list-group-item');
+        const actionBadge = event.target.closest('.badge[data-action]');
+
+        if (!listItem || !actionBadge) return;
+        event.preventDefault(); // Evita o scroll (do link #)
+
+        const pointId = parseInt(listItem.dataset.pointId);
+        const pointIndex = simulatedCollectionPoints.findIndex(p => p.id === pointId);
+        const point = simulatedCollectionPoints[pointIndex];
+
+        if (!point) return;
+
+        if (actionBadge.dataset.action === 'edit-point') {
+
+            // 1. Prepara o formulário do Modal
+            document.getElementById('pointFormTitle').textContent = "Editar Ponto de Coleta";
+            document.getElementById('savePointButton').textContent = "Salvar Alterações";
+
+            // 2. Preenche os campos
+            document.getElementById('pointId').value = point.id; // Campo escondido para ID
+            document.getElementById('pointName').value = point.name;
+            document.getElementById('pointLat').value = point.lat;
+            document.getElementById('pointLng').value = point.lng;
+            document.getElementById('pointType').value = point.type;
+            document.getElementById('pointIsActive').checked = point.isActive;
+
+            // 3. Exibe o formulário (se estiver escondido por padrão)
+            document.getElementById('pointDetailsFormContainer').style.display = 'block';
+
+            // 4. Abre o Modal
+            const mapEditorModal = new bootstrap.Modal(document.getElementById('mapEditorModal'));
+            mapEditorModal.show();
+
+            // 5. Após abrir, centraliza o mapa no ponto (no listener 'shown.bs.modal')
+
+        } else if (actionBadge.dataset.action === 'delete-point') {
+            if (confirm(`Tem certeza que deseja DELETAR o ponto de coleta "${point.name}"?`)) {
+                // Lógica de exclusão:
+                simulatedCollectionPoints.splice(pointIndex, 1);
+                saveCollectionPoints(); // Salva no localStorage (Função já existente)
+                renderPointsList();     // Atualiza a lista lateral
+                alert("Ponto excluído com sucesso!");
+
+                // Se o mapa estiver aberto, precisa atualizar ele também
+                if (fullMapInstance) {
+                    renderCollectionPointsOnFullMap();
+                }
+            }
+        }
+    };
+    // *** FIM handlePointsListClick ***
 
     // Listener para o botão "Abrir Editor de Mapa"
     const handleMapEditorButton = () => {
@@ -1270,6 +1345,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pontos de Coleta
     renderPointsList();
     handleMapEditorButton();
+
+    // *** NOVO: Anexar o Listener para Ações na Lista Lateral ***
+    document.querySelector('.collection-points-management-section .list-group-flush')
+        .addEventListener('click', handlePointsListClick);
+    // *** FIM NOVO ***
 
 
     // Chama a inicialização dos mapas
