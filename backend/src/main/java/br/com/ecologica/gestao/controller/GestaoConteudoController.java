@@ -4,6 +4,8 @@ import br.com.ecologica.gestao.GestaoConteudo;
 import br.com.ecologica.gestao.dto.GestaoConteudoRequest;
 import br.com.ecologica.gestao.dto.GestaoConteudoResponse;
 import br.com.ecologica.gestao.service.GestaoConteudoService;
+import jakarta.validation.Valid;
+
 import org.springframework.validation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
