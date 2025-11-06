@@ -1,26 +1,38 @@
 package br.com.ecologica.visualizacao;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import br.com.ecologica.cadastro.CadastroEmpresasRecicladoras;
+import br.com.ecologica.cadastro.usuarios.model.Usuario;
+import br.com.ecologica.visualizacao.model.StatusSolicitacao;
+import jakarta.persistence.*;
 import lombok.Data;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "visualizacao_solicitacoes")
+@Table(name = "solicitacao") 
 public class VisualizacaoSolicitacoes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_solicitacao") 
     private Long id;
 
-    private Long usuarioId;
-    private String tipoSolicitacao;
-    private String status;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario") 
+    private Usuario usuario;
 
-    public void visualizarSolicitacoes() {
-        // lógica para exibir solicitações feitas pelo usuário
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_recicladora") 
+    private CadastroEmpresasRecicladoras empresaRecicladora;
+
+    @Lob
+    private String descricao;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status") 
+    private StatusSolicitacao status;
+
+    @Column(name = "data_solicitacao", updatable = false, insertable = false) 
+    private LocalDateTime dataSolicitacao;
+
 }

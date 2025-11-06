@@ -1,17 +1,18 @@
 package br.com.ecologica.cadastro.locaiscoleta.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class LocalColetaRequest {
-
+    
     @NotBlank(message = "O nome do local é obrigatório")
-    private String nomeLocal;
+    private String nome; 
 
     private String endereco;
-    private String cidade;
-    private String estado;
-    private String horarioFuncionamento;
-    private boolean ativo;
+
+    @NotNull(message = "O ID da empresa recicladora é obrigatório")
+    private Long idRecicladora; 
+
 }

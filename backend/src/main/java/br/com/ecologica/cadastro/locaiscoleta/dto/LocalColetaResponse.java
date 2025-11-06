@@ -1,27 +1,29 @@
 package br.com.ecologica.cadastro.locaiscoleta.dto;
 
+import br.com.ecologica.cadastro.CadastroLocaisColeta;
 import lombok.Data;
 
 @Data
 public class LocalColetaResponse {
-
     private Long id;
-    private String nomeLocal;
+    private String nome;
     private String endereco;
-    private String cidade;
-    private String estado;
-    private String horarioFuncionamento;
-    private boolean ativo;
+    private Long idRecicladora;
+    private String nomeRecicladora; 
 
-    public static LocalColetaResponse fromEntity(br.com.ecologica.cadastro.CadastroLocaisColeta local) {
+    public static LocalColetaResponse fromEntity(CadastroLocaisColeta local) {
         LocalColetaResponse response = new LocalColetaResponse();
         response.setId(local.getId());
-        response.setNomeLocal(local.getNomeLocal());
+        response.setNome(local.getNome());
         response.setEndereco(local.getEndereco());
-        response.setCidade(local.getCidade());
-        response.setEstado(local.getEstado());
-        response.setHorarioFuncionamento(local.getHorarioFuncionamento());
-        response.setAtivo(local.isAtivo());
+
+        if (local.getEmpresaRecicladora() != null) {
+            response.setIdRecicladora(local.getEmpresaRecicladora().getId());
+
+            if (local.getEmpresaRecicladora().getUsuario() != null) {
+                response.setNomeRecicladora(local.getEmpresaRecicladora().getUsuario().getNome());
+            }
+        }
         return response;
     }
 }

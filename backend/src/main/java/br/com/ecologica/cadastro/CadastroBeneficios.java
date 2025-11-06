@@ -1,26 +1,25 @@
 package br.com.ecologica.cadastro;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "cadastro_beneficios")
+@Table(name = "beneficio")
 public class CadastroBeneficios {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id_beneficio")
+	private Long id;
 
-    private String nomeBeneficio;
-    private String descricao;
-    private boolean ativo;
+	@Column(nullable = false, length = 100)
+	private String titulo;
 
-    public void cadastrar() {
-        // lógica de cadastro de benefício
-    }
+	@Lob
+	private String descricao;
+
+	@Column(name = "pontos_necessarios", nullable = false)
+	private int pontosNecessarios;
+
 }

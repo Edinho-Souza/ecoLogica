@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface HistoricoRepository extends JpaRepository<HistoricoPontuacao, Long> {
-    List<HistoricoPontuacao> findByUsuarioId(Long usuarioId);
+    List<HistoricoPontuacao> findByUsuario_Id(Long usuarioId);
 }

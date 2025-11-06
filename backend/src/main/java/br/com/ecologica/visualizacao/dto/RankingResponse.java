@@ -7,15 +7,19 @@ import lombok.Data;
 public class RankingResponse {
     private Long id;
     private String nomeUsuario;
-    private int pontuacao;
+    private int pontos;
     private int posicao;
 
     public static RankingResponse fromEntity(ExibicaoRanking ranking) {
         RankingResponse response = new RankingResponse();
         response.setId(ranking.getId());
-        response.setNomeUsuario(ranking.getNomeUsuario());
-        response.setPontuacao(ranking.getPontuacao());
+        response.setPontos(ranking.getPontos());
         response.setPosicao(ranking.getPosicao());
+        
+        if (ranking.getUsuario() != null) {
+            response.setNomeUsuario(ranking.getUsuario().getNome());
+        }
+        
         return response;
     }
 }

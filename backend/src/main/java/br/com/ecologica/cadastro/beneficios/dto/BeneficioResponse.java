@@ -6,16 +6,16 @@ import lombok.Data;
 @Data
 public class BeneficioResponse {
     private Long id;
-    private String nomeBeneficio;
+    private String titulo;
     private String descricao;
-    private boolean ativo;
+    private int pontosNecessarios; 
 
     public static BeneficioResponse fromEntity(CadastroBeneficios beneficio) {
         BeneficioResponse response = new BeneficioResponse();
         response.setId(beneficio.getId());
-        response.setNomeBeneficio(beneficio.getNomeBeneficio());
+        response.setTitulo(beneficio.getTitulo()); 
         response.setDescricao(beneficio.getDescricao());
-        response.setAtivo(beneficio.isAtivo());
+        response.setPontosNecessarios(beneficio.getPontosNecessarios()); 
         return response;
     }
 }

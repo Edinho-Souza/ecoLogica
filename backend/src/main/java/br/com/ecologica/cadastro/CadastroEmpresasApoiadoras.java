@@ -1,31 +1,33 @@
 package br.com.ecologica.cadastro;
 
+import br.com.ecologica.cadastro.usuarios.model.Usuario;
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.util.List;
 
 @Data
 @Entity
-@Table(name = "cadastro_empresas_apoiadoras")
+@Table(name = "empresaapoiadora") 
 public class CadastroEmpresasApoiadoras {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_apoiadora")
     private Long id;
 
-    private String nomeEmpresa;
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "id_apoiadora") 
+    private Usuario usuario;
+
+    @Column(nullable = false, unique = true, length = 18) 
     private String cnpj;
-    private String contato;
-    private boolean ativa;
 
-    @Column(nullable = false)
-    private boolean aprovada;
+    @Column(length = 200) // [cite: 2963]
+    private String endereco;
 
-    @OneToMany(mappedBy = "empresaApoiadora")
+    @Column(length = 20) 
+    private String telefone; 
+
+    @OneToMany(mappedBy = "empresaApoiadora") 
     private List<CadastroCampanhas> campanhas;
-
-    public void registrarEmpresa() {
-        // lógica para registrar empresa apoiadora
-    }
 }
