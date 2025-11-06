@@ -3,24 +3,24 @@ package br.com.ecologica.cadastro;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 @Entity
-@Table(name = "locais_coleta")
+@Table(name = "localcoleta")
 public class CadastroLocaisColeta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_local")
     private Long id;
 
-    private String nomeLocal;
-    private String endereco;
-    private String cidade;
-    private String estado;
-    private String horarioFuncionamento;
-    private boolean ativo;
+    @Column(length = 100)
+    private String nome; 
 
-    @OneToMany(mappedBy = "localColeta")
-    private List<CadastroMateriaisColetar> materiais;
+    @Column(length = 200)
+    private String endereco;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_recicladora")
+    private CadastroEmpresasRecicladoras empresaRecicladora;
+    
 }

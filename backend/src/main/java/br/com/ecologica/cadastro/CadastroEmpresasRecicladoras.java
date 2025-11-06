@@ -1,31 +1,30 @@
 package br.com.ecologica.cadastro;
 
+import br.com.ecologica.cadastro.usuarios.model.Usuario;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 @Entity
-@Table(name = "empresas_recicladoras")
+@Table(name = "empresarecicladora")
 public class CadastroEmpresasRecicladoras {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_recicladora") 
     private Long id;
 
-    private String nomeEmpresa;
-    private String cidade;
-    private boolean ativa;
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId 
+    @JoinColumn(name = "id_recicladora")
+    private Usuario usuario;
 
-    @Column(nullable = false)
-    private boolean aprovada;
+    @Column(nullable = false, unique = true, length = 18)
+    private String cnpj;
 
-    @ManyToMany
-    @JoinTable(
-        name = "empresa_recicladora_tipo_material",
-        joinColumns = @JoinColumn(name = "empresa_id"),
-        inverseJoinColumns = @JoinColumn(name = "tipo_material_id")
-    )
-    private List<CadastroTipoMateriais> tiposMateriais;
+    @Column(length = 200) 
+    private String endereco;
+
+    @Column(length = 20) 
+    private String telefone;
+
 }

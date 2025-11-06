@@ -1,27 +1,29 @@
 package br.com.ecologica.visualizacao;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "exibicao_noticias")
+@Table(name = "noticia")
 public class ExibicaoNoticias {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_noticia") 
     private Long id;
 
+    @Column(length = 150)
     private String titulo;
-    private String conteudo;
-    private String fonte;
-    private boolean publicado;
 
-    public void exibir() {
-        // lógica para exibir notícia ao usuário
-    }
+    @Lob 
+    private String conteudo;
+
+    @Column(name = "data_publicacao") 
+    private LocalDate dataPublicacao;
+
+    @Column(length = 100) 
+    private String autor; 
+
 }

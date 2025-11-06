@@ -1,33 +1,28 @@
 package br.com.ecologica.visualizacao;
 
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import br.com.ecologica.cadastro.usuarios.model.Usuario;
+import jakarta.persistence.*;
 import lombok.Data;
-
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Entity
-@Table(name = "historico_pontuacao")
-public class HistoricoPontuacao {
+@Table(name = "historico")
+public class HistoricoPontuacao { 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_historico") 
     private Long id;
 
-    private Long usuarioId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario") 
+    private Usuario usuario;
 
-    @ElementCollection
-    private List<Integer> pontuacoes;
+    @Column(length = 200) 
+    private String acao;
 
-    private LocalDateTime ultimaAtualizacao;
+    @Column(name = "data", updatable = false, insertable = false) 
+    private LocalDateTime data;
 
-    public void mostrarHistorico() {
-        // lógica para exibir histórico de pontuação
-    }
 }

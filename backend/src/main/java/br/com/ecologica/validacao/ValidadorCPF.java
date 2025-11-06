@@ -1,30 +1,36 @@
 package br.com.ecologica.validacao;
 
 public class ValidadorCPF {
-
     public static boolean isCPFValido(String cpf) {
-        if (cpf == null || !cpf.matches("\\d{11}") || cpf.chars().distinct().count() == 1) {
+        if (cpf == null || !cpf.matches("\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}") || cpf.chars().distinct().count() == 1) {
             return false;
         }
 
-        int[] pesos1 = {10, 9, 8, 7, 6, 5, 4, 3, 2};
-        int[] pesos2 = {11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+        // Remove caracteres não numéricos
+        cpf = cpf.replaceAll("[^0-9]", "");
 
-        try {
-            int soma1 = 0, soma2 = 0;
-            for (int i = 0; i < 9; i++) {
-                int digito = Character.getNumericValue(cpf.charAt(i));
-                soma1 += digito * pesos1[i];
-                soma2 += digito * pesos2[i];
-            }
+        // Calcula o primeiro dígito verificador
+        int soma = 0;
+        for (int i = 0; i < 9; i++) {
+            soma += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
+        }
+        int digito1 = 11 - (soma % 11);
+        if (digito1 > 9) digito1 = 0;
 
-            int digito1 = soma1 % 11 < 2 ? 0 : 11 - (soma1 % 11);
-            soma2 += digito1 * pesos2[9];
-            int digito2 = soma2 % 11 < 2 ? 0 : 11 - (soma2 % 11);
-
-            return cpf.endsWith("" + digito1 + digito2);
-        } catch (Exception e) {
+        // Verifica o primeiro dígito
+        if (Character.getNumericValue(cpf.charAt(9)) != digito1) {
             return false;
         }
+
+        // Calcula o segundo dígito verificador
+        soma = 0;
+        for (int i = 0; i < 10; i++) {
+            soma += Character.getNumericValue(cpf.charAt(i)) * (11 - i);
+        }
+        int digito2 = 11 - (soma % 11);
+        if (digito2 > 9) digito2 = 0;
+
+        // Verifica o segundo dígito
+        return Character.getNumericValue(cpf.charAt(10)) == digito2;
     }
 }

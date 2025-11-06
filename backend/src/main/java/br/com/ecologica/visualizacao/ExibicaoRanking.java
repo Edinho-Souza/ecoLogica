@@ -1,26 +1,27 @@
 package br.com.ecologica.visualizacao;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import br.com.ecologica.cadastro.usuarios.model.Usuario;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "exibicao_ranking")
+@Table(name = "ranking") 
 public class ExibicaoRanking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_ranking") 
     private Long id;
 
-    private String nomeUsuario;
-    private int pontuacao;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario") 
+    private Usuario usuario;
+
+    @Column(name = "pontos") 
+    private int pontos; 
+
+    @Column(name = "posicao") 
     private int posicao;
 
-    public void exibirRanking() {
-        // lógica para exibir ranking de usuários
-    }
 }

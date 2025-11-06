@@ -2,29 +2,40 @@ package br.com.ecologica.cadastro.usuarios.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuario")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuario")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String nome;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "cpf", nullable = false, unique = true, length = 14)
+    private String cpf;
+
+    @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String senha;
 
-    @Column(nullable = false)
-    private String perfil; // ADMIN, USUARIO, EMPRESA
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_usuario", nullable = false)
+    private TipoUsuario tipoUsuario; 
 
-    @Column(nullable = false, unique = true)
-    private String cpf;
+    @Column(name = "data_cadastro", updatable = false, insertable = false)
+    private LocalDateTime dataCadastro;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private StatusUsuario status;
 }

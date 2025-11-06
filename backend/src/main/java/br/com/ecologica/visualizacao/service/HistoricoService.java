@@ -4,7 +4,6 @@ import br.com.ecologica.visualizacao.dto.HistoricoResponse;
 import br.com.ecologica.visualizacao.repository.HistoricoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,7 +14,7 @@ public class HistoricoService {
     private HistoricoRepository repository;
 
     public List<HistoricoResponse> obterHistorico(Long usuarioId) {
-        return repository.findByUsuarioId(usuarioId)
+        return repository.findByUsuario_Id(usuarioId)
                 .stream()
                 .map(HistoricoResponse::fromEntity)
                 .collect(Collectors.toList());

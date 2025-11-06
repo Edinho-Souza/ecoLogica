@@ -303,9 +303,11 @@ DROP TABLE IF EXISTS `usuario`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `usuario` (
   `id_usuario` int NOT NULL AUTO_INCREMENT,
+  `cpf` VARCHAR(14) UNIQUE NOT NULL,
   `nome` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `senha` varchar(255) NOT NULL,
+  `status` enum('PENDENTE','ATIVO','SUSPENSO') NOT NULL DEFAULT 'PENDENTE',
   `tipo_usuario` enum('cidadao','recicladora','apoiadora','admin') NOT NULL,
   `data_cadastro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_usuario`),

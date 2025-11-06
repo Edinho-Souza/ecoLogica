@@ -1,19 +1,20 @@
 package br.com.ecologica.cadastro.empresasapoiadoras.dto;
 
+import br.com.ecologica.validacao.ValidadorCNPJ;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class EmpresaApoiadoraRequest {
 
-    @NotBlank(message = "O nome da empresa é obrigatório")
-    private String nomeEmpresa;
 
     @NotBlank(message = "O CNPJ é obrigatório")
     private String cnpj;
+    
+    private String endereco;
+    private String telefone;
 
-    private String contato;
-    private boolean ativa;
-
-    private boolean aprovada;
+    public boolean isCnpjValido() {
+        return ValidadorCNPJ.isCNPJValido(cnpj);
+    }
 }

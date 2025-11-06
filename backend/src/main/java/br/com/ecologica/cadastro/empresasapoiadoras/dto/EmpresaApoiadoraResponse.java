@@ -1,25 +1,35 @@
 package br.com.ecologica.cadastro.empresasapoiadoras.dto;
 
+import br.com.ecologica.cadastro.CadastroEmpresasApoiadoras;
+import br.com.ecologica.cadastro.usuarios.model.StatusUsuario;
 import lombok.Data;
 
 @Data
 public class EmpresaApoiadoraResponse {
 
-    private Long id;
-    private String nomeEmpresa;
+    private Long id; 
+    private String nomeEmpresa; 
+    private String email; 
+    private StatusUsuario status; 
     private String cnpj;
-    private String contato;
-    private boolean ativa;
-    private boolean aprovada;
+    private String endereco;
+    private String telefone;
 
-    public static EmpresaApoiadoraResponse fromEntity(br.com.ecologica.cadastro.CadastroEmpresasApoiadoras empresa) {
+    // Método de conversão
+    public static EmpresaApoiadoraResponse fromEntity(CadastroEmpresasApoiadoras empresa) {
         EmpresaApoiadoraResponse response = new EmpresaApoiadoraResponse();
-        response.setId(empresa.getId());
-        response.setNomeEmpresa(empresa.getNomeEmpresa());
+        
+        // Dados do Usuario
+        response.setId(empresa.getUsuario().getId());
+        response.setNomeEmpresa(empresa.getUsuario().getNome());
+        response.setEmail(empresa.getUsuario().getEmail());
+        response.setStatus(empresa.getUsuario().getStatus());
+
+        // Dados da EmpresaApoiadora
         response.setCnpj(empresa.getCnpj());
-        response.setContato(empresa.getContato());
-        response.setAtiva(empresa.isAtiva());
-        response.setAprovada(empresa.isAprovada());
+        response.setEndereco(empresa.getEndereco());
+        response.setTelefone(empresa.getTelefone());
+
         return response;
     }
 }

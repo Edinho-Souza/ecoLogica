@@ -1,29 +1,31 @@
 package br.com.ecologica.visualizacao;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import br.com.ecologica.cadastro.usuarios.model.Usuario;
+import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.Data;
 
-
 @Data
 @Entity
-@Table(name = "estatistica")
+@Table(name = "estatistica") //
 public class VisualizacaoEstatisticas {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_estatistica;
-    private Long id_usuario;
-    private String tipo;
-    private Double valor;
-    private LocalDate data;
-    private boolean visivel;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id_estatistica")
+	private Long id;
 
-    public void visualizarEstatisticas() {
-        // lógica para exibir estatísticas ao usuário
-    }
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_usuario")
+	private Usuario usuario;
+
+	@Column(length = 100)
+	private String tipo;
+
+	@Column(precision = 10, scale = 2)
+	private BigDecimal valor;
+
+	@Column(name = "data")
+	private LocalDate data;
 }

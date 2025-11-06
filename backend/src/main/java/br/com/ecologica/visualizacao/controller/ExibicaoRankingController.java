@@ -1,13 +1,12 @@
 package br.com.ecologica.visualizacao.controller;
 
-import br.com.ecologica.visualizacao.ExibicaoRanking;
+import br.com.ecologica.visualizacao.dto.RankingRequest;
 import br.com.ecologica.visualizacao.dto.RankingResponse;
 import br.com.ecologica.visualizacao.service.ExibicaoRankingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,8 +35,8 @@ public class ExibicaoRankingController {
     }
 
     @PostMapping
-    public ResponseEntity<RankingResponse> criar(@Valid @RequestBody ExibicaoRanking ranking) {
-        ExibicaoRanking salvo = service.salvar(ranking);
+    public ResponseEntity<RankingResponse> criar(@Valid @RequestBody RankingRequest request) {
+        var salvo = service.salvar(request); 
         return ResponseEntity.ok(RankingResponse.fromEntity(salvo));
     }
 
