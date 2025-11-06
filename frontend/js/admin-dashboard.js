@@ -6,6 +6,9 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    let miniMapInstance = null;
+    let fullMapInstance = null
+
     console.log("admin-dashboard.js: Script carregado.");
 
     // ===================================================================
@@ -79,8 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let currentSettings = {};
-    let isAddingNewPoint = false; // Flag para saber se estamos no modo de adição.
-    let tempNewMarker = null; // Para guardar o marcador temporário de adição.
+    let tempNewMarker = null;
 
 
     // Função para carregar configurações do localStorage ou usar padrão
@@ -138,19 +140,32 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCompanies();
     // *** FIM NOVO ***
 
+
     // ===================================================================
     // *** NOVO: DADOS E VARIÁVEIS PARA PONTOS DE COLETA (ADICIONAR AQUI) ***
     // ===================================================================
 
-    let simulatedCollectionPoints = [
+    let storedCollectionPoints = localStorage.getItem('ecoLogica_CollectionPoints'); // Adicionado
+    let simulatedCollectionPoints = storedCollectionPoints ? JSON.parse(storedCollectionPoints) : [
         { id: 1, name: "EcoPonto Centro", lat: -26.9179, lng: -49.0740, type: "Geral", isActive: true },
         { id: 2, name: "Recicla Eletrônicos Velha", lat: -26.9050, lng: -49.0700, type: "Eletrônicos", isActive: true },
         { id: 3, name: "Ponto Sul (Temporário)", lat: -26.9300, lng: -49.0900, type: "Plástico/Papel", isActive: false }
     ];
-    let nextPointId = simulatedCollectionPoints.length + 1;
-    let fullMapInstance = null;
+    let nextPointId = simulatedCollectionPoints.length > 0 ? Math.max(...simulatedCollectionPoints.map(p => p.id)) + 1 : 1; // Ajuste para o próximo ID
 
-    // *** FIM NOVO ***
+    console.log("Pontos de Coleta carregados:", simulatedCollectionPoints); // Adicione um log para conferir
+    // FIM NOVO: DADOS E VARIÁVEIS PARA PONTOS DE COLETA
+
+    // NOVO: Função para salvar pontos no localStorage
+    const saveCollectionPoints = () => {
+        try {
+            localStorage.setItem('ecoLogica_CollectionPoints', JSON.stringify(simulatedCollectionPoints));
+            console.log("Pontos de Coleta salvos no localStorage.");
+        } catch (e) {
+            console.error("Erro ao salvar pontos de coleta no localStorage:", e);
+        }
+    };
+    // FIM NOVO
 
     // ===================================================================
     // FUNÇÃO: GERENCIAMENTO DO MODAL "EDITAR PERFIL ADMIN"
@@ -205,6 +220,76 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1500);
         });
     }; // Fim handleAdminProfileModal
+
+
+    // Mantenha a função handleMapEditorActions simplificada com a lógica de Salvar:
+    const handleMapEditorActions = () => {
+        const form = document.getElementById('pointDetailsForm');
+        const formContainer = document.getElementById('pointDetailsFormContainer');
+        const cancelButton = document.getElementById('cancelPointButton');
+
+        const resetFormAndMarker = () => {
+            formContainer.style.display = 'none';
+            form.reset();
+            // ESTA LÓGICA AGORA VAI ENCONTRAR O tempNewMarker e fullMapInstance
+            if (tempNewMarker && fullMapInstance) {
+                fullMapInstance.removeLayer(tempNewMarker);
+                tempNewMarker = null;
+            }
+            document.getElementById('pointFormTitle').textContent = "Adicionar Novo Ponto";
+            document.getElementById('savePointButton').textContent = "Salvar Ponto";
+        };
+
+        // Adiciona o listener para o botão Cancelar
+        if (cancelButton) {
+            cancelButton.addEventListener('click', resetFormAndMarker);
+        }
+
+        // Lógica de Salvar (submit)
+// Lógica de Salvar (submit)
+if (form) {
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        // NOVO: Verifica se é edição (se o ID escondido foi preenchido)
+        const editingId = document.getElementById('pointId').value ? parseInt(document.getElementById('pointId').value) : null;
+        const newPointData = {
+            // Se for novo, usa nextPointId++, senão usa o ID existente
+            id: editingId || nextPointId++, 
+            name: document.getElementById('pointName').value.trim(),
+            lat: parseFloat(document.getElementById('pointLat').value),
+            lng: parseFloat(document.getElementById('pointLng').value),
+            type: document.getElementById('pointType').value.trim(),
+            isActive: document.getElementById('pointIsActive').checked
+        };
+        
+        if (editingId) {
+            // MODO EDIÇÃO: Encontra o ponto e o substitui
+            const index = simulatedCollectionPoints.findIndex(p => p.id === editingId);
+            if (index !== -1) {
+                simulatedCollectionPoints[index] = newPointData;
+                alert(`Ponto '${newPointData.name}' atualizado com sucesso!`);
+            }
+        } else {
+            // MODO CRIAÇÃO: Adiciona um novo ponto
+            simulatedCollectionPoints.push(newPointData);
+            alert(`Ponto '${newPointData.name}' cadastrado com sucesso!`);
+        }
+
+        saveCollectionPoints(); // Salva no localStorage (Função já existente)
+        renderCollectionPointsOnFullMap();
+        renderPointsList();
+        
+        // Recarrega o mini-mapa lateral
+        setTimeout(() => {
+            initAdminMaps(); 
+        }, 50);
+
+        resetFormAndMarker(); // Esta função limpa o formulário e o pino temporário
+    });
+}
+
+    };
 
     // ===================================================================
     // FUNÇÃO: INICIALIZA OS GRÁFICOS DO ADMIN
@@ -921,14 +1006,71 @@ document.addEventListener('DOMContentLoaded', () => {
         simulatedCollectionPoints.forEach(point => {
             const itemClass = point.isActive ? '' : 'text-muted'; // Ponto inativo fica cinza
             const listItem = `
-            <a href="#" class="list-group-item list-group-item-action py-1 px-2 d-flex justify-content-between align-items-center ${itemClass}" 
-               data-point-id="${point.id}">
-                ${point.name}
-                <span class="badge bg-secondary rounded-pill" data-action="edit-point" title="Editar Ponto"><i class="fas fa-pencil-alt fa-xs"></i></span>
-            </a>`;
+<a href="#" class="list-group-item list-group-item-action py-1 px-2 d-flex justify-content-between align-items-center ${itemClass}" 
+   data-point-id="${point.id}">
+    ${point.name}
+    <span>
+        <span class="badge bg-secondary rounded-pill me-1" data-action="edit-point" title="Editar Ponto"><i class="fas fa-pencil-alt fa-xs"></i></span>
+        <span class="badge bg-danger rounded-pill" data-action="delete-point" title="Excluir Ponto"><i class="fas fa-trash-alt fa-xs"></i></span> 
+    </span>
+</a>`;
             listElement.innerHTML += listItem;
         });
     };
+
+    // *** NOVO: Handler de Clique para Listas de Pontos de Coleta ***
+    const handlePointsListClick = (event) => {
+        const listItem = event.target.closest('a.list-group-item');
+        const actionBadge = event.target.closest('.badge[data-action]');
+
+        if (!listItem || !actionBadge) return;
+        event.preventDefault(); // Evita o scroll (do link #)
+
+        const pointId = parseInt(listItem.dataset.pointId);
+        const pointIndex = simulatedCollectionPoints.findIndex(p => p.id === pointId);
+        const point = simulatedCollectionPoints[pointIndex];
+
+        if (!point) return;
+
+        if (actionBadge.dataset.action === 'edit-point') {
+
+            // 1. Prepara o formulário do Modal
+            document.getElementById('pointFormTitle').textContent = "Editar Ponto de Coleta";
+            document.getElementById('savePointButton').textContent = "Salvar Alterações";
+
+            // 2. Preenche os campos
+            document.getElementById('pointId').value = point.id; // Campo escondido para ID
+            document.getElementById('pointName').value = point.name;
+            document.getElementById('pointLat').value = point.lat;
+            document.getElementById('pointLng').value = point.lng;
+            document.getElementById('pointType').value = point.type;
+            document.getElementById('pointIsActive').checked = point.isActive;
+
+            // 3. Exibe o formulário (se estiver escondido por padrão)
+            document.getElementById('pointDetailsFormContainer').style.display = 'block';
+
+            // 4. Abre o Modal
+            const mapEditorModal = new bootstrap.Modal(document.getElementById('mapEditorModal'));
+            mapEditorModal.show();
+
+            // 5. Após abrir, centraliza o mapa no ponto (no listener 'shown.bs.modal')
+
+        } else if (actionBadge.dataset.action === 'delete-point') {
+            if (confirm(`Tem certeza que deseja DELETAR o ponto de coleta "${point.name}"?`)) {
+                // Lógica de exclusão:
+                simulatedCollectionPoints.splice(pointIndex, 1);
+                saveCollectionPoints(); // Salva no localStorage (Função já existente)
+                renderPointsList();     // Atualiza a lista lateral
+                alert("Ponto excluído com sucesso!");
+
+                // Se o mapa estiver aberto, precisa atualizar ele também
+                if (fullMapInstance) {
+                    renderCollectionPointsOnFullMap();
+                }
+            }
+        }
+    };
+    // *** FIM handlePointsListClick ***
 
     // Listener para o botão "Abrir Editor de Mapa"
     const handleMapEditorButton = () => {
@@ -943,30 +1085,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const initFullMapEditor = () => {
         const mapContainerId = 'full-map-container';
+        const formContainer = document.getElementById('pointDetailsFormContainer');
+        const pointLatInput = document.getElementById('pointLat');
+        const pointLngInput = document.getElementById('pointLng');
+        const pointNameInput = document.getElementById('pointName');
 
-        if (typeof L === 'undefined') return;
+        if (typeof L === 'undefined' || typeof L.Control.Geocoder === 'undefined') {
+            console.error("Leaflet ou o Geocoder não estão carregados.");
+            return;
+        }
 
-        // Inicializa o mapa SOMENTE se ainda não foi inicializado
         if (!fullMapInstance) {
             fullMapInstance = L.map(mapContainerId, {
                 scrollWheelZoom: true,
-                zoomControl: true, // Garante que o zoom apareça
+                zoomControl: true,
             }).setView([-26.918, -49.075], 14);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(fullMapInstance);
 
-            fullMapInstance.on('click', handleMapClickForNewPoint);
-
-            // *** CORREÇÃO: Chamamos a função para adicionar os pinos ao NOVO mapa ***
             renderCollectionPointsOnFullMap();
-            // **********************************************************************
+
+            // *** INTEGRAÇÃO REAL DO GEOCODER ***
+            const geocoder = L.Control.Geocoder.nominatim();
+
+            L.Control.geocoder({
+                query: "Blumenau, SC",
+                placeholder: "Digite o endereço completo aqui...",
+                defaultMarkGeocode: false,
+                geocoder: geocoder
+            })
+                .on('markgeocode', function (e) {
+                    const latlng = e.geocode.center;
+
+                    // 1. Remove o marcador temporário anterior, se existir
+                    if (tempNewMarker) {
+                        fullMapInstance.removeLayer(tempNewMarker);
+                    }
+
+                    // 2. Cria o novo marcador temporário e preenche o formulário
+                    tempNewMarker = L.marker(latlng, { draggable: true }).addTo(fullMapInstance)
+                        .bindPopup(`Local encontrado: ${e.geocode.name}`).openPopup();
+
+                    // 3. Centraliza e preenche campos
+                    fullMapInstance.setView(latlng, 17);
+                    pointLatInput.value = latlng.lat;
+                    pointLngInput.value = latlng.lng;
+                    pointNameInput.value = e.geocode.name;
+
+                    // 4. Configura o arrasto para atualização das coordenadas
+                    tempNewMarker.on('dragend', function (e) {
+                        const newLatlng = e.target.getLatLng();
+                        pointLatInput.value = newLatlng.lat;
+                        pointLngInput.value = newLatlng.lng;
+                        e.target.openPopup();
+                    });
+
+                    // 5. Exibe o formulário de detalhes
+                    formContainer.style.display = 'block';
+                    formContainer.scrollIntoView({ behavior: 'smooth' });
+
+                }).addTo(fullMapInstance);
+            // *************************************************************
 
         } else {
-            // Se já existe, apenas garante que ele se redesenhe (e re-adicionamos os pontos)
             fullMapInstance.invalidateSize();
-            // *** Chamamos a função de renderização novamente para garantir que os pinos apareçam ***
             renderCollectionPointsOnFullMap();
         }
     };
@@ -1054,36 +1238,46 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===================================================================
 
     const initAdminMaps = () => {
-        // ESSA PARTE NÃO PODE SER OMITIDA!
-        if (typeof L === 'undefined') { //
-            console.error("Leaflet não carregado. Verifique o link do script."); //
-            return; //
+        if (typeof L === 'undefined') {
+            console.error("Leaflet não carregado.");
+            return;
         }
 
-        // --- Mapa lateral (preview pequeno) ---
-        const miniMapDiv = document.getElementById('mini-map-placeholder'); //
-        if (miniMapDiv) { //
-            miniMapDiv.innerHTML = ""; //
-            const miniMap = L.map(miniMapDiv, { //
-                zoomControl: false, //
-                attributionControl: false //
-            }).setView([-26.9179, -49.0740], 13); //
+        const miniMapDiv = document.getElementById('mini-map-placeholder');
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(miniMap); //
+        if (miniMapDiv) {
+            // CORREÇÃO ESSENCIAL: Destruir a instância anterior, se existir
+            if (miniMapInstance) {
+                miniMapInstance.remove();
+                miniMapInstance = null;
+            }
 
-            // >>> MUDANÇA MAIS IMPORTANTE: Chama a função que renderiza todos os pontos
-            renderCollectionPointsOnMiniMap(miniMap);
+            // 1. Recria o container (limpa o HTML e garante que o mapa será novo)
+            miniMapDiv.innerHTML = "";
+
+            // 2. Cria uma nova instância e a armazena
+            miniMapInstance = L.map(miniMapDiv, {
+                zoomControl: false,
+                attributionControl: false
+            }).setView([-26.9179, -49.0740], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(miniMapInstance);
+
+            // 3. Renderiza os pontos no mini-mapa
+            renderCollectionPointsOnMiniMap(miniMapInstance);
 
             // Ajusta o zoom para caber todos os pontos
             if (simulatedCollectionPoints.length > 0) {
-                // L.LatLngBounds precisa ser usada, mas garanta que 'L' esteja acessível
                 const bounds = new L.LatLngBounds(simulatedCollectionPoints.map(p => [p.lat, p.lng]));
-                miniMap.fitBounds(bounds, { padding: [5, 5] });
+                miniMapInstance.fitBounds(bounds, { padding: [5, 5] });
             }
-            // <<< FIM DA MUDANÇA
+
+            // 4. Força o redimensionamento imediatamente (Embora esteja visível, garante o redraw)
+            miniMapInstance.invalidateSize();
+
 
         } else {
-            console.warn("Div #mini-map-placeholder não encontrada."); //
+            console.warn("Div #mini-map-placeholder não encontrada.");
         }
     };
 
@@ -1099,10 +1293,10 @@ document.addEventListener('DOMContentLoaded', () => {
             mapEditorModal.addEventListener('shown.bs.modal', () => {
                 console.log("Modal de Editor de Mapas totalmente visível. Inicializando/Redimensionando mapa...");
 
-                // Chama a função que cria/atualiza o mapa
+                // 1. Chama a função que cria/atualiza o mapa
                 initFullMapEditor();
 
-                // ESSENCIAL: Garante o redimensionamento forçado se a instância existir
+                // 2. ESSENCIAL: Garante o redimensionamento forçado se a instância existir
                 if (fullMapInstance) {
                     fullMapInstance.invalidateSize();
                     console.log("Leaflet invalidateSize() chamado.");
@@ -1152,10 +1346,17 @@ document.addEventListener('DOMContentLoaded', () => {
     renderPointsList();
     handleMapEditorButton();
 
+    // *** NOVO: Anexar o Listener para Ações na Lista Lateral ***
+    document.querySelector('.collection-points-management-section .list-group-flush')
+        .addEventListener('click', handlePointsListClick);
+    // *** FIM NOVO ***
+
 
     // Chama a inicialização dos mapas
     initAdminMaps();
     handleMapEditorModal();
+    handleMapEditorActions();
+
 
     // Chamar outras funções de inicialização aqui
 

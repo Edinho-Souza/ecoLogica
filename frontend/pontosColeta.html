@@ -32,40 +32,58 @@
 
             </div>
 
-            <div class="filtros-container row g-3 mb-4">
-                <div class="filtro col-md-3"> <label for="cidade-select" class="form-label">Selecione sua
-                        cidade:</label>
-                    <select id="cidade-select" class="form-select form-select-lg">
-                        <option value="">Todas as cidades</option>
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label for="cidade-select" class="form-label">Selecione sua cidade:</label>
+                    <select class="form-select" id="cidade-select">
+                        <option value="todos">Mostrar todas as cidades</option>
                         <option value="blumenau">Blumenau</option>
-                        <option value="gaspar">Gaspar</option>
+                        <option value="timbo">Timbó</option>
                         <option value="indaial">Indaial</option>
                         <option value="pomerode">Pomerode</option>
-                        <option value="timbo">Timbó</option>
+                        <option value="gaspar">Gaspar</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="material-select" class="form-label">Selecione o tipo de material:</label>
+                    <select class="form-select" id="material-select">
+                        <option value="todos">Mostrar todos os materiais</option>
+                        <option value="eletronicos">Eletrônicos</option>
+                        <option value="metal">Metal</option>
+                        <option value="oleo">Óleo de Cozinha Usado</option>
+                        <option value="papel">Papel/Papelão</option>
+                        <option value="plastico">Plástico</option>
+                        <option value="vidro">Vidro</option>
                     </select>
                 </div>
             </div>
-
+            
             <div id="mapa">
                 <div class="legenda-mapa">
                     <h4>Legenda</h4>
-                    <div class="legenda-item">
+
+                    <div class="legenda-item" data-type="eletronicos">
                         <span class="cor-legenda" style="background-color: #007bff;"></span> Eletrônicos
                     </div>
-                    <div class="legenda-item">
-                        <span class="cor-legenda" style="background-color: #dc3545;"></span> Plástico e Metal
+                    <div class="legenda-item" data-type="metal">
+                        <span class="cor-legenda" style="background-color: #dc3545;"></span> Metal
                     </div>
-                    <div class="legenda-item">
-                        <span class="cor-legenda" style="background-color: #28a745;"></span> Papel e Vidro
+                    <div class="legenda-item" data-type="oleo">
+                        <span class="cor-legenda" style="background-color: #ffc107;"></span> Óleo de Cozinha Usado
                     </div>
-                    <div class="legenda-item">
-                        <span class="cor-legenda" style="background-color: #ffc107;"></span> Óleo de Cozinha
+                    <div class="legenda-item" data-type="papel">
+                        <span class="cor-legenda" style="background-color: #28a745;"></span> Papel/Papelão
                     </div>
-                    <div class="legenda-item">
-                        <span class="cor-legenda" style="background-color: #6c757d;"></span> Ponto Geral
+                    <div class="legenda-item" data-type="plastico">
+                        <span class="cor-legenda" style="background-color: #dc3545;"></span> Plástico
+                    </div>
+                    <div class="legenda-item" data-type="vidro">
+                        <span class="cor-legenda" style="background-color: #28a745;"></span> Vidro
                     </div>
                 </div>
             </div>
+
         </section>
 
         <div id="placeholder-imagem-rodape"></div>
