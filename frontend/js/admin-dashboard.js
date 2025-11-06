@@ -7,6 +7,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     let miniMapInstance = null;
+    let fullMapInstance = null
 
     console.log("admin-dashboard.js: Script carregado.");
 
@@ -144,15 +145,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // *** NOVO: DADOS E VARIÁVEIS PARA PONTOS DE COLETA (ADICIONAR AQUI) ***
     // ===================================================================
 
-    let simulatedCollectionPoints = [
+    let storedCollectionPoints = localStorage.getItem('ecoLogica_CollectionPoints'); // Adicionado
+    let simulatedCollectionPoints = storedCollectionPoints ? JSON.parse(storedCollectionPoints) : [
         { id: 1, name: "EcoPonto Centro", lat: -26.9179, lng: -49.0740, type: "Geral", isActive: true },
         { id: 2, name: "Recicla Eletrônicos Velha", lat: -26.9050, lng: -49.0700, type: "Eletrônicos", isActive: true },
         { id: 3, name: "Ponto Sul (Temporário)", lat: -26.9300, lng: -49.0900, type: "Plástico/Papel", isActive: false }
     ];
-    let nextPointId = simulatedCollectionPoints.length + 1;
-    let fullMapInstance = null;
+    let nextPointId = simulatedCollectionPoints.length > 0 ? Math.max(...simulatedCollectionPoints.map(p => p.id)) + 1 : 1; // Ajuste para o próximo ID
 
-    // *** FIM NOVO ***
+    console.log("Pontos de Coleta carregados:", simulatedCollectionPoints); // Adicione um log para conferir
+    // FIM NOVO: DADOS E VARIÁVEIS PARA PONTOS DE COLETA
+
+    // NOVO: Função para salvar pontos no localStorage
+    const saveCollectionPoints = () => {
+        try {
+            localStorage.setItem('ecoLogica_CollectionPoints', JSON.stringify(simulatedCollectionPoints));
+            console.log("Pontos de Coleta salvos no localStorage.");
+        } catch (e) {
+            console.error("Erro ao salvar pontos de coleta no localStorage:", e);
+        }
+    };
+    // FIM NOVO
 
     // ===================================================================
     // FUNÇÃO: GERENCIAMENTO DO MODAL "EDITAR PERFIL ADMIN"
@@ -246,6 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     isActive: document.getElementById('pointIsActive').checked
                 };
                 simulatedCollectionPoints.push(newPoint);
+                saveCollectionPoints();
                 alert(`Ponto '${newPoint.name}' cadastrado com sucesso!`);
                 renderCollectionPointsOnFullMap();
                 renderPointsList();
