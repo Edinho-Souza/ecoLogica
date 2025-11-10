@@ -147,10 +147,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let storedCollectionPoints = localStorage.getItem('ecoLogica_CollectionPoints'); // Adicionado
     let simulatedCollectionPoints = storedCollectionPoints ? JSON.parse(storedCollectionPoints) : [
-        { id: 1, name: "EcoPonto Centro", lat: -26.9179, lng: -49.0740, type: "Geral", isActive: true },
-        { id: 2, name: "Recicla Eletrônicos Velha", lat: -26.9050, lng: -49.0700, type: "Eletrônicos", isActive: true },
-        { id: 3, name: "Ponto Sul (Temporário)", lat: -26.9300, lng: -49.0900, type: "Plástico/Papel", isActive: false }
+        { id: 1, name: "EcoPonto Centro", lat: -26.9179, lng: -49.0740, type: "Papel, Vidro", isActive: true },
+        { id: 2, name: "Recicla Eletrônicos Velha", lat: -26.9050, lng: -49.0700, type: "Eletronicos", isActive: true },
+        { id: 3, name: "Ponto Sul (Temporário)", lat: -26.9300, lng: -49.0900, type: "Plastico, Papel", isActive: false }
     ];
+
+
+
     let nextPointId = simulatedCollectionPoints.length > 0 ? Math.max(...simulatedCollectionPoints.map(p => p.id)) + 1 : 1; // Ajuste para o próximo ID
 
     console.log("Pontos de Coleta carregados:", simulatedCollectionPoints); // Adicione um log para conferir
@@ -166,6 +169,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     // FIM NOVO
+
+    // admin-dashboard.js (Perto da linha ~200, após saveCollectionPoints)
+
+    // NOVO: Função para obter os valores dos checkboxes
+    const getSelectedPointTypes = () => {
+        // Seleciona todos os checkboxes com a classe 'point-type-checkbox'
+        const checkboxes = document.querySelectorAll('.point-type-checkbox');
+        const selectedTypes = [];
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedTypes.push(checkbox.value);
+            }
+        });
+        // Retorna os tipos selecionados como uma string separada por vírgula (Ex: "Metal, Papel")
+        return selectedTypes.join(', ');
+    };
+
+    // NOVO: Função para definir o estado dos checkboxes
+    const setPointTypesCheckboxes = (typesString) => {
+        // 1. Limpa todas as seleções primeiro
+        const checkboxes = document.querySelectorAll('.point-type-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+        if (!typesString) return;
+
+        // 2. Define o array de tipos para marcar (Ex: ["Metal", "Papel"])
+        const pointTypes = typesString.split(',').map(type => type.trim());
+
+        // 3. Marca os checkboxes correspondentes
+        pointTypes.forEach(type => {
+            const checkbox = document.querySelector(`.point-type-checkbox[value="${type}"]`);
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        });
+    };
 
     // ===================================================================
     // FUNÇÃO: GERENCIAMENTO DO MODAL "EDITAR PERFIL ADMIN"
@@ -245,49 +286,67 @@ document.addEventListener('DOMContentLoaded', () => {
             cancelButton.addEventListener('click', resetFormAndMarker);
         }
 
+
         // Lógica de Salvar (submit)
-// Lógica de Salvar (submit)
-if (form) {
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
+        // Lógica de Salvar (submit)
+        if (form) {
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
 
-        // NOVO: Verifica se é edição (se o ID escondido foi preenchido)
-        const editingId = document.getElementById('pointId').value ? parseInt(document.getElementById('pointId').value) : null;
-        const newPointData = {
-            // Se for novo, usa nextPointId++, senão usa o ID existente
-            id: editingId || nextPointId++, 
-            name: document.getElementById('pointName').value.trim(),
-            lat: parseFloat(document.getElementById('pointLat').value),
-            lng: parseFloat(document.getElementById('pointLng').value),
-            type: document.getElementById('pointType').value.trim(),
-            isActive: document.getElementById('pointIsActive').checked
-        };
-        
-        if (editingId) {
-            // MODO EDIÇÃO: Encontra o ponto e o substitui
-            const index = simulatedCollectionPoints.findIndex(p => p.id === editingId);
-            if (index !== -1) {
-                simulatedCollectionPoints[index] = newPointData;
-                alert(`Ponto '${newPointData.name}' atualizado com sucesso!`);
-            }
-        } else {
-            // MODO CRIAÇÃO: Adiciona um novo ponto
-            simulatedCollectionPoints.push(newPointData);
-            alert(`Ponto '${newPointData.name}' cadastrado com sucesso!`);
+                const selectedTypesString = getSelectedPointTypes();
+
+                if (selectedTypesString === '') {
+                    alert("Por favor, selecione pelo menos um Tipo de Material.");
+                    return; // Impede a submissão
+                }
+
+                // Atualiza o campo hidden 'pointType' (embora a função getSelectedPointTypes
+                // já esteja sendo usada para newPointData, é bom garantir que a validação 
+                // e a coleta ocorram antes.)
+                document.getElementById('pointType').value = selectedTypesString;
+                // FIM NOVO: LÓGICA DE VALIDAÇÃO E ATUALIZAÇÃO DO CAMPO ESCONDIDO
+
+                const editingId = document.getElementById('pointId').value ? parseInt(document.getElementById('pointId').value) : null;
+
+                const newPointData = {
+                    // Se for novo, usa nextPointId++, senão usa o ID existente
+                    id: editingId || nextPointId++,
+                    // NOVO: Salva o Nome Curto (pointName)
+                    name: document.getElementById('pointName').value.trim(),
+                    // CORRIGIDO: Salva o Endereço Completo (pointAddress)
+                    address: document.getElementById('pointAddress').value.trim(),
+
+                    lat: parseFloat(document.getElementById('pointLat').value),
+                    lng: parseFloat(document.getElementById('pointLng').value),
+                    type: selectedTypesString, // O valor de tipos selecionados
+                    isActive: document.getElementById('pointIsActive').checked
+                };
+
+                if (editingId) {
+                    // MODO EDIÇÃO: Encontra o ponto e o substitui
+                    const index = simulatedCollectionPoints.findIndex(p => p.id === editingId);
+                    if (index !== -1) {
+                        simulatedCollectionPoints[index] = newPointData;
+                        alert(`Ponto '${newPointData.name}' atualizado com sucesso!`);
+                    }
+                } else {
+                    // MODO CRIAÇÃO: Adiciona um novo ponto
+                    simulatedCollectionPoints.push(newPointData);
+                    alert(`Ponto '${newPointData.name}' cadastrado com sucesso!`);
+                }
+
+                saveCollectionPoints(); // Salva no localStorage (Função já existente)
+                renderCollectionPointsOnFullMap();
+                renderPointsList();
+
+                // Recarrega o mini-mapa lateral
+                setTimeout(() => {
+                    initAdminMaps();
+                }, 50);
+
+                resetFormAndMarker(); // Esta função limpa o formulário e o pino temporário
+            });
         }
-
-        saveCollectionPoints(); // Salva no localStorage (Função já existente)
-        renderCollectionPointsOnFullMap();
-        renderPointsList();
-        
-        // Recarrega o mini-mapa lateral
-        setTimeout(() => {
-            initAdminMaps(); 
-        }, 50);
-
-        resetFormAndMarker(); // Esta função limpa o formulário e o pino temporário
-    });
-}
 
     };
 
@@ -1032,6 +1091,9 @@ if (form) {
 
         if (!point) return;
 
+        // admin-dashboard.js (Dentro de handlePointsListClick, Linha ~951)
+
+        // ...
         if (actionBadge.dataset.action === 'edit-point') {
 
             // 1. Prepara o formulário do Modal
@@ -1039,12 +1101,19 @@ if (form) {
             document.getElementById('savePointButton').textContent = "Salvar Alterações";
 
             // 2. Preenche os campos
-            document.getElementById('pointId').value = point.id; // Campo escondido para ID
-            document.getElementById('pointName').value = point.name;
+            document.getElementById('pointId').value = point.id;
+            document.getElementById('pointName').value = point.name;    // Carrega o Nome Curto
+
+            // CORRIGIDO: Tenta carregar 'point.address'. Se for undefined (ponto antigo), usa point.name como fallback.
+            document.getElementById('pointAddress').value = point.address || point.name;
+
             document.getElementById('pointLat').value = point.lat;
             document.getElementById('pointLng').value = point.lng;
-            document.getElementById('pointType').value = point.type;
+            setPointTypesCheckboxes(point.type);
             document.getElementById('pointIsActive').checked = point.isActive;
+
+            // 3. Exibe o formulário (se estiver escondido por padrão)
+            // ...
 
             // 3. Exibe o formulário (se estiver escondido por padrão)
             document.getElementById('pointDetailsFormContainer').style.display = 'block';
@@ -1072,6 +1141,62 @@ if (form) {
     };
     // *** FIM handlePointsListClick ***
 
+    // admin-dashboard.js (Perto da Linha ~1000)
+
+    // *** NOVO: Handler de Edição da Lista DENTRO do Modal ***
+    const handleModalPointEdit = (event) => {
+        const editIcon = event.target.closest('.modal-points-list-scrollable a');
+        if (!editIcon) return;
+
+        event.preventDefault();
+
+        // 1. Encontra o Ponto de Coleta
+        // O ID é necessário para encontrar o ponto. Como a lista dentro do modal não
+        // possui o data-point-id, precisamos re-renderizar a lista do modal (Passo 2)
+        // ou usar o ponto clicado para encontrar o ID na lista original.
+
+        // Por simplicidade, vamos usar o ID do ponto que está sendo editado na lista lateral (handlePointsListClick)
+        // Se o user está editando DENTRO do modal, ele provavelmente clicou na lista lateral anteriormente.
+        // Vamos garantir que a lista do modal tenha o ID.
+
+        // --- LÓGICA REQUER QUE A LISTA DO MODAL TENHA O data-point-id ---
+        const pointId = parseInt(editIcon.dataset.pointId);
+        const point = simulatedCollectionPoints.find(p => p.id === pointId);
+
+        if (!point) {
+            console.error("Ponto de coleta não encontrado para edição no modal.");
+            return;
+        }
+
+        console.log(`Editando ponto no modal: ${point.name}`);
+
+        // 2. Preenche o Formulário (Reutiliza a lógica de edição)
+        document.getElementById('pointId').value = point.id;
+        document.getElementById('pointName').value = point.name;
+        document.getElementById('pointAddress').value = point.address || point.name;
+        document.getElementById('pointLat').value = point.lat;
+        document.getElementById('pointLng').value = point.lng;
+        setPointTypesCheckboxes(point.type);
+        document.getElementById('pointIsActive').checked = point.isActive;
+
+        // 3. Atualiza a UI para modo Edição
+        document.getElementById('pointFormTitle').textContent = "Editar Ponto de Coleta";
+        document.getElementById('savePointButton').textContent = "Salvar Alterações";
+        document.getElementById('pointDetailsFormContainer').style.display = 'block';
+
+        // 4. Centraliza o Mapa no Ponto
+        if (fullMapInstance) {
+            fullMapInstance.setView([point.lat, point.lng], 17); // Ajusta o zoom para 17
+
+            // Se houver um marcador temporário (de uma busca), removemos
+            if (tempNewMarker) {
+                fullMapInstance.removeLayer(tempNewMarker);
+                tempNewMarker = null;
+            }
+        }
+    };
+    // *** FIM handleModalPointEdit ***
+
     // Listener para o botão "Abrir Editor de Mapa"
     const handleMapEditorButton = () => {
         const button = document.querySelector('.collection-points-management-section .btn-info');
@@ -1089,6 +1214,8 @@ if (form) {
         const pointLatInput = document.getElementById('pointLat');
         const pointLngInput = document.getElementById('pointLng');
         const pointNameInput = document.getElementById('pointName');
+        // NOVO: Referência ao campo de Endereço
+        const pointAddressInput = document.getElementById('pointAddress');
 
         if (typeof L === 'undefined' || typeof L.Control.Geocoder === 'undefined') {
             console.error("Leaflet ou o Geocoder não estão carregados.");
@@ -1132,7 +1259,16 @@ if (form) {
                     fullMapInstance.setView(latlng, 17);
                     pointLatInput.value = latlng.lat;
                     pointLngInput.value = latlng.lng;
-                    pointNameInput.value = e.geocode.name;
+
+                    // CORRIGIDO: O resultado completo da busca do Geocoder vai para o campo Endereço
+                    pointAddressInput.value = e.geocode.name;
+
+                    // O campo 'pointName' (nome curto) é deixado para o administrador preencher manualmente.
+                    // Se o campo de Endereço ainda estiver vazio, preenche o Nome com o resultado da busca.
+                    if (pointNameInput.value.trim() === '') {
+                        pointNameInput.value = e.geocode.name.split(',')[0].trim(); // Pega a primeira parte como nome sugerido
+                    }
+
 
                     // 4. Configura o arrasto para atualização das coordenadas
                     tempNewMarker.on('dragend', function (e) {
@@ -1182,18 +1318,34 @@ if (form) {
 
             const marker = L.marker([point.lat, point.lng], { icon: customIcon }).addTo(fullMapInstance);
 
-            // Adicionar pop-up se desejar
-            marker.bindPopup(`<b>${point.name}</b><br>Status: ${point.isActive ? 'Ativo' : 'Inativo'}`);
-            // FIM ADICIONA MARCADOR AO MAPA GRANDE
+            // ===================================================================
+            // *** BLOCO DE POPUP ATUALIZADO (SEM LAT/LNG) ***
+            // ===================================================================
+
+            const popupContent = `
+            <div style="max-width: 250px;">
+                <p class="mb-1"><strong>Ponto:</strong> ${point.name}</p>
+                <p class="mb-1"><strong>Endereço:</strong><br>${point.address || 'Endereço Indisponível'}</p>
+                <hr style="margin: 5px 0;">
+                <p class="mb-1 small">
+                    <strong>Status:</strong> ${point.isActive ? '<span class="text-success">Ativo</span>' : '<span class="text-danger">Inativo</span>'}<br>
+                    <strong>Materiais:</strong> ${point.type || 'Nenhum'}<br>
+                </p>
+                </div>
+        `;
+
+            // Adicionar pop-up com mais detalhes
+            marker.bindPopup(popupContent);
+            // ===================================================================
 
             // Renderizar o item na lista lateral do modal
             if (listContainer) {
                 listContainer.innerHTML += `
-                <a href="#" class="list-group-item list-group-item-action list-group-item-sm d-flex justify-content-between align-items-center">
+                <a href="#" class="list-group-item list-group-item-action list-group-item-sm d-flex justify-content-between align-items-center" data-point-id="${point.id}">
                     ${point.name} 
                     <span style="color:${statusColor}"><i class="fas fa-edit me-1"></i></span>
                 </a>
-            `;
+                `;
             }
         });
     };
@@ -1287,6 +1439,10 @@ if (form) {
 
     const handleMapEditorModal = () => {
         const mapEditorModal = document.getElementById('mapEditorModal');
+        // Adicione a referência ao formulário
+        const form = document.getElementById('pointDetailsForm');
+
+        // As variáveis 'tempNewMarker' e 'fullMapInstance' são acessíveis globalmente.
 
         if (mapEditorModal) {
             // Usa o evento que dispara APÓS o modal estar visível
@@ -1302,6 +1458,39 @@ if (form) {
                     console.log("Leaflet invalidateSize() chamado.");
                 }
             });
+
+            // *** NOVO LISTENER: Quando o modal é ocultado/fechado ***
+            mapEditorModal.addEventListener('hidden.bs.modal', () => {
+                console.log("Modal fechado. Resetando estado do formulário.");
+
+                // Simula a lógica de reset contida em resetFormAndMarker,
+                // garantindo que o modo de edição seja sempre limpo.
+                const formContainer = document.getElementById('pointDetailsFormContainer');
+                if (formContainer) formContainer.style.display = 'none';
+
+                // O form.reset() lida com inputs de texto, rádio, e checkboxes.
+                if (form) form.reset();
+
+                // Limpa o ID de edição (campo escondido)
+                if (document.getElementById('pointId')) {
+                    document.getElementById('pointId').value = "";
+                }
+
+                // Reseta os títulos
+                if (document.getElementById('pointFormTitle')) {
+                    document.getElementById('pointFormTitle').textContent = "Adicionar Novo Ponto";
+                }
+                if (document.getElementById('savePointButton')) {
+                    document.getElementById('savePointButton').textContent = "Salvar Ponto";
+                }
+
+                // Remove o marcador temporário se existir
+                if (tempNewMarker && fullMapInstance) {
+                    fullMapInstance.removeLayer(tempNewMarker);
+                    tempNewMarker = null;
+                }
+            });
+            // *** FIM NOVO LISTENER ***
         }
     };
 
@@ -1356,6 +1545,10 @@ if (form) {
     initAdminMaps();
     handleMapEditorModal();
     handleMapEditorActions();
+
+    // *** NOVO LISTENER: Lidar com a edição DENTRO do Modal ***
+    document.querySelector('#mapEditorModal .modal-points-list-scrollable')
+        .addEventListener('click', handleModalPointEdit);
 
 
     // Chamar outras funções de inicialização aqui

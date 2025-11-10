@@ -599,19 +599,19 @@
                         de Pontos de Coleta</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                
+
                 <div class="modal-body map-editor-body">
 
                     <div class="row g-3">
-                        
+
                         <div class="col-lg-7">
                             <h6><i class="fas fa-map-marked-alt me-1"></i> Mapa Editor</h6>
                             <div id="full-map-container" class="full-map-container">
-                                </div>
+                            </div>
                         </div>
 
                         <div class="col-lg-5">
-                            
+
                             <div id="pointDetailsFormContainer"
                                 style="display: none; padding: 15px; border: 1px solid #ddd; border-radius: 4px;">
                                 <h6 id="pointFormTitle">Adicionar Novo Ponto</h6>
@@ -621,13 +621,61 @@
                                     <input type="hidden" id="pointLng" required>
 
                                     <div class="mb-2">
-                                        <label for="pointName" class="form-label small">Nome do Ponto</label>
+                                        <label for="pointName" class="form-label small">Nome do Ponto (Ex: Ecoponto
+                                            Centro)</label>
                                         <input type="text" class="form-control form-control-sm" id="pointName" required>
                                     </div>
+
                                     <div class="mb-2">
-                                        <label for="pointType" class="form-label small">Tipo de Material</label>
-                                        <input type="text" class="form-control form-control-sm" id="pointType"
-                                            value="Geral">
+                                        <label for="pointAddress" class="form-label small">Endereço (Rua, Número,
+                                            Cidade)</label>
+                                        <input type="text" class="form-control form-control-sm" id="pointAddress"
+                                            required placeholder="Digite o endereço para localizar no mapa...">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="pointTypeCheckGroup" class="form-label small">Tipo(s) de Material
+                                            Aceito(s)</label>
+
+                                        <div id="pointTypeCheckGroup" class="border p-2 rounded bg-light"
+                                            style="max-height: 120px; overflow-y: auto;">
+
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input point-type-checkbox" type="checkbox"
+                                                    id="checkEletronicos" value="Eletronicos">
+                                                <label class="form-check-label small"
+                                                    for="checkEletronicos">Eletrônicos</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input point-type-checkbox" type="checkbox"
+                                                    id="checkMetal" value="Metal">
+                                                <label class="form-check-label small" for="checkMetal">Metal</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input point-type-checkbox" type="checkbox"
+                                                    id="checkOleo" value="Oleo">
+                                                <label class="form-check-label small" for="checkOleo">Óleo de Cozinha
+                                                    Usado</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input point-type-checkbox" type="checkbox"
+                                                    id="checkPapel" value="Papel">
+                                                <label class="form-check-label small"
+                                                    for="checkPapel">Papel/Papelão</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input point-type-checkbox" type="checkbox"
+                                                    id="checkPlastico" value="Plastico">
+                                                <label class="form-check-label small"
+                                                    for="checkPlastico">Plástico</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input point-type-checkbox" type="checkbox"
+                                                    id="checkVidro" value="Vidro">
+                                                <label class="form-check-label small" for="checkVidro">Vidro</label>
+                                            </div>
+
+                                        </div>
+                                        <input type="hidden" id="pointType" required>
                                     </div>
                                     <div class="form-check form-switch mb-3">
                                         <input class="form-check-input" type="checkbox" role="switch" id="pointIsActive"
@@ -642,14 +690,14 @@
                                         id="cancelPointButton">Cancelar</button>
                                 </form>
                             </div>
-                            
+
                             <h6 class="mt-4"><i class="fas fa-list me-1"></i> Pontos Atuais</h6>
                             <div class="list-group list-group-flush modal-points-list-scrollable">
-                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                 </div>
