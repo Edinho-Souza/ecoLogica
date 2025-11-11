@@ -1,28 +1,34 @@
 package br.com.ecologica.login.service;
 
-import br.com.ecologica.cadastro.usuarios.model.StatusUsuario; // Import
-import br.com.ecologica.cadastro.usuarios.repository.UsuarioRepository;
+import br.com.ecologica.login.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import br.com.ecologica.login.security.JwtUtil;
 
 @Service
 public class LoginService {
+
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private AuthenticationManager authenticationManager; 
+
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private CustomUserDetailsService userDetailsService;
+    
     @Autowired
     private JwtUtil jwtUtil;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder; 
 
     public String autenticar(String email, String senha) {
-        return usuarioRepository.findByEmail(email)
-                // Valida a senha
-                .filter(usuario -> passwordEncoder.matches(senha, usuario.getSenha()))
-                // Valida o Status 
-                .filter(usuario -> usuario.getStatus() == StatusUsuario.ATIVO) 
-                .map(usuario -> jwtUtil.gerarToken(email))
-                .orElse(null); 
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, senha)
+        );
+
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                return jwtUtil.gerarToken(userDetails);
     }
 }
