@@ -846,12 +846,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         companyArray.forEach(company => {
+            // --- CÓDIGO SIMPLIFICADO AQUI ---
             const listItem = `
-            <a href="#" class="list-group-item list-group-item-action py-1 px-2 d-flex justify-content-between align-items-center" data-company-id="${company.id}" data-company-type="${company.type}">
-                ${company.name}
-                <span class="badge bg-secondary rounded-pill" data-action="edit" title="Editar"><i class="fas fa-pencil-alt fa-xs"></i></span>
+        <a href="#" class="list-group-item list-group-item-action py-1 px-2 d-flex justify-content-between align-items-center" data-company-id="${company.id}" data-company-type="${company.type}">
+            ${company.name}
             </a>`;
             listElement.innerHTML += listItem;
+            // --- FIM DO CÓDIGO SIMPLIFICADO ---
         });
 
         // Adiciona listener de clique para a lista (se ainda não tiver)
@@ -873,71 +874,98 @@ document.addEventListener('DOMContentLoaded', () => {
     // *** NOVO: Handler de Clique para Listas de Empresas (CORRIGIDO) ***
     // ===================================================================
     const handleCompanyListClick = (event) => {
-        // 1. Encontra o link <a> pai que foi clicado
+
+        // 1. Encontra o elemento de ação. (Compatível com o target do evento virtual)
+        const actionBadge = event.target.closest('.badge[data-action]') || event.target.closest('.company-modal-action-btn');
+
+        // 2. Tenta encontrar o listItem (se for um clique real na lista lateral).
+        // Para o modal, o target.closest não encontrará, mas usaremos os dados do target.
         const listItem = event.target.closest('a.list-group-item');
 
-        // Se o clique não foi em um item da lista, não faz nada
-        if (!listItem) return;
+        if (!actionBadge && !listItem) {
+            if (event.target.closest('a[href="#"]')) {
+                event.preventDefault();
+            }
+            return;
+        }
 
-        // 2. PREVINE O SCROLL (AÇÃO PADRÃO DO LINK '#') IMEDIATAMENTE
         event.preventDefault();
 
-        // 3. Agora, verifica se o clique foi especificamente no badge de ação
-        const actionBadge = event.target.closest('.badge[data-action]');
+        // *** CORREÇÃO: Lê os dados do elemento de ação/target, que agora contém os IDs ***
+        // Usa o dataset do botão real, se existir, ou tenta pegar do dataset do target simulado
+        const dataTarget = actionBadge ? actionBadge.dataset : event.target.dataset;
 
-        // 4. Se o clique foi no badge (edição)
-        if (actionBadge) {
-            const companyId = listItem.dataset.companyId;
-            const companyType = listItem.dataset.companyType;
-            const action = actionBadge.dataset.action;
+        if (!dataTarget.companyId) { return; } // Verifica se o ID está presente.
 
-            // Encontra a empresa no array correto
-            let company;
-            if (companyType === 'recicladora') {
-                company = simulatedRecyclers.find(c => c.id == companyId);
-            } else {
-                company = simulatedSupporters.find(c => c.id == companyId);
-            }
+        const companyId = parseInt(dataTarget.companyId);
+        const companyType = dataTarget.companyType;
+        const action = dataTarget.action;
+        // *** FIM CORREÇÃO ***
 
-            if (!company) {
-                console.error("Empresa não encontrada para edição.");
-                return;
-            }
-
-            if (action === 'edit') {
-                console.log("Modo de Edição:", company);
-
-                // Pega os elementos do formulário
-                const form = document.getElementById('addCompanyForm');
-                const h3 = form.closest('.add-company-section').querySelector('h3');
-                const submitButton = form.querySelector('button[type="submit"]');
-
-                // Preenche o formulário
-                document.getElementById('companyName').value = company.name;
-                document.getElementById('companyEmail').value = company.email;
-                document.getElementById('companyType').value = company.type;
-                document.getElementById('companyCNPJ').value = company.cnpj || '';
-                document.getElementById('companyAddress').value = company.address || '';
-
-                // Armazena o ID da empresa que está sendo editada
-                form.dataset.editingId = company.id;
-
-                // Altera a UI do formulário para "Modo Edição"
-                h3.textContent = "Editar Empresa";
-                submitButton.textContent = "Salvar Alterações";
-                submitButton.classList.remove('btn-success');
-                submitButton.classList.add('btn-primary');
-
-                // Desabilita a troca de tipo
-                document.getElementById('companyType').disabled = true;
-
-                // Rola até o formulário
-                form.closest('.add-company-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+        // Encontra a empresa no array correto
+        let company;
+        if (companyType === 'recicladora') {
+            company = simulatedRecyclers.find(c => c.id === companyId);
         } else {
-            // 5. Se o clique foi no nome (não no badge), o scroll já foi prevenido
-            // e nenhuma outra ação é necessária.
-            console.log("Clicou no nome da empresa, scroll prevenido.");
+            company = simulatedSupporters.find(c => c.id === companyId);
+        }
+
+        if (!company) {
+            console.error("Empresa não encontrada para ação.");
+            return;
+        }
+
+        if (action === 'edit') {
+
+            // Pega os elementos do formulário e preenche (Este bloco deve funcionar agora)
+            const form = document.getElementById('addCompanyForm');
+            const formTitle = document.getElementById('formTitle');
+            const submitButton = document.getElementById('formSubmitButton');
+            const addCompanyTabButton = document.getElementById('add-company-tab');
+
+            // ... (resto do preenchimento e alteração do rótulo da aba) ...
+            document.getElementById('companyName').value = company.name;
+            document.getElementById('companyEmail').value = company.email;
+            document.getElementById('companyType').value = company.type;
+            document.getElementById('companyCNPJ').value = company.cnpj || '';
+            document.getElementById('companyAddress').value = company.address || '';
+            form.dataset.editingId = company.id;
+
+            formTitle.textContent = "Editar Empresa";
+            submitButton.textContent = "Salvar Alterações";
+            submitButton.classList.remove('btn-success');
+            submitButton.classList.add('btn-primary');
+            document.getElementById('companyType').disabled = true;
+
+            addCompanyTabButton.innerHTML = '<i class="fas fa-pencil-alt me-1"></i> Editar Empresa';
+
+        } else if (action === 'delete') {
+            // Sua lógica de exclusão já existente (não foi modificada)
+            if (confirm(`Tem certeza que deseja EXCLUIR a empresa "${company.name}"? Esta ação é irreversível.`)) {
+
+                let arrayToUpdate, storageKey;
+
+                if (companyType === 'recicladora') {
+                    simulatedRecyclers = simulatedRecyclers.filter(c => c.id !== companyId);
+                    arrayToUpdate = simulatedRecyclers;
+                    storageKey = 'ecoLogica_Recyclers';
+                } else {
+                    simulatedSupporters = simulatedSupporters.filter(c => c.id !== companyId);
+                    arrayToUpdate = simulatedSupporters;
+                    storageKey = 'ecoLogica_Supporters';
+                }
+
+                localStorage.setItem(storageKey, JSON.stringify(arrayToUpdate));
+
+                if (companyType === 'recicladora') {
+                    renderCompanyList(recyclerListSelector, simulatedRecyclers);
+                } else {
+                    renderCompanyList(supporterListSelector, simulatedSupporters);
+                }
+
+                console.log(`Empresa ${company.name} (${companyType}) excluída com sucesso.`);
+                alert("Empresa excluída com sucesso!");
+            }
         }
     };
 
@@ -948,20 +976,76 @@ document.addEventListener('DOMContentLoaded', () => {
         const form = document.getElementById('addCompanyForm');
         if (!form) return;
 
-        const h3 = form.closest('.add-company-section').querySelector('h3');
-        const submitButton = form.querySelector('button[type="submit"]');
+        // CORRIGIDO: Substituir as buscas por closest/querySelector para IDs diretos
+        const formTitle = document.getElementById('formTitle');
+        const submitButton = document.getElementById('formSubmitButton');
 
         form.reset(); // Limpa os campos
         delete form.dataset.editingId; // Remove o ID de edição
 
         // Restaura a UI do formulário para "Modo Cadastro"
-        h3.textContent = "Cadastrar Nova Empresa";
-        submitButton.textContent = "Cadastrar Empresa";
-        submitButton.classList.remove('btn-primary'); // Remove cor azul
-        submitButton.classList.add('btn-success'); // Adiciona cor verde
+        if (formTitle) formTitle.textContent = "Cadastrar Nova Empresa"; // Usa formTitle
+        if (submitButton) {
+            submitButton.textContent = "Cadastrar Empresa";
+            submitButton.classList.remove('btn-primary'); // Remove cor azul
+            submitButton.classList.add('btn-success'); // Adiciona cor verde
+        }
 
         // Habilita a troca de tipo
         document.getElementById('companyType').disabled = false;
+    };
+
+
+    // admin-dashboard.js (Função renderCompanyTable, Adicionar perto das funções de gerenciamento de empresas)
+
+    const renderCompanyTable = (containerId, companyArray) => {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (companyArray.length === 0) {
+            container.innerHTML = '<div class="alert alert-info small">Nenhuma empresa cadastrada neste momento.</div>';
+            return;
+        }
+
+        let tableHtml = `
+        <div class="table-responsive">
+            <table class="table table-striped table-sm admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>CNPJ</th>
+                        <th>Endereço</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+        companyArray.forEach(company => {
+            tableHtml += `
+            <tr data-company-id="${company.id}" data-company-type="${company.type}">
+                <td>${company.id}</td>
+                <td>${company.name}</td>
+                <td>${company.email}</td>
+                <td>${company.cnpj || '-'}</td>
+                <td>${company.address || '-'}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-secondary company-modal-action-btn me-1" data-action="edit" data-id="${company.id}" data-type="${company.type}" title="Editar"><i class="fas fa-pencil-alt"></i></button>
+                    <button class="btn btn-sm btn-outline-danger company-modal-action-btn" data-action="delete" data-id="${company.id}" data-type="${company.type}" title="Excluir"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            </tr>
+        `;
+        });
+
+        tableHtml += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+        container.innerHTML = tableHtml;
     };
 
     // ===================================================================
@@ -1052,6 +1136,32 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // *** FIM NOVA FUNÇÃO ***
+
+    // admin-dashboard.js (Adicionar perto das outras funções de gerenciamento de empresas)
+
+    // admin-dashboard.js (Função resetCompanyFormToNew)
+
+    const resetCompanyFormToNew = () => {
+        const form = document.getElementById('addCompanyForm');
+        const formTitle = document.getElementById('formTitle');
+        const submitButton = document.getElementById('formSubmitButton');
+        const addCompanyTabButton = document.getElementById('add-company-tab');
+        if (!form || !formTitle || !submitButton || !addCompanyTabButton) return; // Incluído o novo elemento
+
+        form.reset();
+        form.removeAttribute('data-editing-id');
+        document.getElementById('companyType').disabled = false;
+
+        // Reseta a UI para o modo "Adicionar"
+        formTitle.textContent = "Adicionar Nova Empresa";
+        submitButton.textContent = "Adicionar Empresa";
+        submitButton.classList.remove('btn-primary');
+        submitButton.classList.add('btn-success');
+
+        if (addCompanyTabButton) {
+            addCompanyTabButton.innerHTML = '<i class="fas fa-plus-circle me-1"></i> Adicionar Empresa';
+        }
+    };
 
 
 
@@ -1495,13 +1605,112 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
+    // admin-dashboard.js (Adicionar perto do final, antes do DOMContentLoaded)
 
+    // admin-dashboard.js (Adicionar perto do final, antes do DOMContentLoaded)
 
+    // admin-dashboard.js (Função handleViewAllCompaniesModal)
 
+    // admin-dashboard.js (Função handleViewAllCompaniesModal)
 
+    const handleViewAllCompaniesModal = () => {
+        const modalElement = document.getElementById('viewAllCompaniesModal');
+        const addCompanyTab = document.getElementById('add-company-tab'); // ID da aba de Adicionar/Editar
 
+        if (!modalElement || !addCompanyTab) return;
 
+        // 1. LISTENER PARA RESETAR O FORMULÁRIO AO CLICAR NA ABA 'ADICIONAR'
+        addCompanyTab.addEventListener('shown.bs.tab', () => {
+            resetCompanyFormToNew();
+        });
 
+        modalElement.addEventListener('show.bs.modal', (event) => {
+            // Renderiza as tabelas assim que o modal começa a abrir
+            renderCompanyTable('recyclersTableContainer', simulatedRecyclers);
+            renderCompanyTable('supportersTableContainer', simulatedSupporters);
+
+            // Lógica de ativação de aba de Recicladoras/Apoiadoras
+            const button = event.relatedTarget;
+            const rawCompanyType = button ? button.dataset.companyType : null;
+
+            console.log("Modal acionado por tipo:", rawCompanyType);
+
+            let targetTabId;
+            if (rawCompanyType === 'apoiadora') {
+                targetTabId = 'view-supporters-tab';
+            } else {
+                targetTabId = 'view-recyclers-tab';
+            }
+
+            const targetTabElement = document.getElementById(targetTabId);
+
+            if (targetTabElement) {
+                const tabInstance = new bootstrap.Tab(targetTabElement);
+                tabInstance.show();
+            }
+        });
+
+        // 2. LISTENER DE CLIQUE PARA AÇÕES DENTRO DO MODAL (EDITAR/EXCLUIR)
+        modalElement.addEventListener('click', (event) => {
+            const button = event.target.closest('.company-modal-action-btn');
+            if (!button) return;
+
+            event.preventDefault();
+            const action = button.dataset.action;
+            const companyId = parseInt(button.dataset.id);
+            const companyType = button.dataset.type;
+
+            // *** CORREÇÃO: CRIAÇÃO DO EVENTO VIRTUAL ROBUSTO ***
+            // Este evento virtual simula a estrutura que handleCompanyListClick espera.
+            const virtualEvent = {
+                // Criamos um 'target' que contém os dados e a função 'closest' simulada
+                target: {
+                    dataset: {
+                        action: action,
+                        companyId: companyId,
+                        companyType: companyType
+                    },
+                    // A função 'closest' é necessária para que handleCompanyListClick encontre o item
+                    closest: (selector) => {
+                        // Simula o item da tabela para leitura dos data-attributes
+                        if (selector === '.list-group-item' || selector === 'a.list-group-item') {
+                            return { dataset: { companyId: companyId, companyType: companyType } };
+                        }
+                        // Simula o actionBadge
+                        if (selector === '.badge[data-action]' || selector === '.company-modal-action-btn') {
+                            return button;
+                        }
+                        return null;
+                    }
+                },
+                // Adicionamos a propriedade preventDefault que handleCompanyListClick espera
+                preventDefault: () => { }
+            };
+
+            // Dispara a lógica de edição/exclusão com o evento virtual
+            handleCompanyListClick(virtualEvent);
+            // *** FIM CORREÇÃO ***
+
+            // Se a ação for EDIÇÃO, a empresa é preenchida e mudamos para a aba de formulário.
+            if (action === 'edit') {
+                const editTabElement = document.getElementById('add-company-tab');
+                if (editTabElement) {
+                    const editTab = new bootstrap.Tab(editTabElement);
+                    editTab.show(); // Ativa a aba do formulário
+                }
+            }
+
+            // Se a ação for DELEÇÃO, re-renderizar as tabelas
+            if (action === 'delete') {
+                // Timeout para garantir que o localStorage foi atualizado pela handleCompanyListClick
+                setTimeout(() => {
+                    renderCompanyTable('recyclersTableContainer', simulatedRecyclers);
+                    renderCompanyTable('supportersTableContainer', simulatedSupporters);
+                }, 50);
+            }
+
+        });
+    };
     // ===================================================================
     // CHAMADAS DE INICIALIZAÇÃO (Atualizado com Logs)
     // ===================================================================
@@ -1549,6 +1758,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // *** NOVO LISTENER: Lidar com a edição DENTRO do Modal ***
     document.querySelector('#mapEditorModal .modal-points-list-scrollable')
         .addEventListener('click', handleModalPointEdit);
+
+    // *** NOVO LISTENER: Lidar com a edição DENTRO do Modal ***
+    document.querySelector('#mapEditorModal .modal-points-list-scrollable')
+        .addEventListener('click', handleModalPointEdit);
+
+    // *** NOVO: CHAMA O HANDLER DO MODAL DE EMPRESAS ***
+    handleViewAllCompaniesModal();
 
 
     // Chamar outras funções de inicialização aqui
