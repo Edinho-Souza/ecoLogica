@@ -22,88 +22,98 @@ import java.util.List;
 @Service
 public class UsuarioService {
 
-	@Autowired
-	private UsuarioRepository usuarioRepository;
-	@Autowired
-	private CadastroEmpresasApoiadorasRepository apoiadoraRepository;
-	@Autowired
-	private CadastroEmpresasRecicladorasRepository recicladoraRepository;
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    @Autowired
+    private CadastroEmpresasApoiadorasRepository apoiadoraRepository;
+    @Autowired
+    private CadastroEmpresasRecicladorasRepository recicladoraRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-	@Transactional
-	public Usuario salvar(UsuarioRequest request) {
+    @Transactional
+    public Usuario salvar(UsuarioRequest request) {
+        
+        if (!ValidadorCPF.isCPFValido(request.getCpf())) {
+            throw new IllegalArgumentException("CPF inválido.");
+        }
+        
+        Usuario usuario = new Usuario();
+        usuario.setNome(request.getNome());
+        usuario.setCpf(request.getCpf());
+        usuario.setEmail(request.getEmail());
+        usuario.setSenha(passwordEncoder.encode(request.getSenha()));
+        usuario.setTipoUsuario(request.getTipoUsuario());
 
-		if (!ValidadorCPF.isCPFValido(request.getCpf())) {
-			throw new IllegalArgumentException("CPF inválido.");
-		}
+        if (request.getTipoUsuario() == TipoUsuario.cidadao || request.getTipoUsuario() == TipoUsuario.admin) {
+            usuario.setStatus(StatusUsuario.ATIVO);
+        } else {
+            usuario.setStatus(StatusUsuario.PENDENTE);
+        }
+        
+        Usuario usuarioSalvo = usuarioRepository.save(usuario);
 
-		Usuario usuario = new Usuario();
-		usuario.setNome(request.getNome());
-		usuario.setCpf(request.getCpf());
-		usuario.setEmail(request.getEmail());
-		usuario.setSenha(passwordEncoder.encode(request.getSenha()));
-		usuario.setTipoUsuario(request.getTipoUsuario());
+        try {
+            if (usuarioSalvo.getTipoUsuario() == TipoUsuario.apoiadora) {
+                if (request.getCnpj() == null || !ValidadorCNPJ.isCNPJValido(request.getCnpj().replaceAll("[^0-9]", ""))) {
+                    throw new IllegalArgumentException("CNPJ inválido ou não fornecido para Empresa Apoiadora.");
+                }
+                CadastroEmpresasApoiadoras apoiadora = new CadastroEmpresasApoiadoras();
+                apoiadora.setUsuario(usuarioSalvo); 
+                apoiadora.setCnpj(request.getCnpj()); 
+                apoiadora.setEndereco(request.getEndereco());
+                apoiadora.setTelefone(request.getTelefone());
+                apoiadoraRepository.save(apoiadora);
+            } 
+            else if (usuarioSalvo.getTipoUsuario() == TipoUsuario.recicladora) {
+                if (request.getCnpj() == null || !ValidadorCNPJ.isCNPJValido(request.getCnpj().replaceAll("[^0-9]", ""))) {
+                    throw new IllegalArgumentException("CNPJ inválido ou não fornecido para Empresa Recicladora.");
+                }
+                CadastroEmpresasRecicladoras recicladora = new CadastroEmpresasRecicladoras();
+                recicladora.setUsuario(usuarioSalvo); 
+                recicladora.setCnpj(request.getCnpj());
+                recicladora.setEndereco(request.getEndereco());
+                recicladora.setTelefone(request.getTelefone());
+                recicladoraRepository.save(recicladora);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao salvar detalhes da empresa: " + e.getMessage(), e);
+        }
 
-		if (request.getTipoUsuario() == TipoUsuario.cidadao || request.getTipoUsuario() == TipoUsuario.admin) {
-			usuario.setStatus(StatusUsuario.ATIVO);
-		} else {
-			usuario.setStatus(StatusUsuario.PENDENTE);
-		}
+        return usuarioSalvo;
+    }
+    
+    @Transactional
+    public Usuario atualizarStatus(Long idUsuario, StatusUsuario novoStatus) {
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+  
+        if (usuario.getTipoUsuario() == TipoUsuario.cidadao || usuario.getTipoUsuario() == TipoUsuario.admin) {
+            throw new IllegalArgumentException("O status de Cidadãos ou Admins não pode ser alterado por este endpoint.");
+        }
+        
+        usuario.setStatus(novoStatus);
+        return usuarioRepository.save(usuario);
+    }
 
-		Usuario usuarioSalvo = usuarioRepository.save(usuario);
+    public UsuarioResponse converterParaResponse(Usuario usuario) {
+        UsuarioResponse response = new UsuarioResponse();
+        response.setId(usuario.getId());
+        response.setNome(usuario.getNome());
+        response.setEmail(usuario.getEmail());
+        response.setTipoUsuario(usuario.getTipoUsuario());
+        return response;
+    }
+    
+    public List<Usuario> listarTodos() {
+        return usuarioRepository.findAll();
+    }
 
-		try {
-			if (usuarioSalvo.getTipoUsuario() == TipoUsuario.apoiadora) {
-				if (request.getCnpj() == null
-						|| !ValidadorCNPJ.isCNPJValido(request.getCnpj().replaceAll("[^0-9]", ""))) {
-					throw new IllegalArgumentException("CNPJ inválido ou não fornecido para Empresa Apoiadora.");
-				}
+    public Usuario buscarPorId(Long id) {
+        return usuarioRepository.findById(id).orElse(null);
+    }
 
-				CadastroEmpresasApoiadoras apoiadora = new CadastroEmpresasApoiadoras();
-				apoiadora.setUsuario(usuarioSalvo);
-				apoiadora.setCnpj(request.getCnpj());
-				apoiadora.setEndereco(request.getEndereco());
-				apoiadora.setTelefone(request.getTelefone());
-				apoiadoraRepository.save(apoiadora);
-			} else if (usuarioSalvo.getTipoUsuario() == TipoUsuario.recicladora) {
-				if (request.getCnpj() == null
-						|| !ValidadorCNPJ.isCNPJValido(request.getCnpj().replaceAll("[^0-9]", ""))) {
-					throw new IllegalArgumentException("CNPJ inválido ou não fornecido para Empresa Recicladora.");
-				}
-
-				CadastroEmpresasRecicladoras recicladora = new CadastroEmpresasRecicladoras();
-				recicladora.setUsuario(usuarioSalvo);
-				recicladora.setCnpj(request.getCnpj());
-				recicladora.setEndereco(request.getEndereco());
-				recicladora.setTelefone(request.getTelefone());
-				recicladoraRepository.save(recicladora);
-			}
-		} catch (Exception e) {
-			throw new RuntimeException("Erro ao salvar detalhes da empresa: " + e.getMessage(), e);
-		}
-
-		return usuarioSalvo;
-	}
-
-	public UsuarioResponse converterParaResponse(Usuario usuario) {
-		UsuarioResponse response = new UsuarioResponse();
-		response.setId(usuario.getId());
-		response.setNome(usuario.getNome());
-		response.setEmail(usuario.getEmail());
-		response.setTipoUsuario(usuario.getTipoUsuario());
-		return response;
-	}
-
-	public List<Usuario> listarTodos() {
-		return usuarioRepository.findAll();
-	}
-
-	public Usuario buscarPorId(Long id) {
-		return usuarioRepository.findById(id).orElse(null);
-	}
-
-	public void deletar(Long id) {
-		usuarioRepository.deleteById(id);
-	}
+    public void deletar(Long id) {
+        usuarioRepository.deleteById(id);
+    }
 }
