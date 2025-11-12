@@ -10,34 +10,33 @@ import lombok.*;
 @AllArgsConstructor
 public class CadastroUsuarios {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false)
-    private String nome;
+	@Column(nullable = false)
+	private String nome;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+	@Column(nullable = false, unique = true)
+	private String email;
 
-    @Column(nullable = false)
-    private String senha;
+	@Column(nullable = false)
+	private String senha;
 
-    private String telefone;
+	private String telefone;
 
-    @Column(nullable = false, unique = true)
-    private String cpf;
+	@Column(nullable = false, unique = true)
+	private String cpf;
 
-    public void exibirDados() {
-        System.out.println("Nome: " + nome);
-        System.out.println("Email: " + email);
-        System.out.println("Telefone: " + telefone);
-        System.out.println("CPF: " + cpf);
-    }
+	public void exibirDados() {
+		System.out.println("Nome: " + nome);
+		System.out.println("Email: " + email);
+		System.out.println("Telefone: " + telefone);
+		System.out.println("CPF: " + cpf);
+	}
 
-    public boolean validarCadastro() {
-        return nome != null && !nome.isEmpty()
-            && email != null && email.contains("@")
-            && senha != null && senha.length() >= 6;
-    }
+	public boolean validarCadastro() {
+		return nome != null && !nome.isEmpty() && email != null && email.contains("@") && senha != null
+				&& senha.length() >= 6;
+	}
 }
