@@ -38,7 +38,6 @@ public class CadastroEmpresasApoiadorasController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Endpoint para atualizar os detalhes (CNPJ, Endereço)
     @PutMapping("/{id}")
     public ResponseEntity<EmpresaApoiadoraResponse> atualizarDetalhes(@PathVariable Long id, @RequestBody EmpresaApoiadoraRequest request) {
         return service.atualizarDetalhes(id, request)

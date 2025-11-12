@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class SolicitacaoRequest {
-    
+
     @NotNull(message = "O ID do usuário é obrigatório")
     private Long idUsuario;
 
@@ -15,5 +15,4 @@ public class SolicitacaoRequest {
 
     @NotBlank(message = "A descrição é obrigatória")
     private String descricao;
-
 }
