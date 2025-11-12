@@ -24,4 +24,24 @@ public class CadastroDiasHorarios {
     public void definirHorario() {
         // lógica para definir horários de funcionamento
     }
+
+	public void setDiaSemana(String diaSemana2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setHorarioInicio(String horarioInicio2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setHorarioFim(String horarioFim2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setAtivo(boolean ativo2) {
+		// TODO Auto-generated method stub
+		
+	}
 }
