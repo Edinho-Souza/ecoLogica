@@ -871,15 +871,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // *** FIM NOVAS FUNÇÕES ***
 
     // ===================================================================
-    // *** NOVO: Handler de Clique para Listas de Empresas (CORRIGIDO) ***
+    // *** Handler de Clique para Listas de Empresas (ATUALIZADO) ***
     // ===================================================================
     const handleCompanyListClick = (event) => {
 
-        // 1. Encontra o elemento de ação. (Compatível com o target do evento virtual)
+        // 1. Encontra o elemento de ação.
         const actionBadge = event.target.closest('.badge[data-action]') || event.target.closest('.company-modal-action-btn');
-
-        // 2. Tenta encontrar o listItem (se for um clique real na lista lateral).
-        // Para o modal, o target.closest não encontrará, mas usaremos os dados do target.
         const listItem = event.target.closest('a.list-group-item');
 
         if (!actionBadge && !listItem) {
@@ -891,16 +888,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         event.preventDefault();
 
-        // *** CORREÇÃO: Lê os dados do elemento de ação/target, que agora contém os IDs ***
-        // Usa o dataset do botão real, se existir, ou tenta pegar do dataset do target simulado
+        // Usa o dataset do botão real ou simulado
         const dataTarget = actionBadge ? actionBadge.dataset : event.target.dataset;
 
-        if (!dataTarget.companyId) { return; } // Verifica se o ID está presente.
+        if (!dataTarget.companyId) { return; } 
 
         const companyId = parseInt(dataTarget.companyId);
         const companyType = dataTarget.companyType;
         const action = dataTarget.action;
-        // *** FIM CORREÇÃO ***
 
         // Encontra a empresa no array correto
         let company;
@@ -916,31 +911,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (action === 'edit') {
-
-            // Pega os elementos do formulário e preenche (Este bloco deve funcionar agora)
-            const form = document.getElementById('addCompanyForm');
-            const formTitle = document.getElementById('formTitle');
-            const submitButton = document.getElementById('formSubmitButton');
-            const addCompanyTabButton = document.getElementById('add-company-tab');
-
-            // ... (resto do preenchimento e alteração do rótulo da aba) ...
-            document.getElementById('companyName').value = company.name;
-            document.getElementById('companyEmail').value = company.email;
-            document.getElementById('companyType').value = company.type;
-            document.getElementById('companyCNPJ').value = company.cnpj || '';
-            document.getElementById('companyAddress').value = company.address || '';
-            form.dataset.editingId = company.id;
-
-            formTitle.textContent = "Editar Empresa";
-            submitButton.textContent = "Salvar Alterações";
-            submitButton.classList.remove('btn-success');
-            submitButton.classList.add('btn-primary');
-            document.getElementById('companyType').disabled = true;
-
-            addCompanyTabButton.innerHTML = '<i class="fas fa-pencil-alt me-1"></i> Editar Empresa';
-
+            // REMOVIDO: A lógica antiga preenchia o form #addCompanyForm que foi deletado.
+            console.log("Ação de editar acionada para: ", company.name);
+            alert("Para editar, utilize o botão 'Ver Todas' e acesse o gerenciamento avançado.");
+            
+            // Futuramente, você pode redirecionar para abrir o Modal de Edição aqui.
+            
         } else if (action === 'delete') {
-            // Sua lógica de exclusão já existente (não foi modificada)
+            // (MANTENHA O CÓDIGO DE DELETE COMO ESTAVA, ELE NÃO DEPENDE DO FORMULÁRIO)
             if (confirm(`Tem certeza que deseja EXCLUIR a empresa "${company.name}"? Esta ação é irreversível.`)) {
 
                 let arrayToUpdate, storageKey;
@@ -967,32 +945,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Empresa excluída com sucesso!");
             }
         }
-    };
-
-    // ===================================================================
-    // *** NOVO: Helper para Resetar Formulário da Empresa ***
-    // ===================================================================
-    const resetCompanyForm = () => {
-        const form = document.getElementById('addCompanyForm');
-        if (!form) return;
-
-        // CORRIGIDO: Substituir as buscas por closest/querySelector para IDs diretos
-        const formTitle = document.getElementById('formTitle');
-        const submitButton = document.getElementById('formSubmitButton');
-
-        form.reset(); // Limpa os campos
-        delete form.dataset.editingId; // Remove o ID de edição
-
-        // Restaura a UI do formulário para "Modo Cadastro"
-        if (formTitle) formTitle.textContent = "Cadastrar Nova Empresa"; // Usa formTitle
-        if (submitButton) {
-            submitButton.textContent = "Cadastrar Empresa";
-            submitButton.classList.remove('btn-primary'); // Remove cor azul
-            submitButton.classList.add('btn-success'); // Adiciona cor verde
-        }
-
-        // Habilita a troca de tipo
-        document.getElementById('companyType').disabled = false;
     };
 
 
@@ -1136,32 +1088,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // *** FIM NOVA FUNÇÃO ***
-
-    // admin-dashboard.js (Adicionar perto das outras funções de gerenciamento de empresas)
-
-    // admin-dashboard.js (Função resetCompanyFormToNew)
-
-    const resetCompanyFormToNew = () => {
-        const form = document.getElementById('addCompanyForm');
-        const formTitle = document.getElementById('formTitle');
-        const submitButton = document.getElementById('formSubmitButton');
-        const addCompanyTabButton = document.getElementById('add-company-tab');
-        if (!form || !formTitle || !submitButton || !addCompanyTabButton) return; // Incluído o novo elemento
-
-        form.reset();
-        form.removeAttribute('data-editing-id');
-        document.getElementById('companyType').disabled = false;
-
-        // Reseta a UI para o modo "Adicionar"
-        formTitle.textContent = "Adicionar Nova Empresa";
-        submitButton.textContent = "Adicionar Empresa";
-        submitButton.classList.remove('btn-primary');
-        submitButton.classList.add('btn-success');
-
-        if (addCompanyTabButton) {
-            addCompanyTabButton.innerHTML = '<i class="fas fa-plus-circle me-1"></i> Adicionar Empresa';
-        }
-    };
 
 
 
@@ -1619,11 +1545,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!modalElement || !addCompanyTab) return;
 
-        // 1. LISTENER PARA RESETAR O FORMULÁRIO AO CLICAR NA ABA 'ADICIONAR'
-        addCompanyTab.addEventListener('shown.bs.tab', () => {
-            resetCompanyFormToNew();
-        });
-
         modalElement.addEventListener('show.bs.modal', (event) => {
             // Renderiza as tabelas assim que o modal começa a abrir
             renderCompanyTable('recyclersTableContainer', simulatedRecyclers);
@@ -1736,7 +1657,6 @@ document.addEventListener('DOMContentLoaded', () => {
     handleSiteSettingsForm();
 
     // Empresas
-    handleAddCompanyForm();
     renderCompanyList(recyclerListSelector, simulatedRecyclers);
     renderCompanyList(supporterListSelector, simulatedSupporters);
 
