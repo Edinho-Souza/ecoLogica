@@ -361,18 +361,40 @@
                         <div class="list-group list-group-flush company-list-scrollable" id="recycler-company-list">
                             <a href="#"
                                 class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                Recicladora Vale Limpo <span class="badge bg-secondary rounded-pill"><i
-                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                                Recicladora Vale Limpo
+                                <span>
+                                    <span class="badge bg-secondary rounded-pill me-1" data-action="edit"
+                                        title="Editar"><i class="fas fa-pencil-alt fa-xs"></i></span>
+                                    <span class="badge bg-danger rounded-pill" data-action="delete" title="Excluir"><i
+                                            class="fas fa-trash-alt fa-xs"></i></span>
+                                </span>
+                            </a>
                             <a href="#"
                                 class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                Cooperativa Bairro Verde <span class="badge bg-secondary rounded-pill"><i
-                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                                Cooperativa Bairro Verde
+                                <span>
+                                    <span class="badge bg-secondary rounded-pill me-1" data-action="edit"
+                                        title="Editar"><i class="fas fa-pencil-alt fa-xs"></i></span>
+                                    <span class="badge bg-danger rounded-pill" data-action="delete" title="Excluir"><i
+                                            class="fas fa-trash-alt fa-xs"></i></span>
+                                </span>
+                            </a>
                             <a href="#"
                                 class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                MetalNorte Reciclagem <span class="badge bg-secondary rounded-pill"><i
-                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                                MetalNorte Reciclagem
+                                <span>
+                                    <span class="badge bg-secondary rounded-pill me-1" data-action="edit"
+                                        title="Editar"><i class="fas fa-pencil-alt fa-xs"></i></span>
+                                    <span class="badge bg-danger rounded-pill" data-action="delete" title="Excluir"><i
+                                            class="fas fa-trash-alt fa-xs"></i></span>
+                                </span>
+                            </a>
                         </div>
-                        <button class="btn btn-outline-primary btn-sm w-100 mt-2">Ver Todas</button>
+                        <button class="btn btn-outline-primary btn-sm w-100 mt-2" data-bs-toggle="modal"
+                            data-bs-target="#viewAllCompaniesModal" id="viewAllRecyclersButton"
+                            data-company-type="recicladora">
+                            <i class="fas fa-search me-1"></i> Ver Todas
+                        </button>
                     </section>
 
                     <section class="dashboard-section company-list-section mb-4">
@@ -380,45 +402,30 @@
                         <div class="list-group list-group-flush company-list-scrollable" id="supporter-company-list">
                             <a href="#"
                                 class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                Supermercado Econômico <span class="badge bg-secondary rounded-pill"><i
-                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                                Supermercado Econômico
+                                <span>
+                                    <span class="badge bg-secondary rounded-pill me-1" data-action="edit"
+                                        title="Editar"><i class="fas fa-pencil-alt fa-xs"></i></span>
+                                    <span class="badge bg-danger rounded-pill" data-action="delete" title="Excluir"><i
+                                            class="fas fa-trash-alt fa-xs"></i></span>
+                                </span>
+                            </a>
                             <a href="#"
                                 class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                Loja de Roupas VerdesFolhas <span class="badge bg-secondary rounded-pill"><i
-                                        class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                                Loja de Roupas VerdesFolhas
+                                <span>
+                                    <span class="badge bg-secondary rounded-pill me-1" data-action="edit"
+                                        title="Editar"><i class="fas fa-pencil-alt fa-xs"></i></span>
+                                    <span class="badge bg-danger rounded-pill" data-action="delete" title="Excluir"><i
+                                            class="fas fa-trash-alt fa-xs"></i></span>
+                                </span>
+                            </a>
                         </div>
-                        <button class="btn btn-outline-primary btn-sm w-100 mt-2">Ver Todas</button>
-                    </section>
-
-                    <section class="dashboard-section add-company-section mb-4">
-                        <h3>Cadastrar Nova Empresa</h3>
-                        <form id="addCompanyForm">
-                            <div class="mb-3">
-                                <label for="companyName" class="form-label">Nome da Empresa</label>
-                                <input type="text" class="form-control" id="companyName" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="companyEmail" class="form-label">Email de Contato</label>
-                                <input type="email" class="form-control" id="companyEmail" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="companyType" class="form-label">Tipo de Empresa</label>
-                                <select class="form-select" id="companyType" required>
-                                    <option selected disabled value="">Selecione...</option>
-                                    <option value="recicladora">Empresa Recicladora</option>
-                                    <option value="apoiadora">Empresa Apoiadora</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="companyCNPJ" class="form-label">CNPJ</label>
-                                <input type="text" class="form-control" id="companyCNPJ">
-                            </div>
-                            <div class="mb-3">
-                                <label for="companyAddress" class="form-label">Endereço</label>
-                                <input type="text" class="form-control" id="companyAddress">
-                            </div>
-                            <button type="submit" class="btn btn-success w-100">Cadastrar Empresa</button>
-                        </form>
+                        <button class="btn btn-outline-primary btn-sm w-100 mt-2" data-bs-toggle="modal"
+                            data-bs-target="#viewAllCompaniesModal" id="viewAllSupportersButton"
+                            data-company-type="apoiadora">
+                            <i class="fas fa-search me-1"></i> Ver Todas
+                        </button>
                     </section>
 
                     <section class="dashboard-section announcements-section mb-4">
@@ -586,6 +593,135 @@
                                 class="fas fa-user-slash me-1"></i> Desativar Conta</button>
                     </div>
 
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="viewAllCompaniesModal" tabindex="-1" aria-labelledby="viewAllCompaniesModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="viewAllCompaniesModalLabel">Gerenciamento de Empresas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs mb-3" id="companyTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="view-recyclers-tab" data-bs-toggle="tab"
+                                data-bs-target="#recyclers-pane" type="button" role="tab" aria-controls="recyclers-pane"
+                                aria-selected="true"><i class="fas fa-recycle me-1"></i> Recicladoras</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="view-supporters-tab" data-bs-toggle="tab"
+                                data-bs-target="#supporters-pane" type="button" role="tab"
+                                aria-controls="supporters-pane" aria-selected="false"><i
+                                    class="fas fa-hands-helping me-1"></i> Apoiadoras</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="add-company-tab" data-bs-toggle="tab"
+                                data-bs-target="#add-company-pane" type="button" role="tab"
+                                aria-controls="add-company-pane" aria-selected="false"><i
+                                    class="fas fa-plus-circle me-1"></i> Adicionar Empresa</button>
+                        </li>
+                        <li class="nav-item d-none" role="presentation" id="edit-company-tab-container">
+                            <button class="nav-link" id="edit-company-tab" data-bs-toggle="tab"
+                                data-bs-target="#edit-company-pane" type="button" role="tab"
+                                aria-controls="edit-company-pane" aria-selected="false"><i
+                                    class="fas fa-pencil-alt me-1"></i> Editar Empresa</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="companyTabsContent">
+
+                        <div class="tab-pane fade show active" id="recyclers-pane" role="tabpanel"
+                            aria-labelledby="view-recyclers-tab" tabindex="0">
+                            <div id="recyclersTableContainer">
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="supporters-pane" role="tabpanel"
+                            aria-labelledby="view-supporters-tab" tabindex="0">
+                            <div id="supportersTableContainer">
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="add-company-pane" role="tabpanel"
+                            aria-labelledby="add-company-tab" tabindex="0">
+                            <div class="add-company-section">
+                                <h3 id="addFormTitle">Adicionar Nova Empresa</h3>
+                                <form id="addCompanyFormNew">
+                                    <div class="mb-3">
+                                        <label for="newCompanyName" class="form-label">Nome da Empresa</label>
+                                        <input type="text" class="form-control form-control-sm" id="newCompanyName"
+                                            required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="newCompanyEmail" class="form-label">Email de Contato</label>
+                                        <input type="email" class="form-control form-control-sm" id="newCompanyEmail"
+                                            required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="newCompanyCNPJ" class="form-label">CNPJ (Opcional)</label>
+                                        <input type="text" class="form-control form-control-sm" id="newCompanyCNPJ">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="newCompanyAddress" class="form-label">Endereço (Opcional)</label>
+                                        <input type="text" class="form-control form-control-sm" id="newCompanyAddress">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="newCompanyType" class="form-label">Tipo de Empresa</label>
+                                        <select class="form-select form-select-sm" id="newCompanyType" required>
+                                            <option value="recicladora">Recicladora</option>
+                                            <option value="apoiadora">Apoiadora</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-success w-100"
+                                        id="addFormSubmitButton">Adicionar Empresa</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="edit-company-pane" role="tabpanel"
+                            aria-labelledby="edit-company-tab" tabindex="0">
+                            <div class="edit-company-section">
+                                <h3 id="editFormTitle">Editar Empresa: <span id="editingCompanyNameDisplay"></span></h3>
+                                <form id="editCompanyForm">
+                                    <input type="hidden" id="editCompanyId">
+                                    <div class="mb-3">
+                                        <label for="editCompanyName" class="form-label">Nome da Empresa</label>
+                                        <input type="text" class="form-control form-control-sm" id="editCompanyName"
+                                            required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="editCompanyEmail" class="form-label">Email de Contato</label>
+                                        <input type="email" class="form-control form-control-sm" id="editCompanyEmail"
+                                            required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="editCompanyCNPJ" class="form-label">CNPJ (Opcional)</label>
+                                        <input type="text" class="form-control form-control-sm" id="editCompanyCNPJ">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="editCompanyAddress" class="form-label">Endereço (Opcional)</label>
+                                        <input type="text" class="form-control form-control-sm" id="editCompanyAddress">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="editCompanyTypeDisplay" class="form-label">Tipo de Empresa</label>
+                                        <p class="form-control-plaintext" id="editCompanyTypeDisplay"></p>
+                                        <input type="hidden" id="editCompanyTypeHidden">
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-primary w-100"
+                                        id="editFormSubmitButton">Salvar Alterações</button>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                 </div>
             </div>
         </div>
