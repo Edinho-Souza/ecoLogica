@@ -1,405 +1,409 @@
--- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
---
--- Host: 127.0.0.1    Database: ecologica
--- ------------------------------------------------------
--- Server version	8.0.42
+-- -----------------------------------------------------
+-- Schema ecologica
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `ecologica` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+USE `ecologica` ;
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+-- -----------------------------------------------------
+-- Tabela `usuario`
+-- Baseada em: br.com.ecologica.cadastro.usuarios.model.Usuario
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `usuario` (
+  `id_usuario` INT NOT NULL AUTO_INCREMENT,
+  `nome` VARCHAR(100) NOT NULL,
+  `cpf` VARCHAR(14) NOT NULL UNIQUE,
+  `email` VARCHAR(100) NOT NULL UNIQUE,
+  `senha` VARCHAR(255) NOT NULL,
+  `tipo_usuario` VARCHAR(255) NOT NULL,
+  `data_cadastro` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id_usuario`),
+  INDEX `idx_usuario_email` (`email` ASC) VISIBLE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Table structure for table `beneficio`
---
 
-DROP TABLE IF EXISTS `beneficio`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `beneficio` (
-  `id_beneficio` int NOT NULL AUTO_INCREMENT,
-  `titulo` varchar(100) NOT NULL,
-  `descricao` text,
-  `pontos_necessarios` int NOT NULL,
+-- -----------------------------------------------------
+-- Tabela `empresaapoiadora`
+-- Baseada em: br.com.ecologica.cadastro.CadastroEmpresasApoiadoras
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `empresaapoiadora` (
+  `id_apoiadora` INT NOT NULL,
+  `cnpj` VARCHAR(18) NOT NULL UNIQUE,
+  `endereco` VARCHAR(200) NULL DEFAULT NULL,
+  `telefone` VARCHAR(20) NULL DEFAULT NULL,
+  PRIMARY KEY (`id_apoiadora`),
+  CONSTRAINT `fk_empresaapoiadora_usuario`
+    FOREIGN KEY (`id_apoiadora`)
+    REFERENCES `usuario` (`id_usuario`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Tabela `empresarecicladora`
+-- Baseada em: br.com.ecologica.cadastro.CadastroEmpresasRecicladoras
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `empresarecicladora` (
+  `id_recicladora` INT NOT NULL,
+  `cnpj` VARCHAR(18) NOT NULL UNIQUE,
+  `endereco` VARCHAR(200) NULL DEFAULT NULL,
+  `telefone` VARCHAR(20) NULL DEFAULT NULL,
+  PRIMARY KEY (`id_recicladora`),
+  CONSTRAINT `fk_empresarecicladora_usuario`
+    FOREIGN KEY (`id_recicladora`)
+    REFERENCES `usuario` (`id_usuario`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Tabela `beneficio`
+-- Baseada em: br.com.ecologica.cadastro.CadastroBeneficios
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `beneficio` (
+  `id_beneficio` INT NOT NULL AUTO_INCREMENT,
+  `titulo` VARCHAR(100) NOT NULL,
+  `descricao` TEXT NULL DEFAULT NULL,
+  `pontos_necessarios` INT NOT NULL,
   PRIMARY KEY (`id_beneficio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `beneficio`
---
 
-LOCK TABLES `beneficio` WRITE;
-/*!40000 ALTER TABLE `beneficio` DISABLE KEYS */;
-/*!40000 ALTER TABLE `beneficio` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `campanha`
---
-
-DROP TABLE IF EXISTS `campanha`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `campanha` (
-  `id_campanha` int NOT NULL AUTO_INCREMENT,
-  `titulo` varchar(100) NOT NULL,
-  `descricao` text,
-  `data_inicio` date DEFAULT NULL,
-  `data_fim` date DEFAULT NULL,
-  `id_apoiadora` int DEFAULT NULL,
+-- -----------------------------------------------------
+-- Tabela `campanha`
+-- Baseada em: br.com.ecologica.cadastro.CadastroCampanhas
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `campanha` (
+  `id_campanha` INT NOT NULL AUTO_INCREMENT,
+  `titulo` VARCHAR(100) NOT NULL,
+  `descricao` TEXT NULL DEFAULT NULL,
+  `data_inicio` DATE NULL DEFAULT NULL,
+  `data_fim` DATE NULL DEFAULT NULL,
+  `id_apoiadora` INT NULL DEFAULT NULL,
   PRIMARY KEY (`id_campanha`),
-  KEY `id_apoiadora` (`id_apoiadora`),
-  KEY `idx_campanha_datas` (`data_inicio`,`data_fim`),
-  CONSTRAINT `campanha_ibfk_1` FOREIGN KEY (`id_apoiadora`) REFERENCES `empresaapoiadora` (`id_apoiadora`)
+  INDEX `idx_campanha_datas` (`data_inicio` ASC, `data_fim` ASC) VISIBLE,
+  INDEX `fk_campanha_apoiadora_idx` (`id_apoiadora` ASC) VISIBLE,
+  CONSTRAINT `fk_campanha_apoiadora`
+    FOREIGN KEY (`id_apoiadora`)
+    REFERENCES `empresaapoiadora` (`id_apoiadora`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `campanha`
---
 
-LOCK TABLES `campanha` WRITE;
-/*!40000 ALTER TABLE `campanha` DISABLE KEYS */;
-/*!40000 ALTER TABLE `campanha` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `empresaapoiadora`
---
-
-DROP TABLE IF EXISTS `empresaapoiadora`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `empresaapoiadora` (
-  `id_apoiadora` int NOT NULL,
-  `cnpj` varchar(18) NOT NULL,
-  `endereco` varchar(200) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`id_apoiadora`),
-  UNIQUE KEY `cnpj` (`cnpj`),
-  CONSTRAINT `empresaapoiadora_ibfk_1` FOREIGN KEY (`id_apoiadora`) REFERENCES `usuario` (`id_usuario`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `empresaapoiadora`
---
-
-LOCK TABLES `empresaapoiadora` WRITE;
-/*!40000 ALTER TABLE `empresaapoiadora` DISABLE KEYS */;
-INSERT INTO `empresaapoiadora` VALUES (3,'98.765.432/0001-11','Av. Sustentável, 200','(11) 98888-7777');
-/*!40000 ALTER TABLE `empresaapoiadora` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `empresarecicladora`
---
-
-DROP TABLE IF EXISTS `empresarecicladora`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `empresarecicladora` (
-  `id_recicladora` int NOT NULL,
-  `cnpj` varchar(18) NOT NULL,
-  `endereco` varchar(200) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`id_recicladora`),
-  UNIQUE KEY `cnpj` (`cnpj`),
-  CONSTRAINT `empresarecicladora_ibfk_1` FOREIGN KEY (`id_recicladora`) REFERENCES `usuario` (`id_usuario`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `empresarecicladora`
---
-
-LOCK TABLES `empresarecicladora` WRITE;
-/*!40000 ALTER TABLE `empresarecicladora` DISABLE KEYS */;
-INSERT INTO `empresarecicladora` VALUES (2,'12.345.678/0001-99','Rua das Árvores, 100','(11) 99999-8888');
-/*!40000 ALTER TABLE `empresarecicladora` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `estatistica`
---
-
-DROP TABLE IF EXISTS `estatistica`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `estatistica` (
-  `id_estatistica` int NOT NULL AUTO_INCREMENT,
-  `id_usuario` int DEFAULT NULL,
-  `tipo` varchar(100) DEFAULT NULL,
-  `valor` decimal(10,2) DEFAULT NULL,
-  `data` date DEFAULT NULL,
+-- -----------------------------------------------------
+-- Tabela `estatistica`
+-- Baseada em: br.com.ecologica.visualizacao.VisualizacaoEstatisticas
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `estatistica` (
+  `id_estatistica` INT NOT NULL AUTO_INCREMENT,
+  `id_usuario` INT NULL DEFAULT NULL,
+  `tipo` VARCHAR(100) NULL DEFAULT NULL,
+  `valor` DECIMAL(10,2) NULL DEFAULT NULL,
+  `data` DATE NULL DEFAULT NULL,
   PRIMARY KEY (`id_estatistica`),
-  KEY `id_usuario` (`id_usuario`),
-  CONSTRAINT `estatistica_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+  INDEX `fk_estatistica_usuario_idx` (`id_usuario` ASC) VISIBLE,
+  CONSTRAINT `fk_estatistica_usuario`
+    FOREIGN KEY (`id_usuario`)
+    REFERENCES `usuario` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `estatistica`
---
 
-LOCK TABLES `estatistica` WRITE;
-/*!40000 ALTER TABLE `estatistica` DISABLE KEYS */;
-/*!40000 ALTER TABLE `estatistica` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `historico`
---
-
-DROP TABLE IF EXISTS `historico`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `historico` (
-  `id_historico` int NOT NULL AUTO_INCREMENT,
-  `id_usuario` int DEFAULT NULL,
-  `acao` varchar(200) DEFAULT NULL,
-  `data` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+-- -----------------------------------------------------
+-- Tabela `historico`
+-- Baseada em: br.com.ecologica.visualizacao.HistoricoPontuacao
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `historico` (
+  `id_historico` INT NOT NULL AUTO_INCREMENT,
+  `id_usuario` INT NULL DEFAULT NULL,
+  `acao` VARCHAR(200) NULL DEFAULT NULL,
+  `data` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_historico`),
-  KEY `id_usuario` (`id_usuario`),
-  CONSTRAINT `historico_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+  INDEX `fk_historico_usuario_idx` (`id_usuario` ASC) VISIBLE,
+  CONSTRAINT `fk_historico_usuario`
+    FOREIGN KEY (`id_usuario`)
+    REFERENCES `usuario` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `historico`
---
 
-LOCK TABLES `historico` WRITE;
-/*!40000 ALTER TABLE `historico` DISABLE KEYS */;
-/*!40000 ALTER TABLE `historico` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `localcoleta`
---
-
-DROP TABLE IF EXISTS `localcoleta`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `localcoleta` (
-  `id_local` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(100) DEFAULT NULL,
-  `endereco` varchar(200) DEFAULT NULL,
-  `id_recicladora` int DEFAULT NULL,
+-- -----------------------------------------------------
+-- Tabela `localcoleta`
+-- Baseada em: br.com.ecologica.cadastro.CadastroLocaisColeta
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `localcoleta` (
+  `id_local` INT NOT NULL AUTO_INCREMENT,
+  `nome` VARCHAR(100) NULL DEFAULT NULL,
+  `endereco` VARCHAR(200) NULL DEFAULT NULL,
+  `id_recicladora` INT NULL DEFAULT NULL,
   PRIMARY KEY (`id_local`),
-  KEY `id_recicladora` (`id_recicladora`),
-  CONSTRAINT `localcoleta_ibfk_1` FOREIGN KEY (`id_recicladora`) REFERENCES `empresarecicladora` (`id_recicladora`)
+  INDEX `fk_localcoleta_recicladora_idx` (`id_recicladora` ASC) VISIBLE,
+  CONSTRAINT `fk_localcoleta_recicladora`
+    FOREIGN KEY (`id_recicladora`)
+    REFERENCES `empresarecicladora` (`id_recicladora`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `localcoleta`
---
 
-LOCK TABLES `localcoleta` WRITE;
-/*!40000 ALTER TABLE `localcoleta` DISABLE KEYS */;
-/*!40000 ALTER TABLE `localcoleta` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `noticia`
---
-
-DROP TABLE IF EXISTS `noticia`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `noticia` (
-  `id_noticia` int NOT NULL AUTO_INCREMENT,
-  `titulo` varchar(150) DEFAULT NULL,
-  `conteudo` text,
-  `data_publicacao` date DEFAULT NULL,
-  `autor` varchar(100) DEFAULT NULL,
+-- -----------------------------------------------------
+-- Tabela `noticia`
+-- Baseada em: br.com.ecologica.visualizacao.ExibicaoNoticias
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `noticia` (
+  `id_noticia` INT NOT NULL AUTO_INCREMENT,
+  `titulo` VARCHAR(150) NULL DEFAULT NULL,
+  `conteudo` TEXT NULL DEFAULT NULL,
+  `data_publicacao` DATE NULL DEFAULT NULL,
+  `autor` VARCHAR(100) NULL DEFAULT NULL,
   PRIMARY KEY (`id_noticia`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `noticia`
---
 
-LOCK TABLES `noticia` WRITE;
-/*!40000 ALTER TABLE `noticia` DISABLE KEYS */;
-/*!40000 ALTER TABLE `noticia` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `ranking`
---
-
-DROP TABLE IF EXISTS `ranking`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `ranking` (
-  `id_ranking` int NOT NULL AUTO_INCREMENT,
-  `id_usuario` int DEFAULT NULL,
-  `pontos` int DEFAULT '0',
-  `posicao` int DEFAULT NULL,
+-- -----------------------------------------------------
+-- Tabela `ranking`
+-- Baseada em: br.com.ecologica.visualizacao.ExibicaoRanking
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ranking` (
+  `id_ranking` INT NOT NULL AUTO_INCREMENT,
+  `id_usuario` INT NULL DEFAULT NULL,
+  `pontos` INT NULL DEFAULT '0',
+  `posicao` INT NULL DEFAULT NULL,
   PRIMARY KEY (`id_ranking`),
-  KEY `id_usuario` (`id_usuario`),
-  KEY `idx_ranking_pontos` (`pontos`),
-  CONSTRAINT `ranking_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
+  UNIQUE INDEX `id_usuario_UNIQUE` (`id_usuario` ASC) VISIBLE,
+  INDEX `idx_ranking_pontos` (`pontos` DESC) VISIBLE,
+  CONSTRAINT `fk_ranking_usuario`
+    FOREIGN KEY (`id_usuario`)
+    REFERENCES `usuario` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `ranking`
---
 
-LOCK TABLES `ranking` WRITE;
-/*!40000 ALTER TABLE `ranking` DISABLE KEYS */;
-/*!40000 ALTER TABLE `ranking` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `solicitacao`
---
-
-DROP TABLE IF EXISTS `solicitacao`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `solicitacao` (
-  `id_solicitacao` int NOT NULL AUTO_INCREMENT,
-  `id_usuario` int DEFAULT NULL,
-  `id_recicladora` int DEFAULT NULL,
-  `descricao` text,
-  `status` enum('pendente','andamento','concluida') DEFAULT 'pendente',
-  `data_solicitacao` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+-- -----------------------------------------------------
+-- Tabela `solicitacao`
+-- Baseada em: br.com.ecologica.visualizacao.VisualizacaoSolicitacoes
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `solicitacao` (
+  `id_solicitacao` INT NOT NULL AUTO_INCREMENT,
+  `id_usuario` INT NULL DEFAULT NULL,
+  `id_recicladora` INT NULL DEFAULT NULL,
+  `descricao` TEXT NULL DEFAULT NULL,
+  `status` VARCHAR(255) NULL DEFAULT 'pendente',
+  `data_solicitacao` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_solicitacao`),
-  KEY `id_usuario` (`id_usuario`),
-  KEY `id_recicladora` (`id_recicladora`),
-  KEY `idx_solicitacao_status` (`status`),
-  CONSTRAINT `solicitacao_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`),
-  CONSTRAINT `solicitacao_ibfk_2` FOREIGN KEY (`id_recicladora`) REFERENCES `empresarecicladora` (`id_recicladora`)
+  INDEX `fk_solicitacao_usuario_idx` (`id_usuario` ASC) VISIBLE,
+  INDEX `fk_solicitacao_recicladora_idx` (`id_recicladora` ASC) VISIBLE,
+  INDEX `idx_solicitacao_status` (`status` ASC) VISIBLE,
+  CONSTRAINT `fk_solicitacao_recicladora`
+    FOREIGN KEY (`id_recicladora`)
+    REFERENCES `empresarecicladora` (`id_recicladora`),
+  CONSTRAINT `fk_solicitacao_usuario`
+    FOREIGN KEY (`id_usuario`)
+    REFERENCES `usuario` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `solicitacao`
---
 
-LOCK TABLES `solicitacao` WRITE;
-/*!40000 ALTER TABLE `solicitacao` DISABLE KEYS */;
-/*!40000 ALTER TABLE `solicitacao` ENABLE KEYS */;
-UNLOCK TABLES;
+-- -----------------------------------------------------
+-- Tabela `password_reset_token`
+-- Baseada em: br.com.ecologica.login.model.PasswordResetToken
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `password_reset_token` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `token` VARCHAR(255) NOT NULL UNIQUE,
+  `id_usuario` INT NOT NULL,
+  `expiry_date` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_reset_token_usuario_idx` (`id_usuario` ASC) VISIBLE,
+  CONSTRAINT `fk_reset_token_usuario`
+    FOREIGN KEY (`id_usuario`)
+    REFERENCES `usuario` (`id_usuario`)
+    ON DELETE CASCADE
+) ENGINE = InnoDB;
 
---
--- Table structure for table `usuario`
---
 
-DROP TABLE IF EXISTS `usuario`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `usuario` (
-  `id_usuario` int NOT NULL AUTO_INCREMENT,
-  `cpf` VARCHAR(14) UNIQUE NOT NULL,
-  `nome` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `senha` varchar(255) NOT NULL,
-  `status` enum('PENDENTE','ATIVO','SUSPENSO') NOT NULL DEFAULT 'PENDENTE',
-  `tipo_usuario` enum('cidadao','recicladora','apoiadora','admin') NOT NULL,
-  `data_cadastro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_usuario`),
-  UNIQUE KEY `email` (`email`),
-  KEY `idx_usuario_email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+-- -----------------------------------------------------
+-- Tabela `tipos_materiais`
+-- Baseada em: br.com.ecologica.cadastro.CadastroTipoMateriais
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tipos_materiais` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nome_tipo` VARCHAR(255) NULL,
+  `descricao` TEXT NULL,
+  `ativo` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
 
---
--- Dumping data for table `usuario`
---
 
+-- -----------------------------------------------------
+-- Tabela `materiais_coletar`
+-- Baseada em: br.com.ecologica.cadastro.CadastroMateriaisColetar
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `materiais_coletar` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nome_material` VARCHAR(255) NULL,
+  `descricao` TEXT NULL,
+  `reciclavel` TINYINT(1) NOT NULL DEFAULT 0,
+  `tipo_material_id` INT NULL,
+  `local_coleta_id` INT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_materiais_tipo_idx` (`tipo_material_id` ASC) VISIBLE,
+  INDEX `fk_materiais_local_idx` (`local_coleta_id` ASC) VISIBLE,
+  CONSTRAINT `fk_materiais_tipo`
+    FOREIGN KEY (`tipo_material_id`)
+    REFERENCES `tipos_materiais` (`id`),
+  CONSTRAINT `fk_materiais_local`
+    FOREIGN KEY (`local_coleta_id`)
+    REFERENCES `localcoleta` (`id_local`)
+) ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Tabela `gestao_conteudo`
+-- Baseada em: br.com.ecologica.gestao.GestaoConteudo
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `gestao_conteudo` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `tipo_conteudo` VARCHAR(255) NULL,
+  `titulo` VARCHAR(255) NULL,
+  `descricao` TEXT NULL,
+  `publicado` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Tabela `exibicao_orientacoes`
+-- Baseada em: br.com.ecologica.visualizacao.ExibicaoOrientacoes
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `exibicao_orientacoes` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `titulo` VARCHAR(255) NULL,
+  `conteudo` TEXT NULL,
+  `ativo` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Tabela `permissao_uso_pontos`
+-- Baseada em: br.com.ecologica.gestao.PermissaoUsoPontos
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `permissao_uso_pontos` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `usuario_id` BIGINT NULL,
+  `permitido` TINYINT(1) NOT NULL DEFAULT 0,
+  `motivo` VARCHAR(255) NULL,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Tabela `cadastro_dias_horarios`
+-- Baseada em: br.com.ecologica.cadastro.CadastroDiasHorarios
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `cadastro_dias_horarios` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `dia_semana` VARCHAR(255) NULL,
+  `horario_inicio` VARCHAR(255) NULL,
+  `horario_fim` VARCHAR(255) NULL,
+  `ativo` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabela `tipos_materiais` 
+-- Baseada em: br.com.ecologica.cadastro.CadastroTipoMateriais 
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ecologica`.`tipos_materiais` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `nome_tipo` VARCHAR(255) NULL,
+  `descricao` TEXT NULL,
+  `ativo` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabela `materiais_coletar` 
+-- Baseada em: br.com.ecologica.cadastro.CadastroMateriaisColetar
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ecologica`.`materiais_coletar` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `nome_material` VARCHAR(255) NULL,
+  `descricao` TEXT NULL,
+  `reciclavel` TINYINT(1) NOT NULL DEFAULT 0,
+  `tipo_material_id` BIGINT NULL,
+  `local_coleta_id` INT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_materiais_tipo_idx` (`tipo_material_id` ASC) VISIBLE,
+  INDEX `fk_materiais_local_idx` (`local_coleta_id` ASC) VISIBLE,
+  CONSTRAINT `fk_materiais_tipo`
+    FOREIGN KEY (`tipo_material_id`)
+    REFERENCES `ecologica`.`tipos_materiais` (`id`),
+  CONSTRAINT `fk_materiais_local`
+    FOREIGN KEY (`local_coleta_id`)
+    REFERENCES `ecologica`.`localcoleta` (`id_local`)
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabela `gestao_conteudo`
+-- Baseada em: br.com.ecologica.gestao.GestaoConteudo
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ecologica`.`gestao_conteudo` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `tipo_conteudo` VARCHAR(255) NULL,
+  `titulo` VARCHAR(255) NULL,
+  `descricao` TEXT NULL,
+  `publicado` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabela `exibicao_orientacoes`
+-- Baseada em: br.com.ecologica.visualizacao.ExibicaoOrientacoes
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ecologica`.`exibicao_orientacoes` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `titulo` VARCHAR(255) NULL,
+  `conteudo` TEXT NULL,
+  `ativo` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabela `permissao_uso_pontos`
+-- Baseada em: br.com.ecologica.gestao.PermissaoUsoPontos
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ecologica`.`permissao_uso_pontos` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `usuario_id` BIGINT NULL,
+  `permitido` TINYINT(1) NOT NULL DEFAULT 0,
+  `motivo` VARCHAR(255) NULL,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabela `cadastro_dias_horarios`
+-- Baseada em br.com.ecologica.cadastro.CadastroDiasHorarios
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ecologica`.`cadastro_dias_horarios` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `dia_semana` VARCHAR(255) NULL,
+  `horario_inicio` VARCHAR(255) NULL,
+  `horario_fim` VARCHAR(255) NULL,
+  `ativo` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Inserção de Dados
+-- -----------------------------------------------------
 LOCK TABLES `usuario` WRITE;
-/*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (1,'Admin Geral','admin@sistema.com','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','admin','2025-09-14 22:57:28'),(2,'Recicladora Verde','contato@verde.com','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','recicladora','2025-09-14 22:58:50'),(3,'Apoiadora Eco','eco@apoio.com','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','apoiadora','2025-09-14 22:59:59');
-/*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
+INSERT INTO `usuario` (`id_usuario`, `nome`, `cpf`, `email`, `senha`, `tipo_usuario`, `data_cadastro`, `status`) VALUES 
+(1, 'Admin Geral', '000.000.000-00', 'admin@sistema.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'admin', '2025-09-14 22:57:28', 'ATIVO'),
+(2, 'Recicladora Verde', '111.111.111-11', 'contato@verde.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'recicladora', '2025-09-14 22:58:50', 'ATIVO'),
+(3, 'Apoiadora Eco', '222.222.222-22', 'eco@apoio.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'apoiadora', '2025-09-14 22:59:59', 'ATIVO');
 UNLOCK TABLES;
 
---
--- Temporary view structure for view `vw_ranking`
---
+LOCK TABLES `empresarecicladora` WRITE;
+INSERT INTO `empresarecicladora` VALUES (2,'12.345.678/0001-99','Rua das Árvores, 100','(11) 99999-8888');
+UNLOCK TABLES;
 
-DROP TABLE IF EXISTS `vw_ranking`;
-/*!50001 DROP VIEW IF EXISTS `vw_ranking`*/;
-SET @saved_cs_client     = @@character_set_client;
-/*!50503 SET character_set_client = utf8mb4 */;
-/*!50001 CREATE VIEW `vw_ranking` AS SELECT 
- 1 AS `nome`,
- 1 AS `pontos`,
- 1 AS `posicao`*/;
-SET character_set_client = @saved_cs_client;
+LOCK TABLES `empresaapoiadora` WRITE;
+INSERT INTO `empresaapoiadora` VALUES (3,'98.765.432/0001-11','Av. Sustentável, 200','(11) 98888-7777');
+UNLOCK TABLES;
 
---
--- Temporary view structure for view `vw_solicitacoes`
---
-
-DROP TABLE IF EXISTS `vw_solicitacoes`;
-/*!50001 DROP VIEW IF EXISTS `vw_solicitacoes`*/;
-SET @saved_cs_client     = @@character_set_client;
-/*!50503 SET character_set_client = utf8mb4 */;
-/*!50001 CREATE VIEW `vw_solicitacoes` AS SELECT 
- 1 AS `id_solicitacao`,
- 1 AS `usuario`,
- 1 AS `recicladora`,
- 1 AS `descricao`,
- 1 AS `status`,
- 1 AS `data_solicitacao`*/;
-SET character_set_client = @saved_cs_client;
-
---
--- Final view structure for view `vw_ranking`
---
-
-/*!50001 DROP VIEW IF EXISTS `vw_ranking`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8mb4 */;
-/*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `vw_ranking` AS select `u`.`nome` AS `nome`,`r`.`pontos` AS `pontos`,rank() OVER (ORDER BY `r`.`pontos` desc )  AS `posicao` from (`ranking` `r` join `usuario` `u` on((`u`.`id_usuario` = `r`.`id_usuario`))) */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
-
---
--- Final view structure for view `vw_solicitacoes`
---
-
-/*!50001 DROP VIEW IF EXISTS `vw_solicitacoes`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8mb4 */;
-/*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `vw_solicitacoes` AS select `s`.`id_solicitacao` AS `id_solicitacao`,`u`.`nome` AS `usuario`,`e`.`cnpj` AS `recicladora`,`s`.`descricao` AS `descricao`,`s`.`status` AS `status`,`s`.`data_solicitacao` AS `data_solicitacao` from ((`solicitacao` `s` join `usuario` `u` on((`u`.`id_usuario` = `s`.`id_usuario`))) join `empresarecicladora` `e` on((`e`.`id_recicladora` = `s`.`id_recicladora`))) */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2025-10-05 23:44:35
+show tables
