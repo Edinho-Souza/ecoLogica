@@ -1725,17 +1725,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     // *** FIM NOVA FUNÇÃO ***
 
+    // ===================================================================
+    // FUNÇÃO: INICIALIZA O EDITOR DE MAPA (Corrigida)
+    // ===================================================================
     const initFullMapEditor = () => {
         const mapContainerId = 'full-map-container';
         const formContainer = document.getElementById('pointDetailsFormContainer');
         const pointLatInput = document.getElementById('pointLat');
         const pointLngInput = document.getElementById('pointLng');
         const pointNameInput = document.getElementById('pointName');
-        // NOVO: Referência ao campo de Endereço
         const pointAddressInput = document.getElementById('pointAddress');
 
-        if (typeof L === 'undefined' || typeof L.Control.Geocoder === 'undefined') {
-            console.error("Leaflet ou o Geocoder não estão carregados.");
+        if (typeof L === 'undefined') {
+            console.error("Leaflet não carregado.");
             return;
         }
 
@@ -1751,60 +1753,97 @@ document.addEventListener('DOMContentLoaded', () => {
 
             renderCollectionPointsOnFullMap();
 
-            // *** INTEGRAÇÃO REAL DO GEOCODER ***
+            // 1. INTEGRAÇÃO DO GEOCODER (BUSCA POR TEXTO)
             const geocoder = L.Control.Geocoder.nominatim();
-
             L.Control.geocoder({
                 query: "Blumenau, SC",
-                placeholder: "Digite o endereço completo aqui...",
+                placeholder: "Buscar endereço...",
                 defaultMarkGeocode: false,
                 geocoder: geocoder
             })
                 .on('markgeocode', function (e) {
-                    const latlng = e.geocode.center;
+                    updateMarkerAndForm(e.geocode.center, e.geocode.name);
+                })
+                .addTo(fullMapInstance);
 
-                    // 1. Remove o marcador temporário anterior, se existir
-                    if (tempNewMarker) {
-                        fullMapInstance.removeLayer(tempNewMarker);
-                    }
+            // 2. CLIQUE NO MAPA (CORRIGIDO)
+            fullMapInstance.on('click', async function (e) {
+                const latlng = e.latlng;
 
-                    // 2. Cria o novo marcador temporário e preenche o formulário
-                    tempNewMarker = L.marker(latlng, { draggable: true }).addTo(fullMapInstance)
-                        .bindPopup(`Local encontrado: ${e.geocode.name}`).openPopup();
+                // Feedback imediato
+                updateMarkerAndForm(latlng, "Carregando endereço...");
 
-                    // 3. Centraliza e preenche campos
-                    fullMapInstance.setView(latlng, 17);
-                    pointLatInput.value = latlng.lat;
-                    pointLngInput.value = latlng.lng;
+                try {
+                    // CORREÇÃO AQUI: Usar latlng.lng em vez de latlng.lon
+                    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`;
 
-                    // CORRIGIDO: O resultado completo da busca do Geocoder vai para o campo Endereço
-                    pointAddressInput.value = e.geocode.name;
-
-                    // O campo 'pointName' (nome curto) é deixado para o administrador preencher manualmente.
-                    // Se o campo de Endereço ainda estiver vazio, preenche o Nome com o resultado da busca.
-                    if (pointNameInput.value.trim() === '') {
-                        pointNameInput.value = e.geocode.name.split(',')[0].trim(); // Pega a primeira parte como nome sugerido
-                    }
-
-
-                    // 4. Configura o arrasto para atualização das coordenadas
-                    tempNewMarker.on('dragend', function (e) {
-                        const newLatlng = e.target.getLatLng();
-                        pointLatInput.value = newLatlng.lat;
-                        pointLngInput.value = newLatlng.lng;
-                        e.target.openPopup();
+                    const response = await fetch(url, {
+                        headers: {
+                            'User-Agent': 'EcoLogicaAdmin/1.0' // Boa prática para APIs abertas
+                        }
                     });
 
-                    // 5. Exibe o formulário de detalhes
-                    formContainer.style.display = 'block';
-                    formContainer.scrollIntoView({ behavior: 'smooth' });
+                    if (!response.ok) throw new Error("Erro na resposta da API");
 
-                }).addTo(fullMapInstance);
-            // *************************************************************
+                    const data = await response.json();
+
+                    if (data && data.display_name) {
+                        pointAddressInput.value = data.display_name;
+
+                        // Sugere nome curto
+                        if (pointNameInput.value.trim() === '' || pointNameInput.value === 'Carregando endereço...') {
+                            const street = data.address.road || data.address.pedestrian || data.address.suburb || "Novo Ponto";
+                            pointNameInput.value = street;
+                        }
+
+                        if (tempNewMarker) {
+                            tempNewMarker.setPopupContent(`Local: ${data.display_name}`).openPopup();
+                        }
+                    } else {
+                        // Caso a API responda mas não ache o endereço (ex: meio do oceano)
+                        pointAddressInput.value = "Endereço não identificado (Defina manualmente)";
+                    }
+                } catch (error) {
+                    console.error("Erro na geocodificação:", error);
+                    pointAddressInput.value = "Erro ao buscar endereço (Verifique conexão)";
+                }
+            });
 
         } else {
             fullMapInstance.invalidateSize();
             renderCollectionPointsOnFullMap();
+        }
+
+        // FUNÇÃO AUXILIAR (MANTIDA IGUAL)
+        function updateMarkerAndForm(latlng, addressName) {
+            if (tempNewMarker) fullMapInstance.removeLayer(tempNewMarker);
+
+            tempNewMarker = L.marker(latlng, { draggable: true }).addTo(fullMapInstance);
+            tempNewMarker.bindPopup(`Local selecionado`).openPopup();
+
+            tempNewMarker.on('dragend', function (e) {
+                const newPos = e.target.getLatLng();
+                pointLatInput.value = newPos.lat;
+                pointLngInput.value = newPos.lng;
+            });
+
+            fullMapInstance.setView(latlng, fullMapInstance.getZoom());
+            pointLatInput.value = latlng.lat;
+            pointLngInput.value = latlng.lng;
+
+            if (addressName) {
+                pointAddressInput.value = addressName;
+                if (pointNameInput.value.trim() === '') {
+                    pointNameInput.value = addressName.split(',')[0].trim();
+                }
+            }
+
+            formContainer.style.display = 'block';
+
+            // Limpa checkboxes para garantir estado limpo no novo ponto
+            const checkboxes = document.querySelectorAll('.point-type-checkbox');
+            checkboxes.forEach(cb => cb.checked = false);
+            document.getElementById('pointIsActive').checked = true;
         }
     };
 
