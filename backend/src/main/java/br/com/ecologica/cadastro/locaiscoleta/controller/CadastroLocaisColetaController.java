@@ -18,45 +18,77 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/locais-coleta")
 public class CadastroLocaisColetaController {
-	@Autowired
-	private CadastroLocaisColetaService service;
 
-	@GetMapping
-	public ResponseEntity<List<LocalColetaResponse>> listarTodos() {
-		List<LocalColetaResponse> lista = service.listarTodos().stream().map(LocalColetaResponse::fromEntity)
-				.collect(Collectors.toList());
-		return ResponseEntity.ok(lista);
-	}
+    @Autowired
+    private CadastroLocaisColetaService service;
 
-	@GetMapping("/{id}")
-	public ResponseEntity<LocalColetaResponse> buscarPorId(@PathVariable Long id) {
-		return service.buscarPorId(id).map(LocalColetaResponse::fromEntity).map(ResponseEntity::ok)
-				.orElse(ResponseEntity.notFound().build());
-	}
+    // Endpoints GET, POST, PUT, DELETE
+    @GetMapping
+    public ResponseEntity<List<LocalColetaResponse>> listarTodos() {
+        List<LocalColetaResponse> lista = service.listarTodos().stream().map(LocalColetaResponse::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(lista);
+    }
 
-	@PostMapping
-	public ResponseEntity<LocalColetaResponse> criar(@Valid @RequestBody LocalColetaRequest request,
-			Authentication authentication) {
-		// Pega o usuário logado
-		Usuario usuario = ((CustomUserDetails) authentication.getPrincipal()).getUsuario();
-		CadastroLocaisColeta salvo = service.salvar(request, usuario);
-		LocalColetaResponse response = LocalColetaResponse.fromEntity(salvo);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
-	}
+    @GetMapping("/{id}")
+    public ResponseEntity<LocalColetaResponse> buscarPorId(@PathVariable Long id) {
+        return service.buscarPorId(id).map(LocalColetaResponse::fromEntity).map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
-	@PutMapping("/{id}")
-	public ResponseEntity<LocalColetaResponse> atualizar(@PathVariable Long id,
-			@Valid @RequestBody LocalColetaRequest request, Authentication authentication) {
-		// Pega o usuário logado
-		Usuario usuario = ((CustomUserDetails) authentication.getPrincipal()).getUsuario();
-		return service.atualizar(id, request, usuario).map(LocalColetaResponse::fromEntity).map(ResponseEntity::ok)
-				.orElse(ResponseEntity.notFound().build());
-	}
+    @PostMapping
+    public ResponseEntity<LocalColetaResponse> criar(@Valid @RequestBody LocalColetaRequest request,
+            Authentication authentication) {
+        Usuario usuario = ((CustomUserDetails) authentication.getPrincipal()).getUsuario();
+        CadastroLocaisColeta salvo = service.salvar(request, usuario);
+        LocalColetaResponse response = LocalColetaResponse.fromEntity(salvo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deletar(@PathVariable Long id, Authentication authentication) {
-		Usuario usuario = ((CustomUserDetails) authentication.getPrincipal()).getUsuario();
-		service.deletar(id, usuario);
-		return ResponseEntity.noContent().build();
-	}
+    @PutMapping("/{id}")
+    public ResponseEntity<LocalColetaResponse> atualizar(@PathVariable Long id,
+            @Valid @RequestBody LocalColetaRequest request, Authentication authentication) {
+        Usuario usuario = ((CustomUserDetails) authentication.getPrincipal()).getUsuario();
+        return service.atualizar(id, request, usuario).map(LocalColetaResponse::fromEntity).map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id, Authentication authentication) {
+        Usuario usuario = ((CustomUserDetails) authentication.getPrincipal()).getUsuario();
+        service.deletar(id, usuario);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Endpoint para adicionar um material a um local
+    @PostMapping("/{localId}/materiais/{tipoMaterialId}")
+    public ResponseEntity<LocalColetaResponse> adicionarMaterial(
+            @PathVariable Long localId,
+            @PathVariable Long tipoMaterialId,
+            Authentication authentication) {
+        
+        Usuario usuario = ((CustomUserDetails) authentication.getPrincipal()).getUsuario();
+        try {
+            CadastroLocaisColeta atualizado = service.adicionarMaterial(localId, tipoMaterialId, usuario);
+            return ResponseEntity.ok(LocalColetaResponse.fromEntity(atualizado));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Endpoint para remover um material de um local
+    @DeleteMapping("/{localId}/materiais/{tipoMaterialId}")
+    public ResponseEntity<Void> removerMaterial(
+            @PathVariable Long localId,
+            @PathVariable Long tipoMaterialId,
+            Authentication authentication) {
+        
+        Usuario usuario = ((CustomUserDetails) authentication.getPrincipal()).getUsuario();
+        try {
+            service.removerMaterial(localId, tipoMaterialId, usuario);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
