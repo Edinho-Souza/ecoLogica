@@ -13,8 +13,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString(exclude = "materiais")
-@EqualsAndHashCode(exclude = "materiais")
+@ToString(exclude = "locaisColeta")
+@EqualsAndHashCode(exclude = "locaisColeta")
 public class CadastroTipoMateriais {
 
 	@Id
@@ -30,6 +30,6 @@ public class CadastroTipoMateriais {
 	@Column(nullable = false)
 	private boolean ativo = false;
 
-	@OneToMany(mappedBy = "tipoMaterial")
-	private List<CadastroMateriaisColetar> materiais;
+	@ManyToMany(mappedBy = "tiposMateriaisAceitos", fetch = FetchType.LAZY)
+	private List<CadastroLocaisColeta> locaisColeta;
 }

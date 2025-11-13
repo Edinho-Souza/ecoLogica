@@ -8,6 +8,7 @@ import java.util.List;
 @Entity
 @Table(name = "localcoleta")
 public class CadastroLocaisColeta {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_local")
@@ -25,4 +26,12 @@ public class CadastroLocaisColeta {
 
     @OneToMany(mappedBy = "localColeta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CadastroDiasHorarios> diasHorarios;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "localcoleta_tipos_materiais",
+        joinColumns = @JoinColumn(name = "local_id"),
+        inverseJoinColumns = @JoinColumn(name = "tipo_id")
+    )
+    private List<CadastroTipoMateriais> tiposMateriaisAceitos;
 }
