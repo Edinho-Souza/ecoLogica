@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===================================================================
     // DADOS SIMULADOS E VARIÁVEIS DE PAGINAÇÃO (Atualizado com Logs)
     // ===================================================================
-    let simulatedUsers = [
-        // Adicionando mais usuários para testar a paginação
+    let storedUsers = localStorage.getItem('ecoLogica_Users');
+    let simulatedUsers = storedUsers ? JSON.parse(storedUsers) : [
         { id: 1, name: "Sofia Terra", email: "terradasofia@ecologica.com", points: 150, status: "Ativo" },
         { id: 2, name: "Carlos Rocha", email: "carlos@email.com", points: 1180, status: "Ativo" },
         { id: 3, name: "Beatriz Farias", email: "bia.f@mail.net", points: 1250, status: "Ativo" },
@@ -30,7 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 12, name: "Outro Inativo", email: "outro@inativo.com", points: 5, status: "Inativo" },
         { id: 13, name: "Lucas Mendes", email: "lucas.m@email.net", points: 850, status: "Ativo" }
     ];
-    let filteredUserList = [...simulatedUsers]; // Lista que será exibida (inicialmente todos)
+    let filteredUserList = [...simulatedUsers];
+    let currentUserIdCounter = simulatedUsers.length > 0 ? Math.max(...simulatedUsers.map(u => u.id)) + 1 : 1;
     let currentPage = 1;
     const itemsPerPage = 5; // Quantos usuários mostrar por página
 
@@ -676,11 +677,28 @@ document.addEventListener('DOMContentLoaded', () => {
         usersToDisplay.forEach(user => {
             const statusBadgeClass = user.status === 'Ativo' ? 'bg-success' : 'bg-danger';
             // ATUALIZADO: Adicionado data-bs-toggle/target para o botão "Ver Perfil"
-            const row = `<tr><td>${user.name}</td><td>${user.email}</td><td>${user.points}</td><td><span class="badge ${statusBadgeClass}">${user.status}</span></td><td><button class="btn btn-sm btn-outline-primary action-btn" data-user-id="${user.id}" data-action="view" title="Ver Perfil" data-bs-toggle="modal" data-bs-target="#userProfileModal"><i class="fas fa-eye"></i></button><button class="btn btn-sm btn-outline-secondary action-btn" data-user-id="${user.id}" data-action="points" title="Add/Rem Pontos"><i class="fas fa-coins"></i></button><button class="btn btn-sm btn-outline-warning action-btn" data-user-id="${user.id}" data-action="reset_pw" title="Resetar Senha"><i class="fas fa-key"></i></button><button class="btn btn-sm btn-outline-danger action-btn" data-user-id="${user.id}" data-action="toggle_status" title="${user.status === 'Ativo' ? 'Desativar' : 'Ativar'} Conta"><i class="fas ${user.status === 'Ativo' ? 'fa-user-slash' : 'fa-user-check'}"></i></button></td></tr>`;
+            const row = `
+            <tr>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td>${user.points}</td>
+                <td><span class="badge ${statusBadgeClass}">${user.status}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary action-btn" data-user-id="${user.id}" data-action="view" title="Ver Perfil" data-bs-toggle="modal" data-bs-target="#userProfileModal"><i class="fas fa-eye"></i></button>
+                    
+                    <button class="btn btn-sm btn-outline-secondary action-btn" data-user-id="${user.id}" data-action="edit-data" title="Editar Dados"><i class="fas fa-pencil-alt"></i></button>
+                    
+                    <button class="btn btn-sm btn-outline-secondary action-btn" data-user-id="${user.id}" data-action="points" title="Add/Rem Pontos"><i class="fas fa-coins"></i></button>
+                    <button class="btn btn-sm btn-outline-warning action-btn" data-user-id="${user.id}" data-action="reset_pw" title="Resetar Senha"><i class="fas fa-key"></i></button>
+                    <button class="btn btn-sm btn-outline-danger action-btn" data-user-id="${user.id}" data-action="toggle_status" title="${user.status === 'Ativo' ? 'Desativar' : 'Ativar'} Conta"><i class="fas ${user.status === 'Ativo' ? 'fa-user-slash' : 'fa-user-check'}"></i></button>
+                </td>
+            </tr>`;
             tableBody.innerHTML += row;
         });
         renderPaginationControls();
     };
+
+
     const handleUserActionClick = (event) => {
         // ... (seu código existente, sem alterações) ...
         const button = event.target.closest('.action-btn');
@@ -732,13 +750,47 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert(`(Simulação) Ver perfil de ${user.name}\nPontos: ${user.points}\nStatus: ${user.status}`);
                 }
                 break;
+
+            case 'edit-data': // <--- NOVO CASE
+                const editModalEl = document.getElementById('addEditUserModal');
+                const editModal = new bootstrap.Modal(editModalEl);
+
+                // Preenche o form
+                document.getElementById('userModalTitle').textContent = "Editar Usuário";
+                document.getElementById('userEditId').value = user.id;
+                document.getElementById('userNameInput').value = user.name;
+                document.getElementById('userEmailInput').value = user.email;
+                document.getElementById('userInitialPoints').value = user.points;
+                document.getElementById('userInitialPoints').disabled = true; // Protege pontos na edição básica
+                document.getElementById('userStatusSelect').value = user.status;
+
+                editModal.show();
+                break;
+
             // *** FIM IMPLEMENTAÇÃO DO MODAL ***
-            case 'points': const pointsToAdd = prompt(`Ajustar pontos para ${user.name} (${user.points}). Digite (+/-):`, "0"); if (pointsToAdd !== null) { const points = parseInt(pointsToAdd); if (!isNaN(points)) { user.points += points; console.log(`Pontos atualizados para ${user.points}.`); handleUserSearchAndFilter(true); alert(`Pontos atualizados para ${user.points}.`); } else { alert("Valor inválido."); } } break;
+            case 'points':
+                const pointsToAdd = prompt(`Ajustar pontos para ${user.name} (${user.points}). Digite (+/-):`, "0");
+                if (pointsToAdd !== null) {
+                    const points = parseInt(pointsToAdd);
+                    if (!isNaN(points)) {
+                        user.points += points;
+                        // SALVAR NO STORAGE
+                        localStorage.setItem('ecoLogica_Users', JSON.stringify(simulatedUsers));
+
+                        console.log(`Pontos atualizados para ${user.points}.`);
+                        handleUserSearchAndFilter(true);
+                        alert(`Pontos atualizados para ${user.points}.`);
+                    } else {
+                        alert("Valor inválido.");
+                    }
+                }
+                break;
             case 'reset_pw': if (confirm(`Gerar nova senha para ${user.name}?`)) { console.log(`(Simulação) Senha resetada para ${user.name}.`); alert(`(Simulação) Nova senha gerada.`); } break;
             case 'toggle_status': const newStatus = user.status === 'Ativo' ? 'Inativo' : 'Ativo'; if (confirm(`${newStatus === 'Inativo' ? 'DESATIVAR' : 'ATIVAR'} conta de ${user.name}?`)) { user.status = newStatus; console.log(`Status alterado para ${user.status}.`); handleUserSearchAndFilter(true); alert(`Conta ${newStatus === 'Inativo' ? 'desativada' : 'ativada'}.`); } break;
             default: console.warn(`Ação desconhecida: ${action}`);
         }
     };
+
     const renderPaginationControls = () => {
         // ... (seu código existente, sem alterações) ...
         const paginationNav = document.querySelector('.user-management-section nav[aria-label="Paginação de usuários"]');
@@ -960,6 +1012,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Preenche o formulário com os valores carregados inicialmente
         populateForm();
+    };
+
+    // ===================================================================
+    // NOVA FUNÇÃO: GERENCIA CADASTRO/EDIÇÃO DE USUÁRIOS
+    // ===================================================================
+    const handleUserForm = () => {
+        const form = document.getElementById('addEditUserForm');
+        const modalElement = document.getElementById('addEditUserModal');
+        const btnOpenAdd = document.getElementById('btnOpenAddUser');
+
+        if (!form || !modalElement) return;
+
+        const modalTitle = document.getElementById('userModalTitle');
+        const idInput = document.getElementById('userEditId');
+        const nameInput = document.getElementById('userNameInput');
+        const emailInput = document.getElementById('userEmailInput');
+        const pointsInput = document.getElementById('userInitialPoints');
+        const statusSelect = document.getElementById('userStatusSelect');
+
+        // Limpa o form ao abrir para "Novo Usuário"
+        if (btnOpenAdd) {
+            btnOpenAdd.addEventListener('click', () => {
+                form.reset();
+                idInput.value = '';
+                modalTitle.textContent = "Novo Usuário";
+                pointsInput.disabled = false; // Permite definir pontos no cadastro
+            });
+        }
+
+        // Salvar
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const editingId = idInput.value ? parseInt(idInput.value) : null;
+
+            if (editingId) {
+                // EDIÇÃO
+                const index = simulatedUsers.findIndex(u => u.id === editingId);
+                if (index !== -1) {
+                    simulatedUsers[index].name = nameInput.value.trim();
+                    simulatedUsers[index].email = emailInput.value.trim();
+                    simulatedUsers[index].status = statusSelect.value;
+                    // Pontos geralmente editamos pelo botão de moedas, mas se quiser permitir aqui:
+                    // simulatedUsers[index].points = parseInt(pointsInput.value); 
+
+                    alert("Usuário atualizado com sucesso!");
+                }
+            } else {
+                // CRIAÇÃO
+                const newUser = {
+                    id: currentUserIdCounter++,
+                    name: nameInput.value.trim(),
+                    email: emailInput.value.trim(),
+                    points: parseInt(pointsInput.value) || 0,
+                    status: statusSelect.value
+                };
+                simulatedUsers.push(newUser);
+                alert("Usuário criado com sucesso!");
+            }
+
+            // Persistência e Atualização
+            localStorage.setItem('ecoLogica_Users', JSON.stringify(simulatedUsers));
+
+            // Recarrega a tabela (mantendo filtros se possível, mas resetando a busca simples)
+            handleUserSearchAndFilter(true);
+
+            // Fecha modal
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) modalInstance.hide();
+        });
     };
 
     // ===================================================================
@@ -2087,6 +2209,214 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ===================================================================
+    // NOVA FUNÇÃO: GERENCIA O REGISTRO MANUAL DE LOGS (COLETAS)
+    // ===================================================================
+    const handleLogForm = () => {
+        const form = document.getElementById('addLogForm');
+        const modalElement = document.getElementById('addLogModal');
+        const btnOpen = document.getElementById('btnOpenAddLog');
+
+        const userSelect = document.getElementById('logUserSelect');
+        const companySelect = document.getElementById('logCompanySelect');
+
+        // Função para carregar as listas nos Selects
+        const populateSelects = () => {
+            // 1. Usuários
+            userSelect.innerHTML = '<option value="" selected disabled>Selecione um usuário...</option>';
+            simulatedUsers.forEach(u => {
+                if (u.status === 'Ativo') { // Só mostra ativos
+                    const option = document.createElement('option');
+                    option.value = u.name; // Usando nome para simplificar visualização no log
+                    option.textContent = `${u.name} (ID: ${u.id})`;
+                    userSelect.appendChild(option);
+                }
+            });
+
+            // 2. Empresas (Apenas Recicladoras fazem sentido para coleta)
+            companySelect.innerHTML = '<option value="" selected disabled>Selecione a empresa...</option>';
+            simulatedRecyclers.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c.name;
+                option.textContent = c.name;
+                companySelect.appendChild(option);
+            });
+        };
+
+        // Ao abrir o modal, carrega as listas frescas
+        if (btnOpen) {
+            btnOpen.addEventListener('click', () => {
+                populateSelects();
+                form.reset();
+                // Define data padrão como agora
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById('logDateInput').value = now.toISOString().slice(0, 16);
+            });
+        }
+
+        // Salvar Log
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const userName = userSelect.value;
+                const companyName = companySelect.value;
+                const details = document.getElementById('logMaterialInput').value.trim();
+                const pointsVal = parseInt(document.getElementById('logPointsInput').value);
+                const dateVal = document.getElementById('logDateInput').value;
+
+                if (!userName || !companyName || !details || isNaN(pointsVal)) {
+                    alert("Preencha todos os campos obrigatórios.");
+                    return;
+                }
+
+                // Cria o objeto Log
+                const newLog = {
+                    id: Date.now(), // ID único baseado no tempo
+                    timestamp: dateVal ? dateVal.replace('T', ' ') : new Date().toLocaleString('pt-BR'),
+                    user: userName,
+                    action: "Registro Material",
+                    details: details,
+                    points: `+${pointsVal}`, // Formato visual com +
+                    company: companyName
+                };
+
+                // 1. Adiciona ao array de Logs
+                simulatedLogs.unshift(newLog); // Adiciona no começo da lista
+
+                // 2. Atualiza Pontos do Usuário (Opcional, mas recomendável)
+                const userIndex = simulatedUsers.findIndex(u => u.name === userName);
+                if (userIndex !== -1) {
+                    simulatedUsers[userIndex].points += pointsVal;
+                    localStorage.setItem('ecoLogica_Users', JSON.stringify(simulatedUsers)); // Salva usuários
+                    // Se a tabela de usuários estiver visível, atualize-a:
+                    populateUserTable();
+                }
+
+                // 3. Atualiza Tabela de Logs na tela
+                filteredLogList = [...simulatedLogs]; // Reseta filtro
+                currentLogPage = 1;
+                populateLogTable();
+
+                // 4. ATUALIZA OS GRÁFICOS! (A mágica acontece aqui)
+                initAdminCharts();
+
+                // Fecha e Feedback
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                modalInstance.hide();
+                alert("Coleta registrada com sucesso! Gráficos e pontos atualizados.");
+            });
+        }
+    };
+
+    // ===================================================================
+    // NOVA FUNÇÃO: EXPORTAR DADOS PARA CSV (Excel)
+    // ===================================================================
+    const setupExportButtons = () => {
+
+        // Função Genérica para Converter JSON em CSV e Baixar
+        const downloadCSV = (data, filename, headers) => {
+            if (!data || data.length === 0) {
+                alert("Não há dados para exportar.");
+                return;
+            }
+
+            // 1. Cria o cabeçalho do CSV
+            const csvRows = [];
+            // Mapeia as chaves do objeto para o cabeçalho (ex: "Nome;Email;Status")
+            const headerKeys = Object.keys(headers);
+            const headerLabels = Object.values(headers);
+            csvRows.push(headerLabels.join(';')); // Usa ponto-e-vírgula (padrão Excel BR)
+
+            // 2. Preenche as linhas
+            data.forEach(row => {
+                const values = headerKeys.map(key => {
+                    let val = row[key];
+                    // Tratamento para evitar quebras se o texto tiver ; ou quebra de linha
+                    if (val === null || val === undefined) val = '';
+                    val = String(val).replace(/"/g, '""'); // Escapa aspas duplas
+                    return `"${val}"`; // Envolve em aspas
+                });
+                csvRows.push(values.join(';'));
+            });
+
+            // 3. Cria o arquivo Blob
+            // \ufeff adiciona o BOM para o Excel reconhecer acentos (UTF-8)
+            const csvString = '\ufeff' + csvRows.join('\n');
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+
+            // 4. Dispara o download
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        // --- BOTÃO 1: EXPORTAR USUÁRIOS ---
+        const btnExportUsers = document.getElementById('btnExportUsers');
+        if (btnExportUsers) {
+            btnExportUsers.addEventListener('click', () => {
+                // Define quais colunas queremos exportar e o nome bonito delas
+                const headers = {
+                    id: 'ID',
+                    name: 'Nome Completo',
+                    email: 'Email',
+                    points: 'Pontos',
+                    status: 'Status'
+                };
+                // Exporta a lista filtrada atual (se quiser exportar tudo, use simulatedUsers)
+                const dataToExport = filteredUserList.length > 0 ? filteredUserList : simulatedUsers;
+                downloadCSV(dataToExport, 'relatorio_usuarios.csv', headers);
+            });
+        }
+
+        // --- BOTÃO 2: EXPORTAR LOGS ---
+        const btnExportLogs = document.getElementById('btnExportLogs');
+        if (btnExportLogs) {
+            btnExportLogs.addEventListener('click', () => {
+                const headers = {
+                    timestamp: 'Data/Hora',
+                    user: 'Usuário',
+                    action: 'Ação',
+                    details: 'Detalhes',
+                    points: 'Pontos',
+                    company: 'Empresa Envolvida'
+                };
+                // Exporta a lista filtrada atual
+                const dataToExport = filteredLogList.length > 0 ? filteredLogList : simulatedLogs;
+                downloadCSV(dataToExport, 'relatorio_logs_reciclagem.csv', headers);
+            });
+        }
+
+        // --- BOTÃO 3: EXPORTAR EMPRESAS (Merged) ---
+        const btnExportCompanies = document.getElementById('btnExportCompanies');
+        if (btnExportCompanies) {
+            btnExportCompanies.addEventListener('click', () => {
+                // Junta as duas listas e adiciona um campo "Categoria"
+                const recyclers = simulatedRecyclers.map(c => ({ ...c, category: 'Recicladora' }));
+                const supporters = simulatedSupporters.map(c => ({ ...c, category: 'Apoiadora' }));
+                const allCompanies = [...recyclers, ...supporters];
+
+                const headers = {
+                    id: 'ID',
+                    name: 'Razão Social / Nome',
+                    category: 'Tipo',
+                    email: 'Email',
+                    phone: 'Telefone',
+                    cnpj: 'CNPJ',
+                    address: 'Endereço'
+                };
+
+                downloadCSV(allCompanies, 'relatorio_empresas_parceiras.csv', headers);
+            });
+        }
+    };
+
+    // ===================================================================
     // CHAMADAS DE INICIALIZAÇÃO (Atualizado com Logs)
     // ===================================================================
 
@@ -2094,11 +2424,13 @@ document.addEventListener('DOMContentLoaded', () => {
     initAdminCharts();
 
     // Usuários
+    handleUserForm();
     populateUserTable(); // Popula usuários (página 1 de todos)
     handleUserSearchAndFilter(); // Configura filtros/busca/ações de usuários
     handlePagination(); // Configura paginação de usuários
 
     // Logs
+    handleLogForm();
     populateLogTable(); // Popula logs (página 1 de todos)
     handleLogSearchAndFilter(); // Configura filtros de logs
     handleLogPagination(); // Configura paginação de logs
@@ -2125,6 +2457,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.collection-points-management-section .list-group-flush')
         .addEventListener('click', handlePointsListClick);
     // *** FIM NOVO ***
+
+    // Inicializações Finais
+    setupExportButtons();
 
 
     // Chama a inicialização dos mapas
