@@ -1,10 +1,7 @@
 package br.com.ecologica.gestao;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import br.com.ecologica.cadastro.usuarios.model.Usuario; 
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
@@ -16,12 +13,13 @@ public class PermissaoUsoPontos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long usuarioId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
+
+    @Column(nullable = false)
     private boolean permitido;
+
     private String motivo;
 
-    public boolean verificarPermissao() {
-        // lógica para verificar se o usuário pode usar os pontos
-        return permitido;
-    }
 }

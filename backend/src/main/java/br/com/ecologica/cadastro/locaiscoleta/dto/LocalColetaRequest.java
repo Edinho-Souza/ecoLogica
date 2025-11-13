@@ -6,13 +6,7 @@ import lombok.Data;
 
 @Data
 public class LocalColetaRequest {
-    
-    @NotBlank(message = "O nome do local é obrigatório")
-    private String nome; 
-
-    private String endereco;
-
-    @NotNull(message = "O ID da empresa recicladora é obrigatório")
-    private Long idRecicladora; 
-
+	@NotBlank(message = "O nome do local é obrigatório")
+	private String nome;
+	private String endereco;
 }

@@ -8,14 +8,20 @@ import java.time.LocalDateTime;
 public class HistoricoResponse {
     private Long id;
     private Long usuarioId;
-    private String acao;
+    private String descricao;
+    private int pontos;
+    
     private LocalDateTime data;
 
     public static HistoricoResponse fromEntity(HistoricoPontuacao historico) {
         HistoricoResponse response = new HistoricoResponse();
         response.setId(historico.getId());
-        response.setAcao(historico.getAcao());
+        
+        // Mapeamento dos campos
+        response.setDescricao(historico.getDescricao());
+        response.setPontos(historico.getPontos());
         response.setData(historico.getData());
+        
         if (historico.getUsuario() != null) {
             response.setUsuarioId(historico.getUsuario().getId());
         }

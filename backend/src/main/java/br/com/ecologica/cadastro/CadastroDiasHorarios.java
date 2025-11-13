@@ -11,7 +11,6 @@ public class CadastroDiasHorarios {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Adicionada relação com LocalColeta
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "local_coleta_id", nullable = false)
     private CadastroLocaisColeta localColeta;

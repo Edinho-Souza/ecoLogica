@@ -23,7 +23,6 @@ public class CadastroLocaisColeta {
     @JoinColumn(name = "id_recicladora")
     private CadastroEmpresasRecicladoras empresaRecicladora;
 
-    // Adicionada relação com DiasHorarios
     @OneToMany(mappedBy = "localColeta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CadastroDiasHorarios> diasHorarios;
 }
