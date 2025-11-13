@@ -600,13 +600,22 @@
 
     <div class="modal fade" id="viewAllCompaniesModal" tabindex="-1" aria-labelledby="viewAllCompaniesModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;">
             <div class="modal-content">
                 <div class="modal-header bg-light">
                     <h5 class="modal-title" id="viewAllCompaniesModalLabel">Gerenciamento de Empresas</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-search text-muted"></i></span>
+                                <input type="text" class="form-control" id="companySearchInput"
+                                    placeholder="Pesquisar por Nome ou CNPJ...">
+                            </div>
+                        </div>
+                    </div>
                     <ul class="nav nav-tabs mb-3" id="companyTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="view-recyclers-tab" data-bs-toggle="tab"
@@ -663,6 +672,11 @@
                                             required>
                                     </div>
                                     <div class="mb-3">
+                                        <label for="newCompanyPhone" class="form-label">Telefone</label>
+                                        <input type="tel" class="form-control form-control-sm" id="newCompanyPhone"
+                                            required placeholder="(00) 00000-0000">
+                                    </div>
+                                    <div class="mb-3">
                                         <label for="newCompanyCNPJ" class="form-label">CNPJ</label>
                                         <input type="text" class="form-control form-control-sm" id="newCompanyCNPJ"
                                             required>
@@ -699,6 +713,11 @@
                                     <div class="mb-3">
                                         <label for="editCompanyEmail" class="form-label">Email de Contato</label>
                                         <input type="email" class="form-control form-control-sm" id="editCompanyEmail"
+                                            required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="editCompanyPhone" class="form-label">Telefone</label>
+                                        <input type="tel" class="form-control form-control-sm" id="editCompanyPhone"
                                             required>
                                     </div>
                                     <div class="mb-3">
