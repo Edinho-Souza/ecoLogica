@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===================================================================
     // DADOS SIMULADOS E VARIÁVEIS DE PAGINAÇÃO (Atualizado com Logs)
     // ===================================================================
-    let simulatedUsers = [
-        // Adicionando mais usuários para testar a paginação
+    let storedUsers = localStorage.getItem('ecoLogica_Users');
+    let simulatedUsers = storedUsers ? JSON.parse(storedUsers) : [
         { id: 1, name: "Sofia Terra", email: "terradasofia@ecologica.com", points: 150, status: "Ativo" },
         { id: 2, name: "Carlos Rocha", email: "carlos@email.com", points: 1180, status: "Ativo" },
         { id: 3, name: "Beatriz Farias", email: "bia.f@mail.net", points: 1250, status: "Ativo" },
@@ -30,7 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 12, name: "Outro Inativo", email: "outro@inativo.com", points: 5, status: "Inativo" },
         { id: 13, name: "Lucas Mendes", email: "lucas.m@email.net", points: 850, status: "Ativo" }
     ];
-    let filteredUserList = [...simulatedUsers]; // Lista que será exibida (inicialmente todos)
+    let filteredUserList = [...simulatedUsers];
+    let currentUserIdCounter = simulatedUsers.length > 0 ? Math.max(...simulatedUsers.map(u => u.id)) + 1 : 1;
     let currentPage = 1;
     const itemsPerPage = 5; // Quantos usuários mostrar por página
 
@@ -379,7 +380,30 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ===================================================================
-    // FUNÇÃO: GERENCIA OS FORMULÁRIOS DO MODAL (Adicionar e Editar)
+    // NOVA FUNÇÃO: MÁSCARA DE TELEFONE
+    // ===================================================================
+    const setupPhoneMasks = () => {
+        const formatPhone = (value) => {
+            return value
+                .replace(/\D/g, '') // Remove tudo o que não é dígito
+                .replace(/^(\d{2})(\d)/g, '($1) $2') // Coloca parênteses no DDD
+                .replace(/(\d)(\d{4})$/, '$1-$2') // Coloca o hífen antes dos últimos 4 dígitos
+                .substring(0, 15); // Limita tamanho
+        };
+
+        ['newCompanyPhone', 'editCompanyPhone'].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', (e) => {
+                    e.target.value = formatPhone(e.target.value);
+                });
+                input.maxLength = 15;
+            }
+        });
+    };
+
+    // ===================================================================
+    // FUNÇÃO: GERENCIA OS FORMULÁRIOS DO MODAL (Dispara Refresh)
     // ===================================================================
     const handleModalCompanyForms = () => {
 
@@ -393,14 +417,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     id: nextCompanyId++,
                     name: document.getElementById('newCompanyName').value.trim(),
                     email: document.getElementById('newCompanyEmail').value.trim(),
+                    phone: document.getElementById('newCompanyPhone').value.trim(),
                     type: document.getElementById('newCompanyType').value,
                     cnpj: document.getElementById('newCompanyCNPJ').value.trim(),
                     address: document.getElementById('newCompanyAddress').value.trim()
                 };
 
-                // --- VALIDAÇÃO ATUALIZADA (CNPJ E ENDEREÇO OBRIGATÓRIOS) ---
-                if (!newCompany.name || !newCompany.email || !newCompany.cnpj || !newCompany.address) {
-                    alert("Por favor, preencha todos os campos obrigatórios (Nome, Email, CNPJ e Endereço).");
+                if (!newCompany.name || !newCompany.email || !newCompany.phone || !newCompany.cnpj || !newCompany.address) {
+                    alert("Por favor, preencha todos os campos obrigatórios.");
                     return;
                 }
 
@@ -408,13 +432,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     simulatedRecyclers.push(newCompany);
                     localStorage.setItem('ecoLogica_Recyclers', JSON.stringify(simulatedRecyclers));
                     renderCompanyList(recyclerListSelector, simulatedRecyclers);
-                    renderCompanyTable('recyclersTableContainer', simulatedRecyclers);
                 } else {
                     simulatedSupporters.push(newCompany);
                     localStorage.setItem('ecoLogica_Supporters', JSON.stringify(simulatedSupporters));
                     renderCompanyList(supporterListSelector, simulatedSupporters);
-                    renderCompanyTable('supportersTableContainer', simulatedSupporters);
                 }
+
+                // *** CORREÇÃO: Dispara o evento para o Modal se atualizar (mantendo paginação) ***
+                document.dispatchEvent(new Event('refreshCompanyModal'));
+                // ********************************************************************************
 
                 addForm.reset();
                 alert("Empresa cadastrada com sucesso!");
@@ -430,14 +456,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const id = parseInt(document.getElementById('editCompanyId').value);
                 const type = document.getElementById('editCompanyTypeHidden').value;
 
-                // Coleta novos valores
                 const newName = document.getElementById('editCompanyName').value.trim();
                 const newEmail = document.getElementById('editCompanyEmail').value.trim();
+                const newPhone = document.getElementById('editCompanyPhone').value.trim();
                 const newCNPJ = document.getElementById('editCompanyCNPJ').value.trim();
                 const newAddress = document.getElementById('editCompanyAddress').value.trim();
 
-                // --- VALIDAÇÃO ATUALIZADA NA EDIÇÃO ---
-                if (!newName || !newEmail || !newCNPJ || !newAddress) {
+                if (!newName || !newEmail || !newPhone || !newCNPJ || !newAddress) {
                     alert("Todos os campos são obrigatórios.");
                     return;
                 }
@@ -446,26 +471,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const index = targetArray.findIndex(c => c.id === id);
 
                 if (index !== -1) {
-                    // Atualiza os dados
                     targetArray[index].name = newName;
                     targetArray[index].email = newEmail;
+                    targetArray[index].phone = newPhone;
                     targetArray[index].cnpj = newCNPJ;
                     targetArray[index].address = newAddress;
 
-                    // Salva
                     if (type === 'recicladora') {
                         localStorage.setItem('ecoLogica_Recyclers', JSON.stringify(targetArray));
                         renderCompanyList(recyclerListSelector, targetArray);
-                        renderCompanyTable('recyclersTableContainer', targetArray);
                     } else {
                         localStorage.setItem('ecoLogica_Supporters', JSON.stringify(targetArray));
                         renderCompanyList(supporterListSelector, targetArray);
-                        renderCompanyTable('supportersTableContainer', targetArray);
                     }
 
                     alert("Alterações salvas com sucesso!");
 
-                    // Retorna para a lista
+                    // *** CORREÇÃO: Dispara o evento para o Modal se atualizar ***
+                    document.dispatchEvent(new Event('refreshCompanyModal'));
+                    // ************************************************************
+
                     const listTabBtn = (type === 'recicladora') ? document.getElementById('view-recyclers-tab') : document.getElementById('view-supporters-tab');
                     if (listTabBtn) { const tab = new bootstrap.Tab(listTabBtn); tab.show(); }
                 }
@@ -474,22 +499,167 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ===================================================================
-    // FUNÇÃO: INICIALIZA OS GRÁFICOS DO ADMIN
+    // FUNÇÃO: INICIALIZA OS GRÁFICOS DO ADMIN (Integrado com Dados Reais)
     // ===================================================================
     const initAdminCharts = () => {
-        // ... (seu código existente dos gráficos, sem alterações) ...
-        console.log("Função initAdminCharts chamada.");
-        if (typeof Chart === 'undefined') { console.error("Chart.js não está carregado."); return; }
-        Chart.defaults.font.family = "'Open Sans', sans-serif"; Chart.defaults.color = '#555'; const meses = ['Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out'];
+        console.log("Inicializando gráficos com dados dinâmicos...");
+
+        if (typeof Chart === 'undefined') {
+            console.error("Chart.js não está carregado.");
+            return;
+        }
+
+        // Configurações Globais
+        Chart.defaults.font.family = "'Open Sans', sans-serif";
+        Chart.defaults.color = '#555';
+
+        // -------------------------------------------------------
+        // 1. PREPARAÇÃO DE DADOS: COLETA POR EMPRESA
+        // -------------------------------------------------------
+        const companyMap = {};
+
+        // Inicializa todas as recicladoras com 0 pontos
+        simulatedRecyclers.forEach(comp => {
+            companyMap[comp.name] = 0;
+        });
+
+        // Soma os pontos dos logs para cada empresa
+        simulatedLogs.forEach(log => {
+            // Considera apenas pontos positivos (+) e se a empresa existe
+            if (log.company && log.points.toString().includes('+')) {
+                // Remove caracteres não numéricos para somar
+                const points = parseInt(log.points.replace(/\D/g, '')) || 0;
+
+                // Se a empresa do log está ativa no sistema, soma os pontos
+                if (companyMap.hasOwnProperty(log.company)) {
+                    companyMap[log.company] += points;
+                }
+            }
+        });
+
+        const companyLabels = Object.keys(companyMap);
+        const companyValues = Object.values(companyMap);
+
+        // -------------------------------------------------------
+        // 2. PREPARAÇÃO DE DADOS: EVOLUÇÃO MENSAL (Simulada + Real)
+        // -------------------------------------------------------
+        const monthsLabels = ['Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out'];
+        const monthlyData = [0, 0, 0, 0, 0, 0]; // 6 meses
+
+        // Processa os logs reais (Assumindo que os logs atuais são de Outubro)
+        simulatedLogs.forEach(log => {
+            if (log.points.toString().includes('+')) {
+                const date = new Date(log.timestamp);
+                const month = date.getMonth(); // 9 = Outubro
+                const points = parseInt(log.points.replace(/\D/g, '')) || 0;
+
+                // Mapeia Outubro para o índice 5 do array
+                // (Lógica simples para demonstração)
+                if (month === 9) monthlyData[5] += points;
+                else if (month === 8) monthlyData[4] += points;
+            }
+        });
+
+        // Preenche meses anteriores com dados fictícios para o gráfico ter histórico visual
+        for (let i = 0; i < 5; i++) {
+            if (monthlyData[i] === 0) {
+                monthlyData[i] = Math.floor(Math.random() * 500) + 200; // Valor aleatório entre 200 e 700
+            }
+        }
+
+        // -------------------------------------------------------
+        // 3. RENDERIZAÇÃO DOS GRÁFICOS
+        // -------------------------------------------------------
+
+        // GRÁFICO 1: Coleta por Empresa (ATUALIZADO PARA EXIBIR Kg)
         const companyCtx = document.getElementById('companyCollectionChart')?.getContext('2d');
-        if (companyCtx) { new Chart(companyCtx, { type: 'bar', data: { labels: ['Recicla Vale', 'Cooperativa Bairro', 'MetalNorte', 'Outra'], datasets: [{ label: 'Kg Coletado (Mês Atual)', data: [1250, 850, 1500, 400], backgroundColor: ['rgba(72, 143, 88, 0.7)', 'rgba(44, 88, 54, 0.7)', 'rgba(168, 208, 141, 0.7)', 'rgba(232, 122, 0, 0.7)'], borderColor: ['rgba(72, 143, 88, 1)', 'rgba(44, 88, 54, 1)', 'rgba(168, 208, 141, 1)', 'rgba(232, 122, 0, 1)'], borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, title: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} Kg` } } }, scales: { y: { grid: { display: false } }, x: { beginAtZero: true, title: { display: true, text: 'Kg Coletado' } } } } }); } else { console.warn("Canvas #companyCollectionChart não encontrado."); }
+        if (companyCtx) {
+            // Destrói instância anterior se existir
+            if (window.companyChartInstance) window.companyChartInstance.destroy();
+
+            window.companyChartInstance = new Chart(companyCtx, {
+                type: 'bar',
+                data: {
+                    labels: companyLabels,
+                    datasets: [{
+                        label: 'Volume Coletado (Kg)', // <--- MUDOU AQUI
+                        data: companyValues,
+                        backgroundColor: [
+                            'rgba(72, 143, 88, 0.7)',
+                            'rgba(44, 88, 54, 0.7)',
+                            'rgba(168, 208, 141, 0.7)',
+                            'rgba(232, 122, 0, 0.7)'
+                        ],
+                        borderColor: 'rgba(72, 143, 88, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                // <--- MUDOU AQUI: Agora exibe "Kg" ao passar o mouse
+                                label: ctx => ` ${ctx.parsed.x} Kg`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // GRÁFICO 2: Total Reciclado (Linha)
         const totalUserCtx = document.getElementById('totalUserRecyclingChart')?.getContext('2d');
-        if (totalUserCtx) { const gradientFill = totalUserCtx.createLinearGradient(0, 0, 0, 150); gradientFill.addColorStop(0, 'rgba(232, 122, 0, 0.6)'); gradientFill.addColorStop(1, 'rgba(232, 122, 0, 0.05)'); new Chart(totalUserCtx, { type: 'line', data: { labels: meses, datasets: [{ label: 'Total Reciclado (Kg)', data: [650, 710, 750, 920, 880, 1050], fill: true, backgroundColor: gradientFill, borderColor: '#e87a00', borderWidth: 2, pointBackgroundColor: '#e87a00', pointRadius: 3, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Kg' } }, x: { grid: { display: false } } }, interaction: { intersect: false, mode: 'index' }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} Kg` } } } }); } else { console.warn("Canvas #totalUserRecyclingChart não encontrado."); }
+        if (totalUserCtx) {
+            if (window.totalUserChartInstance) window.totalUserChartInstance.destroy();
+
+            window.totalUserChartInstance = new Chart(totalUserCtx, {
+                type: 'line',
+                data: {
+                    labels: monthsLabels,
+                    datasets: [{
+                        label: 'Total Reciclado (Pontos)',
+                        data: monthlyData,
+                        fill: true,
+                        backgroundColor: 'rgba(232, 122, 0, 0.2)', // Laranja transparente
+                        borderColor: '#e87a00',
+                        borderWidth: 2,
+                        tension: 0.3 // Curva suave
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // GRÁFICO 3: Crescimento de Usuários (Estático - Exemplo)
         const userGrowthCtx = document.getElementById('userGrowthChart')?.getContext('2d');
-        if (userGrowthCtx) { new Chart(userGrowthCtx, { type: 'line', data: { labels: meses, datasets: [{ label: 'Novos Usuários', data: [15, 22, 18, 30, 25, 35], borderColor: '#488f58', borderWidth: 2, pointBackgroundColor: '#488f58', pointRadius: 3, tension: 0.1 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Novos Cadastros' } }, x: { grid: { display: false } } }, interaction: { intersect: false, mode: 'index' }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} usuários` } } } }); } else { console.warn("Canvas #userGrowthChart não encontrado."); }
+        if (userGrowthCtx) {
+            if (window.userGrowthChartInstance) window.userGrowthChartInstance.destroy();
+            window.userGrowthChartInstance = new Chart(userGrowthCtx, { type: 'line', data: { labels: monthsLabels, datasets: [{ label: 'Novos Usuários', data: [15, 22, 18, 30, 25, simulatedUsers.length], borderColor: '#488f58', borderWidth: 2, tension: 0.1 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } } });
+        }
+
+        // GRÁFICO 4: Visitantes (Estático - Exemplo)
         const visitorsCtx = document.getElementById('siteVisitorsChart')?.getContext('2d');
-        if (visitorsCtx) { new Chart(visitorsCtx, { type: 'bar', data: { labels: meses, datasets: [{ label: 'Visitantes Únicos', data: [1100, 1300, 1200, 1500, 1450, 1600], backgroundColor: 'rgba(0, 123, 255, 0.6)', borderColor: 'rgba(0, 123, 255, 1)', borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Visitantes' } }, x: { grid: { display: false } } }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} visitantes` } } } }); } else { console.warn("Canvas #siteVisitorsChart não encontrado."); }
-    }; // Fim initAdminCharts
+        if (visitorsCtx) {
+            if (window.visitorsChartInstance) window.visitorsChartInstance.destroy();
+            window.visitorsChartInstance = new Chart(visitorsCtx, { type: 'bar', data: { labels: monthsLabels, datasets: [{ label: 'Visitantes', data: [1100, 1300, 1200, 1500, 1450, 1600], backgroundColor: 'rgba(0, 123, 255, 0.6)' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } } });
+        }
+    };
 
     // ===================================================================
     // FUNÇÕES DE GERENCIAMENTO DE USUÁRIOS
@@ -507,11 +677,28 @@ document.addEventListener('DOMContentLoaded', () => {
         usersToDisplay.forEach(user => {
             const statusBadgeClass = user.status === 'Ativo' ? 'bg-success' : 'bg-danger';
             // ATUALIZADO: Adicionado data-bs-toggle/target para o botão "Ver Perfil"
-            const row = `<tr><td>${user.name}</td><td>${user.email}</td><td>${user.points}</td><td><span class="badge ${statusBadgeClass}">${user.status}</span></td><td><button class="btn btn-sm btn-outline-primary action-btn" data-user-id="${user.id}" data-action="view" title="Ver Perfil" data-bs-toggle="modal" data-bs-target="#userProfileModal"><i class="fas fa-eye"></i></button><button class="btn btn-sm btn-outline-secondary action-btn" data-user-id="${user.id}" data-action="points" title="Add/Rem Pontos"><i class="fas fa-coins"></i></button><button class="btn btn-sm btn-outline-warning action-btn" data-user-id="${user.id}" data-action="reset_pw" title="Resetar Senha"><i class="fas fa-key"></i></button><button class="btn btn-sm btn-outline-danger action-btn" data-user-id="${user.id}" data-action="toggle_status" title="${user.status === 'Ativo' ? 'Desativar' : 'Ativar'} Conta"><i class="fas ${user.status === 'Ativo' ? 'fa-user-slash' : 'fa-user-check'}"></i></button></td></tr>`;
+            const row = `
+            <tr>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td>${user.points}</td>
+                <td><span class="badge ${statusBadgeClass}">${user.status}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary action-btn" data-user-id="${user.id}" data-action="view" title="Ver Perfil" data-bs-toggle="modal" data-bs-target="#userProfileModal"><i class="fas fa-eye"></i></button>
+                    
+                    <button class="btn btn-sm btn-outline-secondary action-btn" data-user-id="${user.id}" data-action="edit-data" title="Editar Dados"><i class="fas fa-pencil-alt"></i></button>
+                    
+                    <button class="btn btn-sm btn-outline-secondary action-btn" data-user-id="${user.id}" data-action="points" title="Add/Rem Pontos"><i class="fas fa-coins"></i></button>
+                    <button class="btn btn-sm btn-outline-warning action-btn" data-user-id="${user.id}" data-action="reset_pw" title="Resetar Senha"><i class="fas fa-key"></i></button>
+                    <button class="btn btn-sm btn-outline-danger action-btn" data-user-id="${user.id}" data-action="toggle_status" title="${user.status === 'Ativo' ? 'Desativar' : 'Ativar'} Conta"><i class="fas ${user.status === 'Ativo' ? 'fa-user-slash' : 'fa-user-check'}"></i></button>
+                </td>
+            </tr>`;
             tableBody.innerHTML += row;
         });
         renderPaginationControls();
     };
+
+
     const handleUserActionClick = (event) => {
         // ... (seu código existente, sem alterações) ...
         const button = event.target.closest('.action-btn');
@@ -563,13 +750,47 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert(`(Simulação) Ver perfil de ${user.name}\nPontos: ${user.points}\nStatus: ${user.status}`);
                 }
                 break;
+
+            case 'edit-data': // <--- NOVO CASE
+                const editModalEl = document.getElementById('addEditUserModal');
+                const editModal = new bootstrap.Modal(editModalEl);
+
+                // Preenche o form
+                document.getElementById('userModalTitle').textContent = "Editar Usuário";
+                document.getElementById('userEditId').value = user.id;
+                document.getElementById('userNameInput').value = user.name;
+                document.getElementById('userEmailInput').value = user.email;
+                document.getElementById('userInitialPoints').value = user.points;
+                document.getElementById('userInitialPoints').disabled = true; // Protege pontos na edição básica
+                document.getElementById('userStatusSelect').value = user.status;
+
+                editModal.show();
+                break;
+
             // *** FIM IMPLEMENTAÇÃO DO MODAL ***
-            case 'points': const pointsToAdd = prompt(`Ajustar pontos para ${user.name} (${user.points}). Digite (+/-):`, "0"); if (pointsToAdd !== null) { const points = parseInt(pointsToAdd); if (!isNaN(points)) { user.points += points; console.log(`Pontos atualizados para ${user.points}.`); handleUserSearchAndFilter(true); alert(`Pontos atualizados para ${user.points}.`); } else { alert("Valor inválido."); } } break;
+            case 'points':
+                const pointsToAdd = prompt(`Ajustar pontos para ${user.name} (${user.points}). Digite (+/-):`, "0");
+                if (pointsToAdd !== null) {
+                    const points = parseInt(pointsToAdd);
+                    if (!isNaN(points)) {
+                        user.points += points;
+                        // SALVAR NO STORAGE
+                        localStorage.setItem('ecoLogica_Users', JSON.stringify(simulatedUsers));
+
+                        console.log(`Pontos atualizados para ${user.points}.`);
+                        handleUserSearchAndFilter(true);
+                        alert(`Pontos atualizados para ${user.points}.`);
+                    } else {
+                        alert("Valor inválido.");
+                    }
+                }
+                break;
             case 'reset_pw': if (confirm(`Gerar nova senha para ${user.name}?`)) { console.log(`(Simulação) Senha resetada para ${user.name}.`); alert(`(Simulação) Nova senha gerada.`); } break;
             case 'toggle_status': const newStatus = user.status === 'Ativo' ? 'Inativo' : 'Ativo'; if (confirm(`${newStatus === 'Inativo' ? 'DESATIVAR' : 'ATIVAR'} conta de ${user.name}?`)) { user.status = newStatus; console.log(`Status alterado para ${user.status}.`); handleUserSearchAndFilter(true); alert(`Conta ${newStatus === 'Inativo' ? 'desativada' : 'ativada'}.`); } break;
             default: console.warn(`Ação desconhecida: ${action}`);
         }
     };
+
     const renderPaginationControls = () => {
         // ... (seu código existente, sem alterações) ...
         const paginationNav = document.querySelector('.user-management-section nav[aria-label="Paginação de usuários"]');
@@ -791,6 +1012,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Preenche o formulário com os valores carregados inicialmente
         populateForm();
+    };
+
+    // ===================================================================
+    // NOVA FUNÇÃO: GERENCIA CADASTRO/EDIÇÃO DE USUÁRIOS
+    // ===================================================================
+    const handleUserForm = () => {
+        const form = document.getElementById('addEditUserForm');
+        const modalElement = document.getElementById('addEditUserModal');
+        const btnOpenAdd = document.getElementById('btnOpenAddUser');
+
+        if (!form || !modalElement) return;
+
+        const modalTitle = document.getElementById('userModalTitle');
+        const idInput = document.getElementById('userEditId');
+        const nameInput = document.getElementById('userNameInput');
+        const emailInput = document.getElementById('userEmailInput');
+        const pointsInput = document.getElementById('userInitialPoints');
+        const statusSelect = document.getElementById('userStatusSelect');
+
+        // Limpa o form ao abrir para "Novo Usuário"
+        if (btnOpenAdd) {
+            btnOpenAdd.addEventListener('click', () => {
+                form.reset();
+                idInput.value = '';
+                modalTitle.textContent = "Novo Usuário";
+                pointsInput.disabled = false; // Permite definir pontos no cadastro
+            });
+        }
+
+        // Salvar
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const editingId = idInput.value ? parseInt(idInput.value) : null;
+
+            if (editingId) {
+                // EDIÇÃO
+                const index = simulatedUsers.findIndex(u => u.id === editingId);
+                if (index !== -1) {
+                    simulatedUsers[index].name = nameInput.value.trim();
+                    simulatedUsers[index].email = emailInput.value.trim();
+                    simulatedUsers[index].status = statusSelect.value;
+                    // Pontos geralmente editamos pelo botão de moedas, mas se quiser permitir aqui:
+                    // simulatedUsers[index].points = parseInt(pointsInput.value); 
+
+                    alert("Usuário atualizado com sucesso!");
+                }
+            } else {
+                // CRIAÇÃO
+                const newUser = {
+                    id: currentUserIdCounter++,
+                    name: nameInput.value.trim(),
+                    email: emailInput.value.trim(),
+                    points: parseInt(pointsInput.value) || 0,
+                    status: statusSelect.value
+                };
+                simulatedUsers.push(newUser);
+                alert("Usuário criado com sucesso!");
+            }
+
+            // Persistência e Atualização
+            localStorage.setItem('ecoLogica_Users', JSON.stringify(simulatedUsers));
+
+            // Recarrega a tabela (mantendo filtros se possível, mas resetando a busca simples)
+            handleUserSearchAndFilter(true);
+
+            // Fecha modal
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) modalInstance.hide();
+        });
     };
 
     // ===================================================================
@@ -1090,42 +1381,66 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-    // admin-dashboard.js (Função renderCompanyTable, Adicionar perto das funções de gerenciamento de empresas)
+    // admin-dashboard.js (Função renderCompanyTable com Paginação)
 
-    const renderCompanyTable = (containerId, companyArray) => {
+    const renderCompanyTable = (containerId, companyArray, currentSortColumn, currentSortDirection, currentPage = 1, totalPages = 1, tableType) => {
         const container = document.getElementById(containerId);
         if (!container) return;
 
         if (companyArray.length === 0) {
-            container.innerHTML = '<div class="alert alert-info small">Nenhuma empresa cadastrada neste momento.</div>';
+            container.innerHTML = '<div class="alert alert-info small">Nenhum registro encontrado nesta página.</div>';
             return;
         }
 
+        // Função ícone de ordenação
+        const getSortIcon = (columnKey) => {
+            if (columnKey !== currentSortColumn) return '<i class="fas fa-sort text-muted ms-1 small" style="opacity: 0.3;"></i>';
+            return currentSortDirection === 'asc'
+                ? '<i class="fas fa-sort-up text-dark ms-1 small"></i>'
+                : '<i class="fas fa-sort-down text-dark ms-1 small"></i>';
+        };
+
         let tableHtml = `
-        <div class="table-responsive">
-            <table class="table table-striped table-sm admin-table">
+        <div class="table-responsive mb-2">
+            <table class="table table-striped table-sm admin-table align-middle" style="table-layout: fixed; width: 100%;">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Email</th>
-                        <th>CNPJ</th>
-                        <th>Endereço</th>
-                        <th>Ações</th>
+                        <th style="width: 50px; cursor: pointer;" class="text-center sortable-header" data-sort-key="id">
+                            ID ${getSortIcon('id')}
+                        </th>
+                        <th style="cursor: pointer;" class="sortable-header" data-sort-key="name">
+                            Nome ${getSortIcon('name')}
+                        </th>
+                        <th style="cursor: pointer;" class="sortable-header" data-sort-key="email">
+                            Email ${getSortIcon('email')}
+                        </th>
+                        <th style="cursor: pointer;" class="sortable-header" data-sort-key="phone">
+                            Telefone ${getSortIcon('phone')}
+                        </th>
+                        <th style="cursor: pointer;" class="sortable-header" data-sort-key="cnpj">
+                            CNPJ ${getSortIcon('cnpj')}
+                        </th>
+                        <th style="cursor: pointer;" class="sortable-header" data-sort-key="address">
+                            Endereço ${getSortIcon('address')}
+                        </th>
+                        <th style="width: 110px;" class="text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
     `;
 
         companyArray.forEach(company => {
+            const phoneDisplay = company.phone ? company.phone : '-';
+
             tableHtml += `
             <tr data-company-id="${company.id}" data-company-type="${company.type}">
-                <td>${company.id}</td>
-                <td>${company.name}</td>
-                <td>${company.email}</td>
-                <td>${company.cnpj || '-'}</td>
-                <td>${company.address || '-'}</td>
-                <td>
+                <td class="text-center fw-bold">${company.id}</td>
+                <td class="text-break">${company.name}</td>
+                <td class="text-break">${company.email}</td>
+                <td class="text-break">${phoneDisplay}</td>
+                <td class="text-break">${company.cnpj || '-'}</td>
+                <td class="text-break small">${company.address || '-'}</td>
+                <td class="text-center">
                     <button class="btn btn-sm btn-outline-secondary company-modal-action-btn me-1" data-action="edit" data-id="${company.id}" data-type="${company.type}" title="Editar"><i class="fas fa-pencil-alt"></i></button>
                     <button class="btn btn-sm btn-outline-danger company-modal-action-btn" data-action="delete" data-id="${company.id}" data-type="${company.type}" title="Excluir"><i class="fas fa-trash-alt"></i></button>
                 </td>
@@ -1133,11 +1448,35 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         });
 
-        tableHtml += `
-                </tbody>
-            </table>
-        </div>
-    `;
+        tableHtml += `</tbody></table></div>`;
+
+        // --- CONTROLES DE PAGINAÇÃO ---
+        if (totalPages > 1) {
+            tableHtml += `
+            <nav aria-label="Navegação da tabela">
+                <ul class="pagination pagination-sm justify-content-end mb-0">
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link company-page-link" href="#" data-page="prev" data-table-type="${tableType}">Anterior</a>
+                    </li>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                tableHtml += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link company-page-link" href="#" data-page="${i}" data-table-type="${tableType}">${i}</a>
+                    </li>
+                `;
+            }
+
+            tableHtml += `
+                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                        <a class="page-link company-page-link" href="#" data-page="next" data-table-type="${tableType}">Próximo</a>
+                    </li>
+                </ul>
+            </nav>
+            `;
+        }
+        // -------------------------------
 
         container.innerHTML = tableHtml;
     };
@@ -1386,17 +1725,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     // *** FIM NOVA FUNÇÃO ***
 
+    // ===================================================================
+    // FUNÇÃO: INICIALIZA O EDITOR DE MAPA (Corrigida)
+    // ===================================================================
     const initFullMapEditor = () => {
         const mapContainerId = 'full-map-container';
         const formContainer = document.getElementById('pointDetailsFormContainer');
         const pointLatInput = document.getElementById('pointLat');
         const pointLngInput = document.getElementById('pointLng');
         const pointNameInput = document.getElementById('pointName');
-        // NOVO: Referência ao campo de Endereço
         const pointAddressInput = document.getElementById('pointAddress');
 
-        if (typeof L === 'undefined' || typeof L.Control.Geocoder === 'undefined') {
-            console.error("Leaflet ou o Geocoder não estão carregados.");
+        if (typeof L === 'undefined') {
+            console.error("Leaflet não carregado.");
             return;
         }
 
@@ -1412,60 +1753,97 @@ document.addEventListener('DOMContentLoaded', () => {
 
             renderCollectionPointsOnFullMap();
 
-            // *** INTEGRAÇÃO REAL DO GEOCODER ***
+            // 1. INTEGRAÇÃO DO GEOCODER (BUSCA POR TEXTO)
             const geocoder = L.Control.Geocoder.nominatim();
-
             L.Control.geocoder({
                 query: "Blumenau, SC",
-                placeholder: "Digite o endereço completo aqui...",
+                placeholder: "Buscar endereço...",
                 defaultMarkGeocode: false,
                 geocoder: geocoder
             })
                 .on('markgeocode', function (e) {
-                    const latlng = e.geocode.center;
+                    updateMarkerAndForm(e.geocode.center, e.geocode.name);
+                })
+                .addTo(fullMapInstance);
 
-                    // 1. Remove o marcador temporário anterior, se existir
-                    if (tempNewMarker) {
-                        fullMapInstance.removeLayer(tempNewMarker);
-                    }
+            // 2. CLIQUE NO MAPA (CORRIGIDO)
+            fullMapInstance.on('click', async function (e) {
+                const latlng = e.latlng;
 
-                    // 2. Cria o novo marcador temporário e preenche o formulário
-                    tempNewMarker = L.marker(latlng, { draggable: true }).addTo(fullMapInstance)
-                        .bindPopup(`Local encontrado: ${e.geocode.name}`).openPopup();
+                // Feedback imediato
+                updateMarkerAndForm(latlng, "Carregando endereço...");
 
-                    // 3. Centraliza e preenche campos
-                    fullMapInstance.setView(latlng, 17);
-                    pointLatInput.value = latlng.lat;
-                    pointLngInput.value = latlng.lng;
+                try {
+                    // CORREÇÃO AQUI: Usar latlng.lng em vez de latlng.lon
+                    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`;
 
-                    // CORRIGIDO: O resultado completo da busca do Geocoder vai para o campo Endereço
-                    pointAddressInput.value = e.geocode.name;
-
-                    // O campo 'pointName' (nome curto) é deixado para o administrador preencher manualmente.
-                    // Se o campo de Endereço ainda estiver vazio, preenche o Nome com o resultado da busca.
-                    if (pointNameInput.value.trim() === '') {
-                        pointNameInput.value = e.geocode.name.split(',')[0].trim(); // Pega a primeira parte como nome sugerido
-                    }
-
-
-                    // 4. Configura o arrasto para atualização das coordenadas
-                    tempNewMarker.on('dragend', function (e) {
-                        const newLatlng = e.target.getLatLng();
-                        pointLatInput.value = newLatlng.lat;
-                        pointLngInput.value = newLatlng.lng;
-                        e.target.openPopup();
+                    const response = await fetch(url, {
+                        headers: {
+                            'User-Agent': 'EcoLogicaAdmin/1.0' // Boa prática para APIs abertas
+                        }
                     });
 
-                    // 5. Exibe o formulário de detalhes
-                    formContainer.style.display = 'block';
-                    formContainer.scrollIntoView({ behavior: 'smooth' });
+                    if (!response.ok) throw new Error("Erro na resposta da API");
 
-                }).addTo(fullMapInstance);
-            // *************************************************************
+                    const data = await response.json();
+
+                    if (data && data.display_name) {
+                        pointAddressInput.value = data.display_name;
+
+                        // Sugere nome curto
+                        if (pointNameInput.value.trim() === '' || pointNameInput.value === 'Carregando endereço...') {
+                            const street = data.address.road || data.address.pedestrian || data.address.suburb || "Novo Ponto";
+                            pointNameInput.value = street;
+                        }
+
+                        if (tempNewMarker) {
+                            tempNewMarker.setPopupContent(`Local: ${data.display_name}`).openPopup();
+                        }
+                    } else {
+                        // Caso a API responda mas não ache o endereço (ex: meio do oceano)
+                        pointAddressInput.value = "Endereço não identificado (Defina manualmente)";
+                    }
+                } catch (error) {
+                    console.error("Erro na geocodificação:", error);
+                    pointAddressInput.value = "Erro ao buscar endereço (Verifique conexão)";
+                }
+            });
 
         } else {
             fullMapInstance.invalidateSize();
             renderCollectionPointsOnFullMap();
+        }
+
+        // FUNÇÃO AUXILIAR (MANTIDA IGUAL)
+        function updateMarkerAndForm(latlng, addressName) {
+            if (tempNewMarker) fullMapInstance.removeLayer(tempNewMarker);
+
+            tempNewMarker = L.marker(latlng, { draggable: true }).addTo(fullMapInstance);
+            tempNewMarker.bindPopup(`Local selecionado`).openPopup();
+
+            tempNewMarker.on('dragend', function (e) {
+                const newPos = e.target.getLatLng();
+                pointLatInput.value = newPos.lat;
+                pointLngInput.value = newPos.lng;
+            });
+
+            fullMapInstance.setView(latlng, fullMapInstance.getZoom());
+            pointLatInput.value = latlng.lat;
+            pointLngInput.value = latlng.lng;
+
+            if (addressName) {
+                pointAddressInput.value = addressName;
+                if (pointNameInput.value.trim() === '') {
+                    pointNameInput.value = addressName.split(',')[0].trim();
+                }
+            }
+
+            formContainer.style.display = 'block';
+
+            // Limpa checkboxes para garantir estado limpo no novo ponto
+            const checkboxes = document.querySelectorAll('.point-type-checkbox');
+            checkboxes.forEach(cb => cb.checked = false);
+            document.getElementById('pointIsActive').checked = true;
         }
     };
 
@@ -1674,94 +2052,183 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ===================================================================
-    // FUNÇÃO: GERENCIA O MODAL "VER TODAS" E AÇÕES DA TABELA
+    // FUNÇÃO: GERENCIA O MODAL "VER TODAS" (Correção Definitiva da Aba Editar)
     // ===================================================================
     const handleViewAllCompaniesModal = () => {
         const modalElement = document.getElementById('viewAllCompaniesModal');
         const addCompanyTab = document.getElementById('add-company-tab');
+        const recyclersTab = document.getElementById('view-recyclers-tab'); // <--- NOVO
+        const supportersTab = document.getElementById('view-supporters-tab'); // <--- NOVO
+        const searchInput = document.getElementById('companySearchInput');
+
+        // --- ESTADO DA VISUALIZAÇÃO ---
+        let sortCol = 'id';
+        let sortDir = 'asc';
+        let pageRecyclers = 1;
+        let pageSupporters = 1;
+        const itemsPerPage = 5;
 
         if (!modalElement || !addCompanyTab) return;
 
-        // 1. LISTENER DA ABA 'ADICIONAR'
+        // --- FUNÇÃO AUXILIAR: ESCONDER ABA DE EDIÇÃO ---
+        const hideEditTab = () => {
+            const editTabContainer = document.getElementById('edit-company-tab-container');
+            if (editTabContainer) editTabContainer.classList.add('d-none');
+        };
+
+        // --- FUNÇÃO CENTRAL DE ATUALIZAÇÃO ---
+        const updateView = () => {
+            // ... (Lógica de filtro mantida igual) ...
+            const term = searchInput ? searchInput.value.toLowerCase().trim() : '';
+            const matchesSearch = (company) => {
+                if (!term) return true;
+                const nameMatch = company.name.toLowerCase().includes(term);
+                const cnpjClean = company.cnpj ? company.cnpj.replace(/\D/g, '') : '';
+                const cnpjMatch = (company.cnpj && company.cnpj.includes(term)) || cnpjClean.includes(term);
+                return nameMatch || cnpjMatch;
+            };
+
+            let filteredRecyclers = simulatedRecyclers.filter(matchesSearch);
+            let filteredSupporters = simulatedSupporters.filter(matchesSearch);
+
+            // ... (Lógica de ordenação mantida igual) ...
+            const sortFunction = (a, b) => {
+                let valA = a[sortCol];
+                let valB = b[sortCol];
+                if (valA == null) valA = "";
+                if (valB == null) valB = "";
+                if (typeof valA === 'string') valA = valA.toLowerCase();
+                if (typeof valB === 'string') valB = valB.toLowerCase();
+                if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+                if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+                return 0;
+            };
+            filteredRecyclers.sort(sortFunction);
+            filteredSupporters.sort(sortFunction);
+
+            // ... (Lógica de paginação mantida igual) ...
+            // Recicladoras
+            const totalPagesRec = Math.ceil(filteredRecyclers.length / itemsPerPage) || 1;
+            if (pageRecyclers > totalPagesRec) pageRecyclers = totalPagesRec;
+            if (pageRecyclers < 1) pageRecyclers = 1;
+            const startRec = (pageRecyclers - 1) * itemsPerPage;
+            const endRec = startRec + itemsPerPage;
+            const paginatedRecyclers = filteredRecyclers.slice(startRec, endRec);
+            renderCompanyTable('recyclersTableContainer', paginatedRecyclers, sortCol, sortDir, pageRecyclers, totalPagesRec, 'recicladora');
+
+            // Apoiadoras
+            const totalPagesSup = Math.ceil(filteredSupporters.length / itemsPerPage) || 1;
+            if (pageSupporters > totalPagesSup) pageSupporters = totalPagesSup;
+            if (pageSupporters < 1) pageSupporters = 1;
+            const startSup = (pageSupporters - 1) * itemsPerPage;
+            const endSup = startSup + itemsPerPage;
+            const paginatedSupporters = filteredSupporters.slice(startSup, endSup);
+            renderCompanyTable('supportersTableContainer', paginatedSupporters, sortCol, sortDir, pageSupporters, totalPagesSup, 'apoiadora');
+        };
+
+        // Listener para atualização externa (Salvar)
+        document.addEventListener('refreshCompanyModal', () => { updateView(); });
+
+        // Listener da Busca
+        if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                pageRecyclers = 1; pageSupporters = 1; updateView();
+            });
+        }
+
+        // --- LISTENERS DE ABAS (CORREÇÃO AQUI) ---
+        // 1. Aba Adicionar: Limpa form novo e esconde editar
         addCompanyTab.addEventListener('shown.bs.tab', () => {
             const newForm = document.getElementById('addCompanyFormNew');
             if (newForm) newForm.reset();
-
-            const editTabContainer = document.getElementById('edit-company-tab-container');
-            if (editTabContainer) editTabContainer.classList.add('d-none');
+            hideEditTab(); // <--- Usa a função auxiliar
         });
 
-        // 2. AO ABRIR O MODAL (ATUALIZADO PARA ESCONDER A ABA DE EDIÇÃO)
+        // 2. Abas de Listagem: TAMBÉM escondem a aba editar agora
+        if (recyclersTab) recyclersTab.addEventListener('shown.bs.tab', hideEditTab);
+        if (supportersTab) supportersTab.addEventListener('shown.bs.tab', hideEditTab);
+        // -----------------------------------------
+
+        // Listener ao Abrir Modal
         modalElement.addEventListener('show.bs.modal', (event) => {
-            // Renderiza as tabelas
-            renderCompanyTable('recyclersTableContainer', simulatedRecyclers);
-            renderCompanyTable('supportersTableContainer', simulatedSupporters);
+            if (searchInput) searchInput.value = '';
+            sortCol = 'id'; sortDir = 'asc';
+            pageRecyclers = 1; pageSupporters = 1;
 
-            // --- CORREÇÃO: Força a aba de edição a ficar escondida e limpa ---
-            const editTabContainer = document.getElementById('edit-company-tab-container');
-            if (editTabContainer) {
-                editTabContainer.classList.add('d-none'); // Adiciona a classe invisível novamente
-            }
+            updateView();
+
+            hideEditTab(); // Esconde aba editar ao abrir
             const editForm = document.getElementById('editCompanyForm');
-            if (editForm) editForm.reset(); // Garante que o form esteja limpo
-            // -----------------------------------------------------------------
+            if (editForm) editForm.reset();
 
-            // Decide qual aba mostrar inicialmente (Recicladoras ou Apoiadoras)
-            const button = event.relatedTarget; // Botão que clicou para abrir o modal
+            const button = event.relatedTarget;
             const rawCompanyType = button ? button.dataset.companyType : null;
             let targetTabId = (rawCompanyType === 'apoiadora') ? 'view-supporters-tab' : 'view-recyclers-tab';
-
             const targetTabElement = document.getElementById(targetTabId);
-            if (targetTabElement) {
-                const tabInstance = new bootstrap.Tab(targetTabElement);
-                tabInstance.show();
-            }
+            if (targetTabElement) { new bootstrap.Tab(targetTabElement).show(); }
         });
 
-        // 3. LISTENER DE CLIQUES NA TABELA
+        // Listener Global (Cliques)
         modalElement.addEventListener('click', (event) => {
+            // ... (Lógica de Paginação mantida igual) ...
+            const pageLink = event.target.closest('.company-page-link');
+            if (pageLink) {
+                event.preventDefault();
+                const li = pageLink.closest('.page-item');
+                if (li.classList.contains('disabled') || li.classList.contains('active')) return;
+                const targetPage = pageLink.dataset.page;
+                const type = pageLink.dataset.tableType;
+                let currentPage = (type === 'recicladora') ? pageRecyclers : pageSupporters;
+                if (targetPage === 'prev') currentPage = Math.max(1, currentPage - 1);
+                else if (targetPage === 'next') currentPage++;
+                else currentPage = parseInt(targetPage);
+                if (type === 'recicladora') pageRecyclers = currentPage;
+                else pageSupporters = currentPage;
+                updateView();
+                return;
+            }
+
+            // ... (Lógica de Ordenação mantida igual) ...
+            const header = event.target.closest('.sortable-header');
+            if (header) {
+                const column = header.dataset.sortKey;
+                if (column === sortCol) sortDir = (sortDir === 'asc') ? 'desc' : 'asc';
+                else { sortCol = column; sortDir = 'asc'; }
+                updateView();
+                return;
+            }
+
+            // ... (Lógica de Ações mantida igual) ...
             const button = event.target.closest('.company-modal-action-btn');
             if (!button) return;
-
             event.preventDefault();
-
             const action = button.dataset.action;
             const companyId = parseInt(button.dataset.id);
             const companyType = button.dataset.type;
 
             let company;
-            if (companyType === 'recicladora') {
-                company = simulatedRecyclers.find(c => c.id === companyId);
-            } else {
-                company = simulatedSupporters.find(c => c.id === companyId);
-            }
-
+            if (companyType === 'recicladora') company = simulatedRecyclers.find(c => c.id === companyId);
+            else company = simulatedSupporters.find(c => c.id === companyId);
             if (!company) return;
 
             if (action === 'edit') {
-                // Preenche o formulário
+                // Preenche Form
                 document.getElementById('editCompanyId').value = company.id;
                 document.getElementById('editCompanyName').value = company.name;
                 document.getElementById('editCompanyEmail').value = company.email;
+                document.getElementById('editCompanyPhone').value = company.phone || '';
                 document.getElementById('editCompanyCNPJ').value = company.cnpj || '';
                 document.getElementById('editCompanyAddress').value = company.address || '';
-
                 document.getElementById('editCompanyTypeDisplay').innerText = company.type.toUpperCase();
                 document.getElementById('editCompanyTypeHidden').value = company.type;
                 document.getElementById('editingCompanyNameDisplay').innerText = company.name;
 
-                // Mostra a aba de edição
+                // Mostra aba
                 const editTabContainer = document.getElementById('edit-company-tab-container');
-                if (editTabContainer) {
-                    editTabContainer.classList.remove('d-none');
-                }
-
-                // Ativa a aba visualmente
+                if (editTabContainer) editTabContainer.classList.remove('d-none');
                 const editTabBtn = document.getElementById('edit-company-tab');
-                if (editTabBtn) {
-                    const tabInstance = new bootstrap.Tab(editTabBtn);
-                    tabInstance.show();
-                }
+                if (editTabBtn) new bootstrap.Tab(editTabBtn).show();
+
             } else if (action === 'delete') {
                 if (confirm(`Tem certeza que deseja EXCLUIR a empresa "${company.name}"?`)) {
                     if (companyType === 'recicladora') {
@@ -1771,16 +2238,221 @@ document.addEventListener('DOMContentLoaded', () => {
                         simulatedSupporters = simulatedSupporters.filter(c => c.id !== companyId);
                         localStorage.setItem('ecoLogica_Supporters', JSON.stringify(simulatedSupporters));
                     }
-
-                    renderCompanyTable('recyclersTableContainer', simulatedRecyclers);
-                    renderCompanyTable('supportersTableContainer', simulatedSupporters);
                     renderCompanyList(recyclerListSelector, simulatedRecyclers);
                     renderCompanyList(supporterListSelector, simulatedSupporters);
-
+                    updateView();
                     alert("Empresa excluída com sucesso!");
                 }
             }
         });
+    };
+
+    // ===================================================================
+    // NOVA FUNÇÃO: GERENCIA O REGISTRO MANUAL DE LOGS (COLETAS)
+    // ===================================================================
+    const handleLogForm = () => {
+        const form = document.getElementById('addLogForm');
+        const modalElement = document.getElementById('addLogModal');
+        const btnOpen = document.getElementById('btnOpenAddLog');
+
+        const userSelect = document.getElementById('logUserSelect');
+        const companySelect = document.getElementById('logCompanySelect');
+
+        // Função para carregar as listas nos Selects
+        const populateSelects = () => {
+            // 1. Usuários
+            userSelect.innerHTML = '<option value="" selected disabled>Selecione um usuário...</option>';
+            simulatedUsers.forEach(u => {
+                if (u.status === 'Ativo') { // Só mostra ativos
+                    const option = document.createElement('option');
+                    option.value = u.name; // Usando nome para simplificar visualização no log
+                    option.textContent = `${u.name} (ID: ${u.id})`;
+                    userSelect.appendChild(option);
+                }
+            });
+
+            // 2. Empresas (Apenas Recicladoras fazem sentido para coleta)
+            companySelect.innerHTML = '<option value="" selected disabled>Selecione a empresa...</option>';
+            simulatedRecyclers.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c.name;
+                option.textContent = c.name;
+                companySelect.appendChild(option);
+            });
+        };
+
+        // Ao abrir o modal, carrega as listas frescas
+        if (btnOpen) {
+            btnOpen.addEventListener('click', () => {
+                populateSelects();
+                form.reset();
+                // Define data padrão como agora
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById('logDateInput').value = now.toISOString().slice(0, 16);
+            });
+        }
+
+        // Salvar Log
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const userName = userSelect.value;
+                const companyName = companySelect.value;
+                const details = document.getElementById('logMaterialInput').value.trim();
+                const pointsVal = parseInt(document.getElementById('logPointsInput').value);
+                const dateVal = document.getElementById('logDateInput').value;
+
+                if (!userName || !companyName || !details || isNaN(pointsVal)) {
+                    alert("Preencha todos os campos obrigatórios.");
+                    return;
+                }
+
+                // Cria o objeto Log
+                const newLog = {
+                    id: Date.now(), // ID único baseado no tempo
+                    timestamp: dateVal ? dateVal.replace('T', ' ') : new Date().toLocaleString('pt-BR'),
+                    user: userName,
+                    action: "Registro Material",
+                    details: details,
+                    points: `+${pointsVal}`, // Formato visual com +
+                    company: companyName
+                };
+
+                // 1. Adiciona ao array de Logs
+                simulatedLogs.unshift(newLog); // Adiciona no começo da lista
+
+                // 2. Atualiza Pontos do Usuário (Opcional, mas recomendável)
+                const userIndex = simulatedUsers.findIndex(u => u.name === userName);
+                if (userIndex !== -1) {
+                    simulatedUsers[userIndex].points += pointsVal;
+                    localStorage.setItem('ecoLogica_Users', JSON.stringify(simulatedUsers)); // Salva usuários
+                    // Se a tabela de usuários estiver visível, atualize-a:
+                    populateUserTable();
+                }
+
+                // 3. Atualiza Tabela de Logs na tela
+                filteredLogList = [...simulatedLogs]; // Reseta filtro
+                currentLogPage = 1;
+                populateLogTable();
+
+                // 4. ATUALIZA OS GRÁFICOS! (A mágica acontece aqui)
+                initAdminCharts();
+
+                // Fecha e Feedback
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                modalInstance.hide();
+                alert("Coleta registrada com sucesso! Gráficos e pontos atualizados.");
+            });
+        }
+    };
+
+    // ===================================================================
+    // NOVA FUNÇÃO: EXPORTAR DADOS PARA CSV (Excel)
+    // ===================================================================
+    const setupExportButtons = () => {
+
+        // Função Genérica para Converter JSON em CSV e Baixar
+        const downloadCSV = (data, filename, headers) => {
+            if (!data || data.length === 0) {
+                alert("Não há dados para exportar.");
+                return;
+            }
+
+            // 1. Cria o cabeçalho do CSV
+            const csvRows = [];
+            // Mapeia as chaves do objeto para o cabeçalho (ex: "Nome;Email;Status")
+            const headerKeys = Object.keys(headers);
+            const headerLabels = Object.values(headers);
+            csvRows.push(headerLabels.join(';')); // Usa ponto-e-vírgula (padrão Excel BR)
+
+            // 2. Preenche as linhas
+            data.forEach(row => {
+                const values = headerKeys.map(key => {
+                    let val = row[key];
+                    // Tratamento para evitar quebras se o texto tiver ; ou quebra de linha
+                    if (val === null || val === undefined) val = '';
+                    val = String(val).replace(/"/g, '""'); // Escapa aspas duplas
+                    return `"${val}"`; // Envolve em aspas
+                });
+                csvRows.push(values.join(';'));
+            });
+
+            // 3. Cria o arquivo Blob
+            // \ufeff adiciona o BOM para o Excel reconhecer acentos (UTF-8)
+            const csvString = '\ufeff' + csvRows.join('\n');
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+
+            // 4. Dispara o download
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        // --- BOTÃO 1: EXPORTAR USUÁRIOS ---
+        const btnExportUsers = document.getElementById('btnExportUsers');
+        if (btnExportUsers) {
+            btnExportUsers.addEventListener('click', () => {
+                // Define quais colunas queremos exportar e o nome bonito delas
+                const headers = {
+                    id: 'ID',
+                    name: 'Nome Completo',
+                    email: 'Email',
+                    points: 'Pontos',
+                    status: 'Status'
+                };
+                // Exporta a lista filtrada atual (se quiser exportar tudo, use simulatedUsers)
+                const dataToExport = filteredUserList.length > 0 ? filteredUserList : simulatedUsers;
+                downloadCSV(dataToExport, 'relatorio_usuarios.csv', headers);
+            });
+        }
+
+        // --- BOTÃO 2: EXPORTAR LOGS ---
+        const btnExportLogs = document.getElementById('btnExportLogs');
+        if (btnExportLogs) {
+            btnExportLogs.addEventListener('click', () => {
+                const headers = {
+                    timestamp: 'Data/Hora',
+                    user: 'Usuário',
+                    action: 'Ação',
+                    details: 'Detalhes',
+                    points: 'Pontos',
+                    company: 'Empresa Envolvida'
+                };
+                // Exporta a lista filtrada atual
+                const dataToExport = filteredLogList.length > 0 ? filteredLogList : simulatedLogs;
+                downloadCSV(dataToExport, 'relatorio_logs_reciclagem.csv', headers);
+            });
+        }
+
+        // --- BOTÃO 3: EXPORTAR EMPRESAS (Merged) ---
+        const btnExportCompanies = document.getElementById('btnExportCompanies');
+        if (btnExportCompanies) {
+            btnExportCompanies.addEventListener('click', () => {
+                // Junta as duas listas e adiciona um campo "Categoria"
+                const recyclers = simulatedRecyclers.map(c => ({ ...c, category: 'Recicladora' }));
+                const supporters = simulatedSupporters.map(c => ({ ...c, category: 'Apoiadora' }));
+                const allCompanies = [...recyclers, ...supporters];
+
+                const headers = {
+                    id: 'ID',
+                    name: 'Razão Social / Nome',
+                    category: 'Tipo',
+                    email: 'Email',
+                    phone: 'Telefone',
+                    cnpj: 'CNPJ',
+                    address: 'Endereço'
+                };
+
+                downloadCSV(allCompanies, 'relatorio_empresas_parceiras.csv', headers);
+            });
+        }
     };
 
     // ===================================================================
@@ -1791,11 +2463,13 @@ document.addEventListener('DOMContentLoaded', () => {
     initAdminCharts();
 
     // Usuários
+    handleUserForm();
     populateUserTable(); // Popula usuários (página 1 de todos)
     handleUserSearchAndFilter(); // Configura filtros/busca/ações de usuários
     handlePagination(); // Configura paginação de usuários
 
     // Logs
+    handleLogForm();
     populateLogTable(); // Popula logs (página 1 de todos)
     handleLogSearchAndFilter(); // Configura filtros de logs
     handleLogPagination(); // Configura paginação de logs
@@ -1810,6 +2484,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Empresas
     handleModalCompanyForms();
     setupCNPJMasks();
+    setupPhoneMasks();
     renderCompanyList(recyclerListSelector, simulatedRecyclers);
     renderCompanyList(supporterListSelector, simulatedSupporters);
 
@@ -1821,6 +2496,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.collection-points-management-section .list-group-flush')
         .addEventListener('click', handlePointsListClick);
     // *** FIM NOVO ***
+
+    // Inicializações Finais
+    setupExportButtons();
 
 
     // Chama a inicialização dos mapas
