@@ -12,6 +12,44 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("admin-dashboard.js: Script carregado.");
 
     // ===================================================================
+    // DADOS DO PERFIL DO ADMIN
+    // ===================================================================
+    const defaultAdminProfile = {
+        name: "Administrador",
+        email: "admin@ecologica.com",
+        avatar: "img/avatar/avatar-adm.png",
+        memberSince: "20/09/2025" // <--- DATA DEFINIDA AQUI
+    };
+
+    // Carrega do localStorage ou usa o padrão (agora inclui a data)
+    let currentAdminProfile = JSON.parse(localStorage.getItem('ecoLogica_AdminProfile')) || defaultAdminProfile;
+
+    // Garante que o campo exista mesmo se já tiver dados salvos antigos
+    if (!currentAdminProfile.memberSince) {
+        currentAdminProfile.memberSince = defaultAdminProfile.memberSince;
+    }
+
+    // Função para atualizar a interface
+    const loadAdminProfileUI = () => {
+        const avatarEl = document.getElementById('admin-avatar-display');
+        const nameEl = document.getElementById('admin-name-display');
+        const emailEl = document.getElementById('admin-email-display');
+        const memberSinceEl = document.getElementById('admin-member-since-display'); // <--- NOVO SELETOR
+        const greetingNameEl = document.querySelector('.admin-profile-name');
+
+        if (avatarEl) avatarEl.src = currentAdminProfile.avatar;
+        if (nameEl) nameEl.textContent = currentAdminProfile.name;
+        if (emailEl) emailEl.textContent = currentAdminProfile.email;
+        if (greetingNameEl) greetingNameEl.textContent = currentAdminProfile.name;
+
+        // Atualiza o texto da data
+        if (memberSinceEl) memberSinceEl.textContent = currentAdminProfile.memberSince;
+    };
+
+    // Carrega a UI inicialmente
+    loadAdminProfileUI();
+
+    // ===================================================================
     // DADOS SIMULADOS E VARIÁVEIS DE PAGINAÇÃO (Atualizado com Logs)
     // ===================================================================
     let storedUsers = localStorage.getItem('ecoLogica_Users');
@@ -1085,6 +1123,107 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ===================================================================
+    // FUNÇÃO: GERENCIA O FORMULÁRIO DE ANÚNCIOS (Criar e Remover)
+    // ===================================================================
+    const handleAnnouncementForm = () => {
+        const form = document.getElementById('announcementForm');
+        const btnRemove = document.getElementById('btnRemoveAnnouncement');
+
+        if (!form) { console.warn("Formulário de anúncios não encontrado."); return; }
+
+        // --- PUBLICAR ANÚNCIO ---
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const text = document.getElementById('announcementText').value.trim();
+            const type = document.getElementById('announcementType').value;
+
+            if (!text) {
+                alert("Por favor, escreva uma mensagem.");
+                return;
+            }
+
+            // Cria o objeto de dados
+            const announcementData = {
+                id: Date.now(),
+                text: text,
+                type: type, // 'info', 'warning', 'success'
+                date: new Date().toLocaleDateString('pt-BR'),
+                active: true
+            };
+
+            // Salva no localStorage para que o site principal possa ler
+            localStorage.setItem('ecoLogica_CurrentAnnouncement', JSON.stringify(announcementData));
+
+            console.log("Anúncio publicado:", announcementData);
+            alert("Anúncio publicado com sucesso! Ele aparecerá no topo das páginas do site.");
+            form.reset();
+        });
+
+        // --- REMOVER ANÚNCIO ---
+        if (btnRemove) {
+            btnRemove.addEventListener('click', () => {
+                if (confirm("Tem certeza que deseja remover o anúncio do site?")) {
+                    // Remove do storage
+                    localStorage.removeItem('ecoLogica_CurrentAnnouncement');
+                    alert("Anúncio removido com sucesso.");
+                    form.reset();
+                }
+            });
+        }
+    };
+
+
+    // ===================================================================
+    // FUNÇÃO: GERENCIA O BANNER PROMOCIONAL (Imagem)
+    // ===================================================================
+    const handleAdBannerForm = () => {
+        const form = document.getElementById('adBannerForm');
+        const btnRemove = document.getElementById('btnRemoveAdBanner');
+
+        if (!form) return;
+
+        // --- PUBLICAR BANNER ---
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const imageUrl = document.getElementById('adBannerImage').value.trim();
+            const linkUrl = document.getElementById('adBannerLink').value.trim();
+            const altText = document.getElementById('adBannerAlt').value.trim();
+
+            if (!imageUrl) {
+                alert("A URL da imagem é obrigatória.");
+                return;
+            }
+
+            const bannerData = {
+                id: Date.now(),
+                image: imageUrl,
+                link: linkUrl || '#',
+                alt: altText,
+                active: true
+            };
+
+            localStorage.setItem('ecoLogica_AdBanner', JSON.stringify(bannerData));
+
+            console.log("Banner publicado:", bannerData);
+            alert("Banner de propaganda publicado com sucesso!");
+            form.reset();
+        });
+
+        // --- REMOVER BANNER ---
+        if (btnRemove) {
+            btnRemove.addEventListener('click', () => {
+                if (confirm("Tem certeza que deseja remover o banner de propaganda?")) {
+                    localStorage.removeItem('ecoLogica_AdBanner');
+                    alert("Banner removido.");
+                    form.reset();
+                }
+            });
+        }
+    };
+
+    // ===================================================================
     // FUNÇÃO: GERENCIA O FORMULÁRIO "CONFIGURAÇÕES GERAIS"
     // ===================================================================
     const handleSiteSettingsForm = () => {
@@ -1726,7 +1865,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // *** FIM NOVA FUNÇÃO ***
 
     // ===================================================================
-    // FUNÇÃO: INICIALIZA O EDITOR DE MAPA (Corrigida)
+    // FUNÇÃO: INICIALIZA O EDITOR DE MAPA (Endereço Padronizado e Limpo)
     // ===================================================================
     const initFullMapEditor = () => {
         const mapContainerId = 'full-map-container';
@@ -1753,60 +1892,123 @@ document.addEventListener('DOMContentLoaded', () => {
 
             renderCollectionPointsOnFullMap();
 
-            // 1. INTEGRAÇÃO DO GEOCODER (BUSCA POR TEXTO)
+            // --- FUNÇÃO CENTRAL: BUSCA E FORMATA O ENDEREÇO ---
+            const fetchAndFormatAddress = async (lat, lng, suggestedName = "") => {
+
+                // Feedback visual
+                updateMarkerAndForm({ lat, lng }, "Formatando endereço...");
+
+                try {
+                    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`;
+                    const response = await fetch(url, { headers: { 'User-Agent': 'EcoLogicaAdmin/1.0' } });
+                    if (!response.ok) throw new Error("Erro na API");
+                    const data = await response.json();
+
+                    if (data && data.address) {
+                        const addr = data.address;
+                        let parts = [];
+
+                        // 1. LOGRADOURO (Com abreviações)
+                        let logradouro = addr.road || "";
+                        // Mapa de abreviações comuns
+                        logradouro = logradouro.replace(/^Avenida/i, 'Av.')
+                            .replace(/^Doutor/i, 'Dr.')
+                            .replace(/^Engenheiro/i, 'Eng.')
+                            .replace(/^Professor/i, 'Prof.')
+                            .replace(/^Coronel/i, 'Cel.')
+                            .replace(/^General/i, 'Gen.');
+
+                        if (logradouro) parts.push(logradouro);
+
+                        // 2. NÚMERO
+                        if (addr.house_number) parts.push(addr.house_number);
+
+                        // 3. COMPLEMENTO / BAIRRO
+                        // Às vezes o andar vem em 'flats' ou no nome extra
+                        // Vamos montar o bloco do meio: " - Bairro" ou " - Complemento - Bairro"
+                        let middleParts = [];
+
+                        // Tenta pegar complemento se disponível (raro na API free, mas preventivo)
+                        if (addr.flats) middleParts.push(addr.flats);
+
+                        const bairro = addr.suburb || addr.neighbourhood || addr.city_district || addr.village;
+                        if (bairro) middleParts.push(bairro);
+
+                        // Junta logradouro e número com vírgula
+                        let finalString = parts.join(', ');
+
+                        // Adiciona o meio com " - "
+                        if (middleParts.length > 0) {
+                            finalString += ` - ${middleParts.join(' - ')}`;
+                        }
+
+                        // 4. CIDADE - ESTADO (Sigla)
+                        const cidade = addr.city || addr.town || addr.municipality;
+                        let estado = addr.state || "";
+
+                        // Mapa de Estados para Sigla (Adicione outros se precisar)
+                        const stateMap = {
+                            "Santa Catarina": "SC", "Paraná": "PR", "Rio Grande do Sul": "RS",
+                            "São Paulo": "SP", "Rio de Janeiro": "RJ", "Minas Gerais": "MG"
+                        };
+                        if (stateMap[estado]) estado = stateMap[estado];
+
+                        if (cidade && estado) {
+                            finalString += `, ${cidade} - ${estado}`;
+                        } else if (cidade) {
+                            finalString += `, ${cidade}`;
+                        }
+
+                        // 5. CEP
+                        if (addr.postcode) {
+                            finalString += `, ${addr.postcode}`;
+                        }
+
+                        // --- ATUALIZAÇÃO FINAL DO INPUT ---
+                        pointAddressInput.value = finalString;
+
+                        // Atualiza Popup
+                        if (tempNewMarker) tempNewMarker.setPopupContent(`<b>Local:</b><br>${finalString}`).openPopup();
+
+                        // Sugere nome se vazio (Prioriza o nome do local buscado ou a rua)
+                        if (pointNameInput.value.trim() === '' || pointNameInput.value === 'Carregando endereço...' || pointNameInput.value === 'Formatando endereço...') {
+                            // Se veio de uma busca (suggestedName), usa o nome do local (ex: Senac)
+                            // Se for clique, usa o nome da rua
+                            if (suggestedName && !suggestedName.includes(',')) {
+                                pointNameInput.value = suggestedName;
+                            } else {
+                                // Pega a primeira parte do nome sugerido ou o logradouro
+                                const shortName = suggestedName ? suggestedName.split(',')[0] : (logradouro || bairro || "Novo Ponto");
+                                pointNameInput.value = shortName;
+                            }
+                        }
+
+                    } else {
+                        pointAddressInput.value = "Endereço não identificado";
+                    }
+                } catch (e) {
+                    console.error(e);
+                    pointAddressInput.value = "Erro na conexão com mapa";
+                }
+            };
+
+            // 1. EVENTO DE BUSCA (GEOCODER)
             const geocoder = L.Control.Geocoder.nominatim();
             L.Control.geocoder({
                 query: "Blumenau, SC",
-                placeholder: "Buscar endereço...",
+                placeholder: "Buscar (Ex: Senac Blumenau)...",
                 defaultMarkGeocode: false,
                 geocoder: geocoder
             })
                 .on('markgeocode', function (e) {
-                    updateMarkerAndForm(e.geocode.center, e.geocode.name);
+                    // Passa o nome original da busca para usar como sugestão de Nome do Ponto
+                    fetchAndFormatAddress(e.geocode.center.lat, e.geocode.center.lng, e.geocode.name);
                 })
                 .addTo(fullMapInstance);
 
-            // 2. CLIQUE NO MAPA (CORRIGIDO)
-            fullMapInstance.on('click', async function (e) {
-                const latlng = e.latlng;
-
-                // Feedback imediato
-                updateMarkerAndForm(latlng, "Carregando endereço...");
-
-                try {
-                    // CORREÇÃO AQUI: Usar latlng.lng em vez de latlng.lon
-                    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`;
-
-                    const response = await fetch(url, {
-                        headers: {
-                            'User-Agent': 'EcoLogicaAdmin/1.0' // Boa prática para APIs abertas
-                        }
-                    });
-
-                    if (!response.ok) throw new Error("Erro na resposta da API");
-
-                    const data = await response.json();
-
-                    if (data && data.display_name) {
-                        pointAddressInput.value = data.display_name;
-
-                        // Sugere nome curto
-                        if (pointNameInput.value.trim() === '' || pointNameInput.value === 'Carregando endereço...') {
-                            const street = data.address.road || data.address.pedestrian || data.address.suburb || "Novo Ponto";
-                            pointNameInput.value = street;
-                        }
-
-                        if (tempNewMarker) {
-                            tempNewMarker.setPopupContent(`Local: ${data.display_name}`).openPopup();
-                        }
-                    } else {
-                        // Caso a API responda mas não ache o endereço (ex: meio do oceano)
-                        pointAddressInput.value = "Endereço não identificado (Defina manualmente)";
-                    }
-                } catch (error) {
-                    console.error("Erro na geocodificação:", error);
-                    pointAddressInput.value = "Erro ao buscar endereço (Verifique conexão)";
-                }
+            // 2. EVENTO DE CLIQUE
+            fullMapInstance.on('click', function (e) {
+                fetchAndFormatAddress(e.latlng.lat, e.latlng.lng);
             });
 
         } else {
@@ -1814,37 +2016,34 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCollectionPointsOnFullMap();
         }
 
-        // FUNÇÃO AUXILIAR (MANTIDA IGUAL)
-        function updateMarkerAndForm(latlng, addressName) {
+        // Helper simples para posicionar o pino antes do fetch terminar
+        function updateMarkerAndForm(latlng, placeholderText) {
             if (tempNewMarker) fullMapInstance.removeLayer(tempNewMarker);
 
             tempNewMarker = L.marker(latlng, { draggable: true }).addTo(fullMapInstance);
-            tempNewMarker.bindPopup(`Local selecionado`).openPopup();
+            tempNewMarker.bindPopup(placeholderText).openPopup();
 
+            // Permite arrastar e atualizar novamente
             tempNewMarker.on('dragend', function (e) {
                 const newPos = e.target.getLatLng();
+                fetchAndFormatAddress(newPos.lat, newPos.lng);
                 pointLatInput.value = newPos.lat;
                 pointLngInput.value = newPos.lng;
             });
 
-            fullMapInstance.setView(latlng, fullMapInstance.getZoom());
+            fullMapInstance.setView(latlng, 16); // Zoom mais próximo ao encontrar
             pointLatInput.value = latlng.lat;
             pointLngInput.value = latlng.lng;
-
-            if (addressName) {
-                pointAddressInput.value = addressName;
-                if (pointNameInput.value.trim() === '') {
-                    pointNameInput.value = addressName.split(',')[0].trim();
-                }
-            }
+            pointAddressInput.value = placeholderText;
 
             formContainer.style.display = 'block';
-
-            // Limpa checkboxes para garantir estado limpo no novo ponto
             const checkboxes = document.querySelectorAll('.point-type-checkbox');
             checkboxes.forEach(cb => cb.checked = false);
             document.getElementById('pointIsActive').checked = true;
         }
+
+        const fetchAndFormatAddress = async (lat, lng, suggestedName = "") => {
+        };
     };
 
     // Função helper para listar pontos no modal E RENDERIZAR MARCADORES NO MAPA GRANDE
@@ -2480,6 +2679,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configurações Sidebar
     handlePointsSystemForm();
     handleSiteSettingsForm();
+
+    // Anúncios
+    handleAnnouncementForm();
+    handleAdBannerForm();
 
     // Empresas
     handleModalCompanyForms();

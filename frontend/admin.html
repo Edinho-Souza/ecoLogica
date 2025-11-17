@@ -18,10 +18,14 @@
 
 <body>
 
+    <div id="site-announcement-container"></div>
     <header id="placeholder-header"></header>
 
     <main>
         <div id="placeholder-menu"></div>
+
+        <div id="site-ad-banner-container" class="container text-center mt-4 mb-4" style="display: none;">
+        </div>
 
         <div class="content-wrapper admin-dashboard">
             <h1>Painel de Administração</h1>
@@ -42,6 +46,9 @@
 
                         <div class="admin-profile-content">
                             <div class="admin-profile-info-group">
+                                <p><strong>Membro desde:</strong> <span
+                                        id="admin-member-since-display">--/--/----</span></p>
+
                                 <p><strong>Nome:</strong> <span id="admin-name-display">Administrador</span>
                                 </p>
                                 <p><strong>Email:</strong> <span id="admin-email-display">admin@ecologica.com</span></p>
@@ -456,22 +463,58 @@
                     </section>
 
                     <section class="dashboard-section announcements-section mb-4">
-                        <h3>Criar Anúncio no Site</h3>
+                        <h3><i class="fas fa-bullhorn me-2"></i>Avisos Informativos (Texto)</h3>
                         <form id="announcementForm">
                             <div class="mb-2">
-                                <label for="announcementText" class="form-label">Mensagem</label>
-                                <textarea class="form-control form-control-sm" id="announcementText" rows="3"
-                                    placeholder="Ex: Manutenção programada para domingo..." required></textarea>
+                                <label for="announcementText" class="form-label">Mensagem de Texto</label>
+                                <textarea class="form-control form-control-sm" id="announcementText" rows="2"
+                                    placeholder="Ex: Manutenção no servidor domingo às 14h..." required></textarea>
                             </div>
                             <div class="mb-2">
-                                <label for="announcementType" class="form-label">Tipo</label>
+                                <label for="announcementType" class="form-label">Cor do Aviso</label>
                                 <select id="announcementType" class="form-select form-select-sm">
-                                    <option value="info" selected>Informativo (Azul)</option>
-                                    <option value="warning">Atenção (Amarelo)</option>
-                                    <option value="success">Sucesso (Verde)</option>
+                                    <option value="info" selected>Azul (Informativo)</option>
+                                    <option value="warning">Amarelo (Atenção)</option>
+                                    <option value="success">Verde (Sucesso)</option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-sm btn-secondary w-100">Publicar Anúncio</button>
+                            <button type="submit" class="btn btn-sm btn-secondary w-100 mb-2">Publicar Aviso</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger w-100"
+                                id="btnRemoveAnnouncement">
+                                <i class="fas fa-trash-alt me-1"></i> Remover Aviso
+                            </button>
+                        </form>
+                    </section>
+
+                    <section class="dashboard-section ad-banner-section mb-4">
+                        <h3><i class="fas fa-ad me-2"></i>Banner Promocional (Imagem)</h3>
+                        <p class="text-muted small mb-3">Exibe uma faixa de imagem no topo do site.</p>
+
+                        <form id="adBannerForm">
+                            <div class="mb-2">
+                                <label for="adBannerImage" class="form-label">URL da Imagem</label>
+                                <input type="url" class="form-control form-control-sm" id="adBannerImage"
+                                    placeholder="https://site.com/banner-promo.jpg" required>
+                                <div class="form-text small">Recomendado: Imagem larga e baixa (Ex: 1200x100px).</div>
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="adBannerLink" class="form-label">Link de Destino (Opcional)</label>
+                                <input type="url" class="form-control form-control-sm" id="adBannerLink"
+                                    placeholder="https://parceiro.com.br">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="adBannerAlt" class="form-label">Texto Alternativo (Acessibilidade)</label>
+                                <input type="text" class="form-control form-control-sm" id="adBannerAlt"
+                                    placeholder="Ex: Promoção de dia das mães" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-sm btn-primary w-100 mb-2">Publicar Banner</button>
+
+                            <button type="button" class="btn btn-sm btn-outline-danger w-100" id="btnRemoveAdBanner">
+                                <i class="fas fa-trash-alt me-1"></i> Remover Banner
+                            </button>
                         </form>
                     </section>
 
