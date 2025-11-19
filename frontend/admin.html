@@ -487,15 +487,14 @@
                     </section>
 
                     <section class="dashboard-section ad-banner-section mb-4">
-                        <h3><i class="fas fa-ad me-2"></i>Banner Promocional (Imagem)</h3>
-                        <p class="text-muted small mb-3">Exibe uma faixa de imagem no topo do site.</p>
+                        <h3><i class="fas fa-ad me-2"></i>Banners Promocionais (Carrossel)</h3>
+                        <p class="text-muted small mb-3">Adicione imagens para rotacionar no topo do site.</p>
 
                         <form id="adBannerForm">
                             <div class="mb-2">
                                 <label for="adBannerImage" class="form-label">URL da Imagem</label>
                                 <input type="url" class="form-control form-control-sm" id="adBannerImage"
-                                    placeholder="https://site.com/banner-promo.jpg" required>
-                                <div class="form-text small">Recomendado: Imagem larga e baixa (Ex: 1200x100px).</div>
+                                    placeholder="https://site.com/banner1.jpg" required>
                             </div>
 
                             <div class="mb-2">
@@ -505,17 +504,20 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="adBannerAlt" class="form-label">Texto Alternativo (Acessibilidade)</label>
+                                <label for="adBannerAlt" class="form-label">Texto Alternativo</label>
                                 <input type="text" class="form-control form-control-sm" id="adBannerAlt"
-                                    placeholder="Ex: Promoção de dia das mães" required>
+                                    placeholder="Ex: Promoção de Natal" required>
                             </div>
 
-                            <button type="submit" class="btn btn-sm btn-primary w-100 mb-2">Publicar Banner</button>
-
-                            <button type="button" class="btn btn-sm btn-outline-danger w-100" id="btnRemoveAdBanner">
-                                <i class="fas fa-trash-alt me-1"></i> Remover Banner
+                            <button type="submit" class="btn btn-sm btn-primary w-100 mb-3">
+                                <i class="fas fa-plus me-1"></i> Adicionar ao Carrossel
                             </button>
                         </form>
+
+                        <h6 class="border-bottom pb-2">Banners Ativos</h6>
+                        <div id="active-banners-list" class="list-group list-group-flush small">
+                            <div class="text-muted text-center py-2">Nenhum banner ativo.</div>
+                        </div>
                     </section>
 
                     <section class="dashboard-section site-settings-section">
