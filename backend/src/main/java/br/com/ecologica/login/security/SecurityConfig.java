@@ -11,96 +11,94 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-	@Autowired
-	private JwtAuthenticationFilter jwtAuthenticationFilter;
-	@Autowired
-	private CustomUserDetailsService customUserDetailsService;
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-	@Bean
-	public AuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-		authProvider.setUserDetailsService(customUserDetailsService);
-		authProvider.setPasswordEncoder(passwordEncoder());
-		return authProvider;
-	}
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-		return config.getAuthenticationManager();
-	}
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(AbstractHttpConfigurer::disable)
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Configuração CORS explícita
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .authorizeHttpRequests(auth -> auth
+                // Rotas Públicas
+                .requestMatchers("/api/login/**", "/api/recuperar-senha/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Cadastro
+                .requestMatchers(HttpMethod.GET, 
+                    "/api/campanhas/ativas", 
+                    "/api/noticias/**", 
+                    "/api/ranking",
+                    "/api/beneficios", 
+                    "/api/locais-coleta/**", 
+                    "/api/tipos-materiais",
+                    "/api/orientacoes/ativas").permitAll()
 
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.csrf(csrf -> csrf.disable())
-				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authenticationProvider(authenticationProvider())
-				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-				.authorizeHttpRequests(auth -> auth
-						// Rotas Públicas (Login, Cadastro, Visualização)
-						.requestMatchers("/api/login").permitAll().requestMatchers("/api/recuperar-senha/**")
-						.permitAll().requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/campanhas/ativas").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/noticias").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/ranking").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/beneficios").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/locais-coleta").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/tipos-materiais").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/materiais").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/orientacoes/ativas").permitAll()
-						// Rotas de Admin (Gestão de Conteúdo e Usuários)
-						.requestMatchers("/api/admin/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.POST, "/api/campanhas").hasAuthority("admin")
-						.requestMatchers(HttpMethod.PUT, "/api/campanhas/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.DELETE, "/api/campanhas/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.POST, "/api/noticias").hasAuthority("admin")
-						.requestMatchers(HttpMethod.PUT, "/api/noticias/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.DELETE, "/api_noticias/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.POST, "/api/beneficios").hasAuthority("admin")
-						.requestMatchers(HttpMethod.PUT, "/api/beneficios/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.DELETE, "/api/beneficios/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.POST, "/api/ranking").hasAuthority("admin")
-						.requestMatchers(HttpMethod.POST, "/api/tipos-materiais").hasAuthority("admin")
-						.requestMatchers(HttpMethod.PUT, "/api/tipos-materiais/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.DELETE, "/api/tipos-materiais/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.POST, "/api/materiais").hasAuthority("admin")
-						.requestMatchers(HttpMethod.PUT, "/api/materiais/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.DELETE, "/api/materiais/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.POST, "/api/estatisticas").hasAuthority("admin")
-						.requestMatchers(HttpMethod.POST, "/api/conteudo").hasAuthority("admin")
-						.requestMatchers(HttpMethod.PUT, "/api/conteudo/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.DELETE, "/api/conteudo/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.POST, "/api/orientacoes").hasAuthority("admin")
-						.requestMatchers(HttpMethod.PUT, "/api/orientacoes/**").hasAuthority("admin")
-						.requestMatchers(HttpMethod.DELETE, "/api/orientacoes/**").hasAuthority("admin")
-						//  Permite que admin veja TODAS orientações
-						.requestMatchers(HttpMethod.GET, "/api/orientacoes").hasAuthority("admin")
-						// Rotas de Empresas
-						.requestMatchers(HttpMethod.POST, "/api/locais-coleta").hasAnyAuthority("admin", "recicladora")
-						.requestMatchers(HttpMethod.PUT, "/api/locais-coleta/**")
-						.hasAnyAuthority("admin", "recicladora")
-						.requestMatchers(HttpMethod.DELETE, "/api/locais-coleta/**")
-						.hasAnyAuthority("admin", "recicladora").requestMatchers(HttpMethod.POST, "/api/dias-horarios")
-						.hasAnyAuthority("admin", "recicladora")
-						.requestMatchers(HttpMethod.PUT, "/api/dias-horarios/**")
-						.hasAnyAuthority("admin", "recicladora")
-						.requestMatchers(HttpMethod.DELETE, "/api/dias-horarios/**")
-						.hasAnyAuthority("admin", "recicladora")
-						// Rotas Autenticadas (Ações de Usuário)
-						.anyRequest().authenticated());
-		return http.build();
-	}
+                // Rotas Admin
+                .requestMatchers("/api/admin/**", "/api/conteudo/**", "/api/estatisticas/**").hasAuthority("admin")
+                .requestMatchers(HttpMethod.POST, "/api/campanhas", "/api/noticias", "/api/beneficios", "/api/tipos-materiais", "/api/orientacoes").hasAuthority("admin")
+                .requestMatchers(HttpMethod.PUT, "/api/campanhas/**", "/api/noticias/**", "/api/beneficios/**", "/api/tipos-materiais/**", "/api/orientacoes/**").hasAuthority("admin")
+                .requestMatchers(HttpMethod.DELETE, "/api/**").hasAuthority("admin") 
+
+                // Rotas Recicladora e Admin
+                .requestMatchers("/api/locais-coleta/**", "/api/dias-horarios/**", "/api/materiais/**").hasAnyAuthority("admin", "recicladora")
+                
+                // Rotas Autenticadas (Todas as outras)
+                .anyRequest().authenticated()
+            );
+
+        return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:3000")); // Adicione as URLs do seu front
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }

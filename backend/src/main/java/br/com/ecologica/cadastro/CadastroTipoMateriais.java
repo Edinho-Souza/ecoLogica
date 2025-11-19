@@ -1,11 +1,7 @@
 package br.com.ecologica.cadastro;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import java.util.List;
 
 @Entity
@@ -17,19 +13,19 @@ import java.util.List;
 @EqualsAndHashCode(exclude = "locaisColeta")
 public class CadastroTipoMateriais {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column(name = "nome_tipo", length = 255)
-	private String nomeTipo;
+    @Column(name = "nome_tipo", length = 255)
+    private String nomeTipo;
 
-	@Lob
-	private String descricao;
+    @Lob
+    private String descricao;
 
-	@Column(nullable = false)
-	private boolean ativo = false;
+    @Column(nullable = false)
+    private boolean ativo = true;
 
-	@ManyToMany(mappedBy = "tiposMateriaisAceitos", fetch = FetchType.LAZY)
-	private List<CadastroLocaisColeta> locaisColeta;
+    @ManyToMany(mappedBy = "tiposMateriaisAceitos", fetch = FetchType.LAZY)
+    private List<CadastroLocaisColeta> locaisColeta;
 }
