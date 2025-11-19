@@ -1,6 +1,5 @@
 package br.com.ecologica.login.security;
 
-import br.com.ecologica.login.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import br.com.ecologica.service.CustomUserDetailsService;
+
 import java.io.IOException;
 
 @Component

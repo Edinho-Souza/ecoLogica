@@ -1,8 +1,8 @@
 package br.com.ecologica.visualizacao;
 
-import br.com.ecologica.cadastro.CadastroEmpresasRecicladoras;
-import br.com.ecologica.cadastro.usuarios.model.Usuario;
-import br.com.ecologica.visualizacao.model.StatusSolicitacao;
+import br.com.ecologica.CadastroEmpresasRecicladoras;
+import br.com.ecologica.model.StatusSolicitacao;
+import br.com.ecologica.model.Usuario;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;

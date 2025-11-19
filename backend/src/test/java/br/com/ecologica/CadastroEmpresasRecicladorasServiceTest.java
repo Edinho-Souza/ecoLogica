@@ -1,8 +1,7 @@
 package br.com.ecologica;
 
-import br.com.ecologica.cadastro.CadastroEmpresasRecicladoras;
-import br.com.ecologica.cadastro.empresasrecicladoras.repository.CadastroEmpresasRecicladorasRepository;
-import br.com.ecologica.cadastro.empresasrecicladoras.service.CadastroEmpresasRecicladorasService;
+import br.com.ecologica.repository.CadastroEmpresasRecicladorasRepository;
+import br.com.ecologica.service.CadastroEmpresasRecicladorasService;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

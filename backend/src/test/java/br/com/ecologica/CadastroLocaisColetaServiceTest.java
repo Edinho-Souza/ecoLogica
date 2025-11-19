@@ -1,8 +1,7 @@
 package br.com.ecologica;
 
-import br.com.ecologica.cadastro.CadastroLocaisColeta;
-import br.com.ecologica.cadastro.locaiscoleta.repository.CadastroLocaisColetaRepository;
-import br.com.ecologica.cadastro.locaiscoleta.service.CadastroLocaisColetaService;
+import br.com.ecologica.repository.CadastroLocaisColetaRepository;
+import br.com.ecologica.service.CadastroLocaisColetaService;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

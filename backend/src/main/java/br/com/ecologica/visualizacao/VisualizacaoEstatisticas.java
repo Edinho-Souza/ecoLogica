@@ -1,9 +1,10 @@
 package br.com.ecologica.visualizacao;
 
-import br.com.ecologica.cadastro.usuarios.model.Usuario;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import br.com.ecologica.model.Usuario;
 import lombok.Data;
 
 @Data

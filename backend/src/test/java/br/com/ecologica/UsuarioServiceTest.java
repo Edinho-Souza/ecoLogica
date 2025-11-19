@@ -1,8 +1,8 @@
 package br.com.ecologica;
 
-import br.com.ecologica.cadastro.usuarios.model.Usuario;
-import br.com.ecologica.cadastro.usuarios.repository.UsuarioRepository;
-import br.com.ecologica.cadastro.usuarios.service.UsuarioService;
+import br.com.ecologica.model.Usuario;
+import br.com.ecologica.repository.UsuarioRepository;
+import br.com.ecologica.service.UsuarioService;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
