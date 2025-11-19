@@ -1175,15 +1175,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ===================================================================
-    // FUNÇÃO: GERENCIA O BANNER PROMOCIONAL (Imagem)
+    // FUNÇÃO: GERENCIA OS BANNERS PROMOCIONAIS (Lista/Carrossel)
     // ===================================================================
     const handleAdBannerForm = () => {
         const form = document.getElementById('adBannerForm');
-        const btnRemove = document.getElementById('btnRemoveAdBanner');
+        const listContainer = document.getElementById('active-banners-list');
 
-        if (!form) return;
+        if (!form || !listContainer) return;
 
-        // --- PUBLICAR BANNER ---
+        // 1. Carrega a lista atual do Storage
+        const loadBanners = () => {
+            const stored = localStorage.getItem('ecoLogica_AdBanners_List');
+            return stored ? JSON.parse(stored) : [];
+        };
+
+        // 2. Renderiza a lista na tela do Admin
+        const renderBannerList = () => {
+            const banners = loadBanners();
+            listContainer.innerHTML = '';
+
+            if (banners.length === 0) {
+                listContainer.innerHTML = '<div class="text-muted text-center py-2">Nenhum banner ativo.</div>';
+                return;
+            }
+
+            banners.forEach((banner, index) => {
+                const item = document.createElement('div');
+                item.className = 'list-group-item d-flex justify-content-between align-items-center px-0';
+                item.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <img src="${banner.image}" style="width: 60px; height: 30px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
+                        <div class="text-truncate" style="max-width: 180px;">
+                            <strong>${banner.alt}</strong><br>
+                            <span class="text-muted" style="font-size: 0.75rem;">${banner.link || 'Sem link'}</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger delete-banner-btn" data-id="${banner.id}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                `;
+                listContainer.appendChild(item);
+            });
+
+            // Adiciona listeners de exclusão
+            document.querySelectorAll('.delete-banner-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idToDelete = parseInt(e.currentTarget.dataset.id);
+                    deleteBanner(idToDelete);
+                });
+            });
+        };
+
+        // 3. Função de Deletar
+        const deleteBanner = (id) => {
+            if (confirm("Remover este banner?")) {
+                let banners = loadBanners();
+                banners = banners.filter(b => b.id !== id);
+                localStorage.setItem('ecoLogica_AdBanners_List', JSON.stringify(banners));
+                renderBannerList();
+            }
+        };
+
+        // 4. Adicionar Novo Banner
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
@@ -1191,36 +1244,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const linkUrl = document.getElementById('adBannerLink').value.trim();
             const altText = document.getElementById('adBannerAlt').value.trim();
 
-            if (!imageUrl) {
-                alert("A URL da imagem é obrigatória.");
-                return;
-            }
+            if (!imageUrl) { alert("URL da imagem é obrigatória."); return; }
 
-            const bannerData = {
+            const newBanner = {
                 id: Date.now(),
                 image: imageUrl,
                 link: linkUrl || '#',
-                alt: altText,
-                active: true
+                alt: altText
             };
 
-            localStorage.setItem('ecoLogica_AdBanner', JSON.stringify(bannerData));
+            const banners = loadBanners();
+            banners.push(newBanner); // Adiciona na lista
+            localStorage.setItem('ecoLogica_AdBanners_List', JSON.stringify(banners));
 
-            console.log("Banner publicado:", bannerData);
-            alert("Banner de propaganda publicado com sucesso!");
+            alert("Banner adicionado ao carrossel!");
             form.reset();
+            renderBannerList();
         });
 
-        // --- REMOVER BANNER ---
-        if (btnRemove) {
-            btnRemove.addEventListener('click', () => {
-                if (confirm("Tem certeza que deseja remover o banner de propaganda?")) {
-                    localStorage.removeItem('ecoLogica_AdBanner');
-                    alert("Banner removido.");
-                    form.reset();
-                }
-            });
-        }
+        // Renderiza ao iniciar
+        renderBannerList();
     };
 
     // ===================================================================

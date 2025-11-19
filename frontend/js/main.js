@@ -523,26 +523,70 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// ===================================================================
+// FUNÇÃO: CARREGAR BANNERS (FADE 10s + BARRAS FINAS + ALTURA MENOR)
+// ===================================================================
 const loadSiteAdBanner = () => {
     const container = document.getElementById('site-ad-banner-container');
-    const bannerData = localStorage.getItem('ecoLogica_AdBanner');
+    const storedBanners = localStorage.getItem('ecoLogica_AdBanners_List'); 
 
-    if (container && bannerData) {
-        const data = JSON.parse(bannerData);
+    if (container && storedBanners) {
+        const banners = JSON.parse(storedBanners);
+        
+        if (banners.length > 0) {
+            
+            // CASO 1: Apenas 1 banner (Estático)
+            if (banners.length === 1) {
+                const b = banners[0];
+                container.innerHTML = `
+                    <a href="${b.link}" target="_blank" style="display: block; width: 100%;">
+                        <img src="${b.image}" alt="${b.alt}" class="img-fluid rounded" style="width: 100%; max-height: 150px; object-fit: cover;">
+                    </a>
+                `;
+            } 
+            // CASO 2: Carrossel Automático
+            else {
+                let slidesHtml = '';
 
-        if (data.active) {
-            // Cria o HTML da imagem clicável
-            // style="width: 100%; object-fit: cover;" garante que vire uma 'tira' responsiva
-            const bannerHtml = `
-                <a href="${data.link}" target="_blank" style="display: block; width: 100%;">
-                    <img src="${data.image}" alt="${data.alt}" style="width: 100%; height: auto; max-height: 150px; object-fit: cover; display: block;">
-                </a>
-            `;
+                banners.forEach((b, index) => {
+                    const activeClass = index === 0 ? 'active' : '';
+                    
+                    slidesHtml += `
+                        <div class="carousel-item ${activeClass}" data-bs-interval="10000">
+                            <a href="${b.link}" target="_blank">
+                                <img src="${b.image}" class="d-block w-100 rounded" alt="${b.alt}" style="max-height: 100px; object-fit: cover;">
+                            </a>
+                        </div>
+                    `;
+                });
 
-            container.innerHTML = bannerHtml;
-            container.style.display = 'block'; // Mostra o container
+                container.innerHTML = `
+                    <div id="promoCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            ${slidesHtml}
+                        </div>
+                        
+                        <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev" 
+                            style="width: 1.5%; background-color: rgba(255, 255, 255, 0.1); border: none;">
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        
+                        <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next" 
+                            style="width: 1.5%; background-color: rgba(255, 255, 255, 0.1); border: none;">
+                            <span class="visually-hidden">Próximo</span>
+                        </button>
+                    </div>
+                `;
+                
+                const myCarousel = document.getElementById('promoCarousel');
+                new bootstrap.Carousel(myCarousel, {
+                    interval: 10000, 
+                    ride: 'carousel',
+                    pause: false 
+                });
+            }
+
+            container.style.display = 'block';
         }
     }
 };
-
-// Lembre de chamar loadSiteAdBanner() no DOMContentLoaded do main.js
