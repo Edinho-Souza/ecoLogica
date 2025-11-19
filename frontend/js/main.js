@@ -407,6 +407,11 @@ document.addEventListener("DOMContentLoaded", function () {
         // (Chamada após a inicialização de todos os componentes principais)
         updateUserAuthDisplay();
 
+        // --- CARREGA O BANNER DE PROPAGANDA (NOVO) ---
+        if (typeof loadSiteAdBanner === 'function') {
+            loadSiteAdBanner(); // <--- ADICIONE ISSO AQUI
+        }
+
         // --- TENTA INICIALIZAR O MAPA LEAFLET ---
         // (Verifica se a função existe, pois mapa.js é carregado condicionalmente)
         if (typeof inicializarMapaLeaflet === 'function') {
@@ -441,3 +446,103 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+// ===================================================================
+// FUNÇÃO: CARREGAR ANÚNCIO GLOBAL (Integrado com Admin)
+// ===================================================================
+const loadSiteAnnouncement = () => {
+    const container = document.getElementById('site-announcement-container');
+    if (!container) return;
+
+    // 1. Lê os dados salvos pelo Admin
+    const announcementData = localStorage.getItem('ecoLogica_CurrentAnnouncement');
+
+    if (announcementData) {
+        const announcement = JSON.parse(announcementData);
+
+        // Verifica se o anúncio está ativo
+        if (announcement.active) {
+            // Mapeia os tipos do Admin para classes do Bootstrap
+            let alertClass = 'alert-info'; // Padrão
+            let icon = 'fa-info-circle';
+
+            if (announcement.type === 'warning') {
+                alertClass = 'alert-warning';
+                icon = 'fa-exclamation-triangle';
+            } else if (announcement.type === 'success') {
+                alertClass = 'alert-success';
+                icon = 'fa-check-circle';
+            }
+
+            // 2. Cria o HTML do Alerta
+            container.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show mb-0 text-center rounded-0" role="alert" style="border: none; border-bottom: 1px solid rgba(0,0,0,0.1);">
+                    <div class="container">
+                        <i class="fas ${icon} me-2"></i>
+                        <strong>${announcement.text}</strong>
+                        <span class="text-muted ms-2 small" style="opacity: 0.8;">(${announcement.date})</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+        }
+    }
+};
+
+// Adicione a chamada no final do seu DOMContentLoaded ou script
+document.addEventListener('DOMContentLoaded', () => {
+    // ... outros scripts
+    loadSiteAnnouncement();
+});
+
+// Função para carregar anúncios do Admin
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('site-announcement-container');
+    const announcementData = localStorage.getItem('ecoLogica_CurrentAnnouncement');
+
+    if (container && announcementData) {
+        const data = JSON.parse(announcementData);
+
+        // Define a cor baseada no tipo
+        let alertClass = 'alert-info';
+        let icon = 'fa-info-circle';
+
+        if (data.type === 'warning') { alertClass = 'alert-warning'; icon = 'fa-exclamation-triangle'; }
+        if (data.type === 'success') { alertClass = 'alert-success'; icon = 'fa-check-circle'; }
+
+        container.innerHTML = `
+            <div class="alert ${alertClass} alert-dismissible fade show mb-0 text-center rounded-0 border-0" role="alert">
+                <div class="container">
+                    <i class="fas ${icon} me-2"></i>
+                    <strong>${data.text}</strong>
+                    <small class="ms-2 text-muted">(${data.date})</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+    }
+});
+
+const loadSiteAdBanner = () => {
+    const container = document.getElementById('site-ad-banner-container');
+    const bannerData = localStorage.getItem('ecoLogica_AdBanner');
+
+    if (container && bannerData) {
+        const data = JSON.parse(bannerData);
+
+        if (data.active) {
+            // Cria o HTML da imagem clicável
+            // style="width: 100%; object-fit: cover;" garante que vire uma 'tira' responsiva
+            const bannerHtml = `
+                <a href="${data.link}" target="_blank" style="display: block; width: 100%;">
+                    <img src="${data.image}" alt="${data.alt}" style="width: 100%; height: auto; max-height: 150px; object-fit: cover; display: block;">
+                </a>
+            `;
+
+            container.innerHTML = bannerHtml;
+            container.style.display = 'block'; // Mostra o container
+        }
+    }
+};
+
+// Lembre de chamar loadSiteAdBanner() no DOMContentLoaded do main.js
