@@ -281,6 +281,21 @@ CREATE TABLE IF NOT EXISTS `cadastro_dias_horarios` (
     ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS `localcoleta_tipos_materiais` (
+  `local_id` BIGINT NOT NULL,
+  `tipo_id` BIGINT NOT NULL,
+  PRIMARY KEY (`local_id`, `tipo_id`),
+  INDEX `idx_local_tipo_local` (`local_id` ASC),
+  INDEX `idx_local_tipo_material` (`tipo_id` ASC),
+  CONSTRAINT `fk_lctm_local`
+    FOREIGN KEY (`local_id`)
+    REFERENCES `localcoleta` (`id_local`)
+    ON DELETE CASCADE,
+  CONSTRAINT `fk_lctm_tipo`
+    FOREIGN KEY (`tipo_id`)
+    REFERENCES `tipos_materiais` (`id`)
+    ON DELETE CASCADE
+) ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Inserção de Dados
 -- -----------------------------------------------------

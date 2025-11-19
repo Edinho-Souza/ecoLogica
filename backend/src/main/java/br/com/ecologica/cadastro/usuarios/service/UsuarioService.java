@@ -17,11 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.nio.file.AccessDeniedException; 
+
+import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuarioService {
+
     @Autowired
     private UsuarioRepository usuarioRepository;
     @Autowired
@@ -31,18 +34,22 @@ public class UsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Transactional
-    public Usuario salvar(UsuarioRequest request) throws AccessDeniedException { 
-
-        // Impede que um usuário se cadastre como admin pela API pública
+    @Transactional(rollbackFor = Exception.class)
+    public Usuario salvar(UsuarioRequest request) throws AccessDeniedException {
+        // Regra: Não criar admin via API pública
         if (request.getTipoUsuario() == TipoUsuario.admin) {
             throw new AccessDeniedException("Não é permitido criar um usuário 'admin' por este endpoint.");
         }
 
+        // Validação de Duplicidade
+        if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("E-mail já cadastrado.");
+        }
         if (!ValidadorCPF.isCPFValido(request.getCpf())) {
             throw new IllegalArgumentException("CPF inválido.");
         }
 
+        // Construção do Usuário
         Usuario usuario = new Usuario();
         usuario.setNome(request.getNome());
         usuario.setCpf(request.getCpf());
@@ -50,53 +57,62 @@ public class UsuarioService {
         usuario.setSenha(passwordEncoder.encode(request.getSenha()));
         usuario.setTipoUsuario(request.getTipoUsuario());
 
-        if (request.getTipoUsuario() == TipoUsuario.cidadao) { 
+        // Define Status Inicial
+        if (request.getTipoUsuario() == TipoUsuario.cidadao) {
             usuario.setStatus(StatusUsuario.ATIVO);
         } else {
-            // Empresas (apoiadora, recicladora) entram como PENDENTE
+            // Empresas entram como pendente
             usuario.setStatus(StatusUsuario.PENDENTE);
         }
 
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
-        try {
-            if (usuarioSalvo.getTipoUsuario() == TipoUsuario.apoiadora) {
-                if (request.getCnpj() == null || !ValidadorCNPJ.isCNPJValido(request.getCnpj().replaceAll("[^0-9]", ""))) {
-                    throw new IllegalArgumentException("CNPJ inválido ou não fornecido para Empresa Apoiadora.");
-                }
-                CadastroEmpresasApoiadoras apoiadora = new CadastroEmpresasApoiadoras();
-                apoiadora.setUsuario(usuarioSalvo);
-                apoiadora.setCnpj(request.getCnpj());
-                apoiadora.setEndereco(request.getEndereco());
-                apoiadora.setTelefone(request.getTelefone());
-                apoiadoraRepository.save(apoiadora);
-            } else if (usuarioSalvo.getTipoUsuario() == TipoUsuario.recicladora) {
-                if (request.getCnpj() == null || !ValidadorCNPJ.isCNPJValido(request.getCnpj().replaceAll("[^0-9]", ""))) {
-                    throw new IllegalArgumentException("CNPJ inválido ou não fornecido para Empresa Recicladora.");
-                }
-                CadastroEmpresasRecicladoras recicladora = new CadastroEmpresasRecicladoras();
-                recicladora.setUsuario(usuarioSalvo);
-                recicladora.setCnpj(request.getCnpj());
-                recicladora.setEndereco(request.getEndereco());
-                recicladora.setTelefone(request.getTelefone());
-                recicladoraRepository.save(recicladora);
-            }
-        } catch (Exception e) {
-            // Se falhar ao salvar a empresa, desfaz o cadastro do usuário (rollback)
-            throw new RuntimeException("Erro ao salvar detalhes da empresa: " + e.getMessage(), e);
+
+        // Lógica específica para Empresas
+        if (request.getTipoUsuario() == TipoUsuario.apoiadora) {
+            salvarApoiadora(usuarioSalvo, request);
+        } else if (request.getTipoUsuario() == TipoUsuario.recicladora) {
+            salvarRecicladora(usuarioSalvo, request);
         }
+
         return usuarioSalvo;
+    }
+
+    private void salvarApoiadora(Usuario usuario, UsuarioRequest request) {
+        validarCNPJ(request.getCnpj());
+        CadastroEmpresasApoiadoras apoiadora = new CadastroEmpresasApoiadoras();
+        apoiadora.setUsuario(usuario);
+        apoiadora.setCnpj(request.getCnpj());
+        apoiadora.setEndereco(request.getEndereco());
+        apoiadora.setTelefone(request.getTelefone());
+        apoiadoraRepository.save(apoiadora);
+    }
+
+    private void salvarRecicladora(Usuario usuario, UsuarioRequest request) {
+        validarCNPJ(request.getCnpj());
+        CadastroEmpresasRecicladoras recicladora = new CadastroEmpresasRecicladoras();
+        recicladora.setUsuario(usuario);
+        recicladora.setCnpj(request.getCnpj());
+        recicladora.setEndereco(request.getEndereco());
+        recicladora.setTelefone(request.getTelefone());
+        recicladoraRepository.save(recicladora);
+    }
+
+    private void validarCNPJ(String cnpj) {
+        if (cnpj == null || !ValidadorCNPJ.isCNPJValido(cnpj.replaceAll("[^0-9]", ""))) {
+            throw new IllegalArgumentException("CNPJ inválido ou obrigatório para empresas.");
+        }
     }
 
     @Transactional
     public Usuario atualizarStatus(Long idUsuario, StatusUsuario novoStatus) {
-        // Troca RuntimeException por exceção específica
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
-        if (usuario.getTipoUsuario() == TipoUsuario.cidadao || usuario.getTipoUsuario() == TipoUsuario.admin) {
-            throw new IllegalArgumentException("O status de Cidadãos ou Admins não pode ser alterado por este endpoint.");
+        // Proteção para não bloquear admins acidentalmente
+        if (usuario.getTipoUsuario() == TipoUsuario.admin) {
+             throw new IllegalArgumentException("Não é possível alterar status de admin via API.");
         }
-
+        
         usuario.setStatus(novoStatus);
         return usuarioRepository.save(usuario);
     }
@@ -110,20 +126,14 @@ public class UsuarioService {
         return response;
     }
 
-    public List<Usuario> listarTodos() {
-        return usuarioRepository.findAll();
-    }
-
+    // Métodos auxiliares
+    public List<Usuario> listarTodos() { return usuarioRepository.findAll(); }
     public Usuario buscarPorId(Long id) {
-        // Troca RuntimeException por exceção específica
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
     }
-
     public void deletar(Long id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Usuário não encontrado.");
-        }
+        if (!usuarioRepository.existsById(id)) throw new ResourceNotFoundException("Usuário não encontrado.");
         usuarioRepository.deleteById(id);
     }
 }
