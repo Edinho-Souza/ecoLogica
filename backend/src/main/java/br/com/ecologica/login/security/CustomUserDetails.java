@@ -1,9 +1,11 @@
 package br.com.ecologica.login.security;
 
-import br.com.ecologica.cadastro.usuarios.model.Usuario;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import br.com.ecologica.model.Usuario;
+
 import java.util.Collection;
 import java.util.Collections;
 
@@ -54,6 +56,6 @@ public class CustomUserDetails implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		// O login só funciona se o status do usuário for ATIVO
-		return usuario.getStatus() == br.com.ecologica.cadastro.usuarios.model.StatusUsuario.ATIVO;
+		return usuario.getStatus() == br.com.ecologica.model.StatusUsuario.ATIVO;
 	}
 }

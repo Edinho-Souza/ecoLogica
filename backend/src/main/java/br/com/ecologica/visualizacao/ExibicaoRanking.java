@@ -1,6 +1,6 @@
 package br.com.ecologica.visualizacao;
 
-import br.com.ecologica.cadastro.usuarios.model.Usuario;
+import br.com.ecologica.model.Usuario;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;

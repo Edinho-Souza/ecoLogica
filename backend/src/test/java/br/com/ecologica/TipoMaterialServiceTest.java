@@ -1,9 +1,8 @@
 package br.com.ecologica;
 
-import br.com.ecologica.cadastro.CadastroTipoMateriais;
 import br.com.ecologica.cadastro.tipomateriais.dto.TipoMaterialDto;
-import br.com.ecologica.cadastro.tipomateriais.repository.CadastroTipoMateriaisRepository;
-import br.com.ecologica.cadastro.tipomateriais.service.TipoMaterialService;
+import br.com.ecologica.repository.CadastroTipoMateriaisRepository;
+import br.com.ecologica.service.TipoMaterialService;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

@@ -1,8 +1,9 @@
 package br.com.ecologica;
 
-import br.com.ecologica.cadastro.usuarios.controller.UsuarioController;
-import br.com.ecologica.cadastro.usuarios.model.Usuario;
-import br.com.ecologica.cadastro.usuarios.service.UsuarioService;
+import br.com.ecologica.controller.UsuarioController;
+import br.com.ecologica.model.Usuario;
+import br.com.ecologica.service.UsuarioService;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

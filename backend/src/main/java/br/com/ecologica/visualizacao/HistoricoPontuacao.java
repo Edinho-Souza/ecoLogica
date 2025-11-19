@@ -1,9 +1,10 @@
 package br.com.ecologica.visualizacao;
 
-import br.com.ecologica.cadastro.usuarios.model.Usuario;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+
+import br.com.ecologica.model.Usuario;
 
 @Data
 @Entity
