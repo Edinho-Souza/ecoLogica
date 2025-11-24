@@ -1,6 +1,6 @@
 package br.com.ecologica;
 
-import br.com.ecologica.cadastro.CadastroMateriaisColetar;
+import br.com.ecologica.cadastro.campanhas.repository.CadastroCampanhasRepository;
 import br.com.ecologica.cadastro.materiais.repository.CadastroMateriaisColetarRepository;
 import br.com.ecologica.cadastro.materiais.service.CadastroMateriaisColetarService;
 
@@ -18,11 +18,12 @@ import static org.mockito.Mockito.*;
 
 public class CadastroMateriaisColetarServiceTest {
 
+	// DEPOIS (CORRETO):
 	@Mock
-	private CadastroMateriaisColetarRepository repository;
+	private CadastroCampanhasRepository repository; // MOCK DO REPOSITÓRIO CERTO
 
 	@InjectMocks
-	private CadastroMateriaisColetarService service;
+	private CadastroMateriaisColetarServiceTest service; // INJEÇÃO NO SERVIÇO QUE SERÁ TESTADO
 
 	CadastroMateriaisColetarServiceTest() {
         MockitoAnnotations.openMocks(this);
@@ -36,7 +37,7 @@ public class CadastroMateriaisColetarServiceTest {
 
 		when(repository.save(any())).thenReturn(material);
 
-		CadastroMateriaisColetar resultado = service.salvar(material);
+		CadastroMateriaisColetarServiceTest resultado = service.salvar(material);
 
 		assertNotNull(resultado);
 		assertEquals("Plástico PET", resultado.getNomeMaterial());
@@ -51,14 +52,14 @@ public class CadastroMateriaisColetarServiceTest {
 
 		when(repository.findById(1L)).thenReturn(Optional.of(material));
 
-		Optional<CadastroMateriaisColetar> resultado = service.buscarPorId(1L);
+		Optional<CadastroMateriaisColetarServiceTest> resultado = service.buscarPorId(1L);
 
 		assertTrue(resultado.isPresent());
 		assertEquals("Vidro", resultado.get().getNomeMaterial());
 	}
 
 	@Test
-	public void testListarTodos() {
+	public List<CadastroMateriaisColetarServiceTest> testListarTodos() {
 		CadastroMateriaisColetar m1 = new CadastroMateriaisColetar();
 		m1.setNomeMaterial("Metal");
 		CadastroMateriaisColetar m2 = new CadastroMateriaisColetar();
@@ -66,7 +67,7 @@ public class CadastroMateriaisColetarServiceTest {
 
 		when(repository.findAll()).thenReturn(Arrays.asList(m1, m2));
 
-		List<CadastroMateriaisColetar> lista = service.listarTodos();
+		List<CadastroMateriaisColetarServiceTest> lista = service.testListarTodos();
 
 		assertEquals(2, lista.size());
 	}
