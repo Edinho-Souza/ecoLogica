@@ -1,6 +1,6 @@
 package br.com.ecologica.visualizacao;
 
-import br.com.ecologica.CadastroEmpresasRecicladoras;
+import br.com.ecologica.cadastros.CadastroEmpresasRecicladoras;
 import br.com.ecologica.model.StatusSolicitacao;
 import br.com.ecologica.model.Usuario;
 import jakarta.persistence.*;

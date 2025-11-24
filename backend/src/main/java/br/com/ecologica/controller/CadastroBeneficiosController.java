@@ -1,6 +1,6 @@
 package br.com.ecologica.controller;
 
-import br.com.ecologica.CadastroBeneficios;
+import br.com.ecologica.cadastros.CadastroBeneficios;
 import br.com.ecologica.dto.BeneficioRequest;
 import br.com.ecologica.dto.BeneficioResponse;
 import br.com.ecologica.service.CadastroBeneficiosService;

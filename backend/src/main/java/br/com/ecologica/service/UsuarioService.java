@@ -1,7 +1,7 @@
 package br.com.ecologica.service;
 
-import br.com.ecologica.CadastroEmpresasApoiadoras;
-import br.com.ecologica.CadastroEmpresasRecicladoras;
+import br.com.ecologica.cadastros.CadastroEmpresasApoiadoras;
+import br.com.ecologica.cadastros.CadastroEmpresasRecicladoras;
 import br.com.ecologica.dto.UsuarioRequest;
 import br.com.ecologica.dto.UsuarioResponse;
 import br.com.ecologica.exception.ResourceNotFoundException;

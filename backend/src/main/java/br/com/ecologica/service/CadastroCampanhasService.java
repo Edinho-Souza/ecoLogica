@@ -1,7 +1,7 @@
 package br.com.ecologica.service;
 
-import br.com.ecologica.CadastroCampanhas;
-import br.com.ecologica.CadastroEmpresasApoiadoras;
+import br.com.ecologica.cadastros.CadastroCampanhas;
+import br.com.ecologica.cadastros.CadastroEmpresasApoiadoras;
 import br.com.ecologica.dto.CampanhaRequest;
 import br.com.ecologica.repository.CadastroCampanhasRepository;
 import br.com.ecologica.repository.CadastroEmpresasApoiadorasRepository;

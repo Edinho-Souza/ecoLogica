@@ -1,6 +1,6 @@
 package br.com.ecologica.service;
 
-import br.com.ecologica.CadastroTipoMateriais;
+import br.com.ecologica.cadastros.CadastroTipoMateriais;
 import br.com.ecologica.dto.TipoMateriaisRequest;
 import br.com.ecologica.repository.CadastroTipoMateriaisRepository;
 

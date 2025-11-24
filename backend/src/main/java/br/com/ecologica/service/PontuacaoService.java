@@ -1,6 +1,6 @@
 package br.com.ecologica.service;
 
-import br.com.ecologica.CadastroBeneficios;
+import br.com.ecologica.cadastros.CadastroBeneficios;
 import br.com.ecologica.dto.PontuacaoRequest;
 import br.com.ecologica.dto.PontuacaoResponse;
 import br.com.ecologica.dto.ResgateBeneficioRequest;

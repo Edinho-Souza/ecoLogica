@@ -1,4 +1,4 @@
-package br.com.ecologica;
+package br.com.ecologica.cadastros;
 
 import br.com.ecologica.model.Usuario;
 import jakarta.persistence.*;

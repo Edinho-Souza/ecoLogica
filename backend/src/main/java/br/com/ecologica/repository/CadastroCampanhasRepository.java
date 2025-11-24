@@ -2,7 +2,7 @@ package br.com.ecologica.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import br.com.ecologica.CadastroCampanhas;
+import br.com.ecologica.cadastros.CadastroCampanhas;
 
 import java.time.LocalDate;
 import java.util.List;

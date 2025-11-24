@@ -1,6 +1,6 @@
 package br.com.ecologica.service;
 
-import br.com.ecologica.CadastroEmpresasRecicladoras;
+import br.com.ecologica.cadastros.CadastroEmpresasRecicladoras;
 import br.com.ecologica.dto.SolicitacaoRequest;
 import br.com.ecologica.dto.SolicitacaoResponse;
 import br.com.ecologica.model.Usuario;
