@@ -1123,13 +1123,42 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ===================================================================
-    // FUNÇÃO: GERENCIA O FORMULÁRIO DE ANÚNCIOS (Criar e Remover)
+    // FUNÇÃO: GERENCIA O FORMULÁRIO DE ANÚNCIOS (Criar, Remover e Visualizar)
     // ===================================================================
     const handleAnnouncementForm = () => {
         const form = document.getElementById('announcementForm');
         const btnRemove = document.getElementById('btnRemoveAnnouncement');
+        const previewContainer = document.getElementById('active-announcement-preview'); // Novo container
 
-        if (!form) { console.warn("Formulário de anúncios não encontrado."); return; }
+        if (!form) return;
+
+        // --- FUNÇÃO AUXILIAR: RENDERIZA O AVISO NA TELA ---
+        const renderActiveAnnouncement = () => {
+            if (!previewContainer) return;
+
+            const storedData = localStorage.getItem('ecoLogica_CurrentAnnouncement');
+
+            if (storedData) {
+                const data = JSON.parse(storedData);
+
+                // Define classes do Bootstrap baseadas no tipo salvo
+                let alertClass = 'alert-info';
+                let icon = 'fa-info-circle';
+                if (data.type === 'warning') { alertClass = 'alert-warning'; icon = 'fa-exclamation-triangle'; }
+                if (data.type === 'success') { alertClass = 'alert-success'; icon = 'fa-check-circle'; }
+
+                // Mostra um "mini-alert" igual ao do site
+                previewContainer.innerHTML = `
+                    <div class="alert ${alertClass} py-2 px-3 mb-0 small" role="alert">
+                        <i class="fas ${icon} me-2"></i>
+                        <strong>${data.text}</strong>
+                        <br><span class="text-muted" style="font-size: 0.75rem;">Publicado em: ${data.date}</span>
+                    </div>
+                `;
+            } else {
+                previewContainer.innerHTML = '<p class="text-muted small fst-italic">Nenhum aviso publicado.</p>';
+            }
+        };
 
         // --- PUBLICAR ANÚNCIO ---
         form.addEventListener('submit', (e) => {
@@ -1143,36 +1172,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Cria o objeto de dados
             const announcementData = {
                 id: Date.now(),
                 text: text,
-                type: type, // 'info', 'warning', 'success'
+                type: type,
                 date: new Date().toLocaleDateString('pt-BR'),
                 active: true
             };
 
-            // Salva no localStorage para que o site principal possa ler
             localStorage.setItem('ecoLogica_CurrentAnnouncement', JSON.stringify(announcementData));
 
-            console.log("Anúncio publicado:", announcementData);
-            alert("Anúncio publicado com sucesso! Ele aparecerá no topo das páginas do site.");
+            alert("Aviso publicado com sucesso!");
             form.reset();
+
+            // Atualiza a visualização imediatamente
+            renderActiveAnnouncement();
         });
 
         // --- REMOVER ANÚNCIO ---
         if (btnRemove) {
             btnRemove.addEventListener('click', () => {
-                if (confirm("Tem certeza que deseja remover o anúncio do site?")) {
-                    // Remove do storage
+                // Verifica se existe algo para remover antes de perguntar
+                if (!localStorage.getItem('ecoLogica_CurrentAnnouncement')) {
+                    alert("Não há nenhum aviso ativo para remover.");
+                    return;
+                }
+
+                if (confirm("Tem certeza que deseja remover o aviso do site?")) {
                     localStorage.removeItem('ecoLogica_CurrentAnnouncement');
-                    alert("Anúncio removido com sucesso.");
+                    alert("Aviso removido com sucesso.");
                     form.reset();
+
+                    // Atualiza a visualização imediatamente
+                    renderActiveAnnouncement();
                 }
             });
         }
-    };
 
+        // Carrega a visualização ao abrir a página
+        renderActiveAnnouncement();
+    };
 
     // ===================================================================
     // FUNÇÃO: GERENCIA OS BANNERS PROMOCIONAIS (Lista/Carrossel)
@@ -2698,6 +2737,137 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ===================================================================
+    // FUNÇÃO: GERENCIAMENTO DE RECOMPENSAS (CRUD COMPLETO)
+    // ===================================================================
+
+    // 1. Dados e Estado
+    let storedRewards = localStorage.getItem('ecoLogica_Rewards');
+    let simulatedRewards = storedRewards ? JSON.parse(storedRewards) : [
+        { id: 1, name: "Ecobag Reutilizável", cost: 50, stock: 20 },
+        { id: 2, name: "Garrafa de Água Metal", cost: 150, stock: 15 },
+        { id: 3, name: "Cupom de R$10 (Parceiros)", cost: 200, stock: 50 }
+    ];
+
+    // 2. Função de Renderizar Lista
+    const renderRewardsList = () => {
+        const listContainer = document.getElementById('rewards-list');
+        if (!listContainer) return;
+
+        listContainer.innerHTML = '';
+
+        if (simulatedRewards.length === 0) {
+            listContainer.innerHTML = '<div class="text-muted small text-center p-3">Nenhuma recompensa cadastrada.</div>';
+            return;
+        }
+
+        simulatedRewards.forEach(reward => {
+            const item = document.createElement('a');
+            item.href = "#";
+            item.className = "list-group-item list-group-item-action py-2 px-2 d-flex justify-content-between align-items-center";
+            item.innerHTML = `
+                <div>
+                    <div class="fw-bold" style="font-size: 0.9rem;">${reward.name}</div>
+                    <div class="text-muted" style="font-size: 0.8rem;">${reward.cost} pts • Est: ${reward.stock}</div>
+                </div>
+                <div>
+                    <span class="badge bg-secondary rounded-pill me-1 reward-action-btn" data-action="edit" data-id="${reward.id}" title="Editar"><i class="fas fa-pencil-alt fa-xs"></i></span>
+                    <span class="badge bg-danger rounded-pill reward-action-btn" data-action="delete" data-id="${reward.id}" title="Excluir"><i class="fas fa-trash-alt fa-xs"></i></span>
+                </div>
+            `;
+            listContainer.appendChild(item);
+        });
+    };
+
+    // 3. Gerenciador do Formulário e Ações
+    const handleRewardManager = () => {
+        const form = document.getElementById('rewardForm');
+        const modalElement = document.getElementById('rewardModal');
+        const btnAdd = document.getElementById('btnAddReward');
+        const listContainer = document.getElementById('rewards-list');
+
+        if (!form || !modalElement) return;
+
+        const modalInstance = new bootstrap.Modal(modalElement);
+
+        // --- ABRIR PARA ADICIONAR ---
+        if (btnAdd) {
+            btnAdd.addEventListener('click', () => {
+                form.reset();
+                document.getElementById('rewardId').value = "";
+                document.getElementById('rewardModalTitle').textContent = "Nova Recompensa";
+            });
+        }
+
+        // --- SALVAR (ADD/EDIT) ---
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const idVal = document.getElementById('rewardId').value;
+            const name = document.getElementById('rewardName').value.trim();
+            const cost = parseInt(document.getElementById('rewardCost').value);
+            const stock = parseInt(document.getElementById('rewardStock').value) || 0;
+
+            if (!name || isNaN(cost)) {
+                alert("Preencha o nome e o custo corretamente.");
+                return;
+            }
+
+            if (idVal) {
+                // EDIÇÃO
+                const index = simulatedRewards.findIndex(r => r.id == idVal);
+                if (index !== -1) {
+                    simulatedRewards[index] = { id: parseInt(idVal), name, cost, stock };
+                    alert("Recompensa atualizada!");
+                }
+            } else {
+                // CRIAÇÃO
+                const newId = Date.now(); // ID simples baseado em timestamp
+                simulatedRewards.push({ id: newId, name, cost, stock });
+                alert("Recompensa criada!");
+            }
+
+            // Salva e Atualiza
+            localStorage.setItem('ecoLogica_Rewards', JSON.stringify(simulatedRewards));
+            renderRewardsList();
+            modalInstance.hide();
+        });
+
+        // --- CLIQUES NA LISTA (EDITAR/EXCLUIR) ---
+        if (listContainer) {
+            listContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.reward-action-btn');
+                if (!btn) {
+                    if (e.target.closest('a')) e.preventDefault(); // Evita scroll se clicar no item
+                    return;
+                }
+
+                e.preventDefault();
+                const action = btn.dataset.action;
+                const id = parseInt(btn.dataset.id);
+
+                if (action === 'delete') {
+                    if (confirm("Tem certeza que deseja excluir esta recompensa?")) {
+                        simulatedRewards = simulatedRewards.filter(r => r.id !== id);
+                        localStorage.setItem('ecoLogica_Rewards', JSON.stringify(simulatedRewards));
+                        renderRewardsList();
+                    }
+                } else if (action === 'edit') {
+                    const reward = simulatedRewards.find(r => r.id === id);
+                    if (reward) {
+                        document.getElementById('rewardId').value = reward.id;
+                        document.getElementById('rewardName').value = reward.name;
+                        document.getElementById('rewardCost').value = reward.cost;
+                        document.getElementById('rewardStock').value = reward.stock;
+                        document.getElementById('rewardModalTitle').textContent = "Editar Recompensa";
+
+                        modalInstance.show();
+                    }
+                }
+            });
+        }
+    };
+
+    // ===================================================================
     // CHAMADAS DE INICIALIZAÇÃO (Atualizado com Logs)
     // ===================================================================
 
@@ -2762,6 +2932,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // *** NOVO: CHAMA O HANDLER DO MODAL DE EMPRESAS ***
     handleViewAllCompaniesModal();
+
+    // Recompensas
+    renderRewardsList(); 
+    handleRewardManager();
 
 
     // Chamar outras funções de inicialização aqui
