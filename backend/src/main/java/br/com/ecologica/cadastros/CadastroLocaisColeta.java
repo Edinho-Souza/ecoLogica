@@ -1,4 +1,4 @@
-package br.com.ecologica;
+package br.com.ecologica.cadastros;
 
 import jakarta.persistence.*;
 import lombok.Data;

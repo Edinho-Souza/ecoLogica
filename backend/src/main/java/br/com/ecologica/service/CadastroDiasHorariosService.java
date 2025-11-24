@@ -1,7 +1,7 @@
 package br.com.ecologica.service;
 
-import br.com.ecologica.CadastroDiasHorarios;
-import br.com.ecologica.CadastroLocaisColeta;
+import br.com.ecologica.cadastros.CadastroDiasHorarios;
+import br.com.ecologica.cadastros.CadastroLocaisColeta;
 import br.com.ecologica.dto.DiasHorariosRequest;
 import br.com.ecologica.model.TipoUsuario;
 import br.com.ecologica.model.Usuario;

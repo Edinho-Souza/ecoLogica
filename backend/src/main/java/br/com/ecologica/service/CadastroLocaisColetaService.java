@@ -3,9 +3,9 @@ package br.com.ecologica.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.com.ecologica.CadastroEmpresasRecicladoras;
-import br.com.ecologica.CadastroLocaisColeta;
-import br.com.ecologica.CadastroTipoMateriais;
+import br.com.ecologica.cadastros.CadastroEmpresasRecicladoras;
+import br.com.ecologica.cadastros.CadastroLocaisColeta;
+import br.com.ecologica.cadastros.CadastroTipoMateriais;
 import br.com.ecologica.dto.LocalColetaRequest;
 import br.com.ecologica.model.TipoUsuario;
 import br.com.ecologica.model.Usuario;

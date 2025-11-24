@@ -1,6 +1,6 @@
 package br.com.ecologica.dto;
 
-import br.com.ecologica.CadastroBeneficios;
+import br.com.ecologica.cadastros.CadastroBeneficios;
 import lombok.Data;
 
 @Data
