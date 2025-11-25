@@ -1,6 +1,6 @@
 package br.com.ecologica.controller;
 
-import br.com.ecologica.CadastroLocaisColeta;
+import br.com.ecologica.cadastros.CadastroLocaisColeta;
 import br.com.ecologica.dto.LocalColetaRequest;
 import br.com.ecologica.dto.LocalColetaResponse;
 import br.com.ecologica.login.security.CustomUserDetails;

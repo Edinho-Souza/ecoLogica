@@ -1,6 +1,6 @@
 package br.com.ecologica.dto;
 
-import br.com.ecologica.CadastroEmpresasRecicladoras;
+import br.com.ecologica.cadastros.CadastroEmpresasRecicladoras;
 import br.com.ecologica.model.StatusUsuario;
 import lombok.Data;
 

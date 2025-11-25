@@ -3,7 +3,7 @@ package br.com.ecologica.dto;
 import lombok.Data;
 import java.time.LocalDate;
 
-import br.com.ecologica.CadastroCampanhas;
+import br.com.ecologica.cadastros.CadastroCampanhas;
 
 @Data
 public class CampanhaResponse {
