@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/beneficios")
+@CrossOrigin(origins = "*")
 public class CadastroBeneficiosController {
 
 	@Autowired

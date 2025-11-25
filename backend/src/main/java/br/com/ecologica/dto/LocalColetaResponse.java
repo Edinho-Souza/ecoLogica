@@ -4,8 +4,8 @@ import lombok.Data;
 import java.util.List; 
 import java.util.stream.Collectors;
 
-import br.com.ecologica.CadastroLocaisColeta;
-import br.com.ecologica.CadastroTipoMateriais; 
+import br.com.ecologica.cadastros.CadastroLocaisColeta;
+import br.com.ecologica.cadastros.CadastroTipoMateriais; 
 
 @Data
 public class LocalColetaResponse {
