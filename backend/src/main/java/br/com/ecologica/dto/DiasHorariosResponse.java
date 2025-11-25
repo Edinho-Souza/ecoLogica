@@ -11,7 +11,7 @@ public class DiasHorariosResponse {
     private String horarioFim;
     private boolean ativo;
 
-    public static DiasHorariosResponse fromEntity(br.com.ecologica.CadastroDiasHorarios horario) {
+    public static DiasHorariosResponse fromEntity(br.com.ecologica.cadastros.CadastroDiasHorarios horario) {
         DiasHorariosResponse response = new DiasHorariosResponse();
         response.setId(horario.getId());
         response.setDiaSemana(horario.getDiaSemana());

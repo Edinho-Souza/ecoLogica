@@ -10,7 +10,7 @@ public class TipoMaterialResponse {
     private boolean ativo;
 
     // Construtor estático para conversão
-    public static TipoMaterialResponse fromEntity(br.com.ecologica.CadastroTipoMateriais tipo) {
+    public static TipoMaterialResponse fromEntity(br.com.ecologica.cadastros.CadastroTipoMateriais tipo) {
         TipoMaterialResponse response = new TipoMaterialResponse();
         response.setId(tipo.getId());
         response.setNomeTipo(tipo.getNomeTipo());

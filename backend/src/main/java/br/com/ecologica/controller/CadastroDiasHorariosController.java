@@ -1,6 +1,6 @@
 package br.com.ecologica.controller;
 
-import br.com.ecologica.CadastroDiasHorarios;
+import br.com.ecologica.cadastros.CadastroDiasHorarios;
 import br.com.ecologica.dto.DiasHorariosRequest;
 import br.com.ecologica.dto.DiasHorariosResponse;
 import br.com.ecologica.login.security.CustomUserDetails;
