@@ -301,7 +301,7 @@ CREATE TABLE IF NOT EXISTS `localcoleta_tipos_materiais` (
 -- -----------------------------------------------------
 LOCK TABLES `usuario` WRITE;
 INSERT INTO `usuario` (`id_usuario`, `nome`, `cpf`, `email`, `senha`, `tipo_usuario`, `data_cadastro`, `status`) VALUES
-(1, 'Admin Geral', '000.000.000-00', 'admin@sistema.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'admin', '2025-09-14 22:57:28', 'ATIVO'),
+(1, 'Admin Geral', '000.000.000-00', 'admin@sistema.com', '123456789', 'admin', '2025-09-14 22:57:28', 'ATIVO'),
 (2, 'Recicladora Verde', '111.111.111-11', 'contato@verde.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'recicladora', '2025-09-14 22:58:50', 'ATIVO'),
 (3, 'Apoiadora Eco', '222.222.222-22', 'eco@apoio.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'apoiadora', '2025-09-14 22:59:59', 'ATIVO');
 UNLOCK TABLES;
