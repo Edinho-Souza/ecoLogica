@@ -1,17 +1,12 @@
-<!--------------------------------------------------------------------------->
-<!-- Modal Entrar/Cadastrar -->
-<!--------------------------------------------------------------------------->
 <div id="authModal" class="auth-modal">
   <div class="auth-modal-content split-modal">
 
     <span class="close-modal">&times;</span>
 
-    <!-- Lado esquerdo: imagem -->
     <div class="modal-left">
       <img src="img/geral-site/modal.png" alt="Imagem" class="modal-image">
     </div>
 
-    <!-- Lado direito: formulários -->
     <div class="modal-right">
 
       <div class="auth-tabs">
@@ -20,8 +15,10 @@
       </div>
 
       <form id="loginForm" class="modal-form active">
-        <input type="email" placeholder="Email" required>
-        <input type="password" placeholder="Senha" required>
+        <input type="email" id="email" placeholder="Email" required>
+        
+        <input type="password" id="password" placeholder="Senha" required>
+        
         <div class="form-extra">
           <label>
             <input type="checkbox"> Manter conectado
@@ -32,9 +29,10 @@
       </form>
 
       <form id="registerForm" class="modal-form">
-        <input type="text" placeholder="Nome completo" required>
-        <input type="email" placeholder="Email" required>
-        <input type="password" placeholder="Senha" required>
+        <input type="text" id="reg-nome" placeholder="Nome completo" required>
+        <input type="email" id="reg-email" placeholder="Email" required>
+        <input type="password" id="reg-password" placeholder="Senha" required>
+        
         <div class="form-extra">
           <label>
             <input type="checkbox"> Manter conectado
@@ -47,7 +45,7 @@
         <h3 class="form-title">Recuperar Senha</h3>
         <p class="form-description">Insira seu e-mail abaixo para receber as instruções de como criar uma nova senha.
         </p>
-        <input type="email" placeholder="Email" required>
+        <input type="email" id="recover-email" placeholder="Email" required>
         <button type="submit" class="btn-custom">Enviar link</button>
         <a href="#" class="back-to-login-link">Voltar para o login</a>
       </form>

@@ -1,27 +1,43 @@
 package br.com.ecologica.controller;
 
-import br.com.ecologica.model.UsuarioLogin;
-import br.com.ecologica.service.LoginService;
-
+import br.com.ecologica.dto.LoginRequestDTO;
+import br.com.ecologica.dto.LoginResponseDTO;
+import br.com.ecologica.infra.security.TokenService;
+import br.com.ecologica.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/login")
 public class LoginController {
 
-	@Autowired
-	private LoginService loginService;
+    @Autowired
+    private AuthenticationManager manager;
 
-	@PostMapping
-	public ResponseEntity<String> login(@RequestBody UsuarioLogin login) {
-		String token = loginService.autenticar(login.getEmail(), login.getSenha());
-		if (token != null) {
-			return ResponseEntity.ok(token);
-		} else {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
-		}
-	}
+    @Autowired
+    private TokenService tokenService;
+
+    @PostMapping
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO dados) {
+        
+        // O Lombok cria o getEmail() e getSenha() automaticamente
+        var tokenAutenticacao = new UsernamePasswordAuthenticationToken(dados.getEmail(), dados.getSenha());
+
+        Authentication authentication = manager.authenticate(tokenAutenticacao);
+        var usuario = (Usuario) authentication.getPrincipal();
+        String tokenJWT = tokenService.gerarToken(usuario);
+
+        return ResponseEntity.ok(new LoginResponseDTO(
+            tokenJWT, 
+            usuario.getNome(), 
+            usuario.getTipoUsuario()
+        ));
+    }
 }
