@@ -13,44 +13,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Carrega dados fictícios (simulados) da empresa e preenche a página.
-     * @description Simula uma busca de backend e atualiza o DOM com nome, email, endereço, CNPJ e pontos.
      */
     const loadUserData = () => {
-        console.log("Função loadUserData (Empresa) chamada (simulando busca de dados)");
+        console.log("Função loadUserData (Empresa) chamada");
 
         // Simulação de dados da Empresa
         const simData = {
             name: "Recicladora Vale Limpo Ltda.",
             email: "contato@valelimpo.com",
-            address: "Rua Industrial, 1000, Itoupava",
+            address: "Rua Industrial, 1000, Itoupava Norte, Blumenau-SC",
             cnpj: "12.345.678/0001-99",
-            // Simula um total de pontos gerados por usuários (um número maior)
-            points: Math.floor(Math.random() * 7000) + 1500, // Ex: 1500 a 8500
-            avatar: "img/avatar/avatar-emp.png"
+            points: Math.floor(Math.random() * 7000) + 1500,
+            avatar: "img/avatar/avatar-emp.png",
+            memberSince: "17/11/2025" // <--- Data definida aqui
         };
 
-        // Preenche o perfil principal com IDs da EMPRESA
+        // Preenche os campos na tela
         if (document.getElementById('company-name')) document.getElementById('company-name').textContent = simData.name;
         if (document.getElementById('company-email')) document.getElementById('company-email').textContent = simData.email;
+        
+        // Preenche a data de membro
+        if (document.getElementById('company-member-since')) {
+            document.getElementById('company-member-since').textContent = simData.memberSince;
+        }
 
         const userAddressEl = document.getElementById('company-address');
-        if (userAddressEl) {
-            userAddressEl.textContent = simData.address || '[Endereço não cadastrado]';
-        } else {
-            console.warn("Elemento #company-address não encontrado no HTML do perfil.");
-        }
+        if (userAddressEl) userAddressEl.textContent = simData.address || '[Endereço não cadastrado]';
 
         const companyCnpjEl = document.getElementById('company-cnpj');
-        if (companyCnpjEl) {
-            companyCnpjEl.textContent = simData.cnpj || '[CNPJ não cadastrado]';
-        } else {
-            console.warn("Elemento #company-cnpj não encontrado no HTML do perfil.");
-        }
+        if (companyCnpjEl) companyCnpjEl.textContent = simData.cnpj || '[CNPJ não cadastrado]';
 
         const avatarDisplay = document.getElementById('company-avatar-display');
         if (avatarDisplay) avatarDisplay.src = simData.avatar;
 
-        // Preenche os pontos (MANTIDO, pois a seção existe no HTML)
         const pointsValueEl = document.getElementById('user-points-value');
         if (pointsValueEl) pointsValueEl.textContent = simData.points;
     };

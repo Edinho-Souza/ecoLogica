@@ -312,3 +312,37 @@
   --bs-btn-hover-bg: #3a7547;
   --bs-btn-hover-border-color: #3a7547;
 }
+
+/* Botão de Fechar do Lightbox - Versão Final Fixa */
+.lightbox-close-btn {
+    position: absolute;
+    top: -15px;       /* Sobe um pouco para fora da imagem/modal */
+    right: -15px;     /* Vai para a direita, meio fora meio dentro */
+    z-index: 1060;
+    background-color: #fff !important; /* Fundo branco para contraste máximo */
+    color: #000;      /* X preto */
+    border-radius: 50%;
+    padding: 10px;    /* Tamanho do clique */
+    width: 40px;      /* Largura fixa */
+    height: 40px;     /* Altura fixa para garantir círculo perfeito */
+    background-size: 14px; /* Tamanho do ícone X interno */
+    opacity: 1 !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5); /* Sombra para destacar */
+    transition: transform 0.2s ease;
+}
+
+.lightbox-close-btn:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+/* Ajuste para telas muito pequenas (celular em pé) */
+@media (max-width: 576px) {
+    .lightbox-close-btn {
+        top: 0;       /* No celular, cola no topo */
+        right: 0;     /* Cola na direita */
+        background-color: rgba(0, 0, 0, 0.6); /* Fundo escuro transparente */
+        filter: invert(1); /* Inverte a cor do X para branco */
+    }
+}

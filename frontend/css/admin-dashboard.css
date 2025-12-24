@@ -239,39 +239,99 @@
     font-size: 0.7rem;
 }
 
-/* --- Definição de Largura das Colunas da Tabela de Usuários --- */
+/* --- Definição de Largura das Colunas da Tabela de Usuários (AJUSTADO) --- */
 
+/* 1. Coluna Nome */
 .user-management-section .admin-table th:nth-child(1),
 .user-management-section .admin-table td:nth-child(1) {
     width: 25%;
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis; /* Adiciona "..." se cortar */
 }
 
+/* 2. Coluna Email (Mais larga) */
 .user-management-section .admin-table th:nth-child(2),
 .user-management-section .admin-table td:nth-child(2) {
     width: 30%;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+/* 3. Coluna Pontos (Centralizada) */
 .user-management-section .admin-table th:nth-child(3),
 .user-management-section .admin-table td:nth-child(3) {
     width: 10%;
     text-align: center;
 }
 
+/* 4. Coluna Status (Centralizada) */
 .user-management-section .admin-table th:nth-child(4),
 .user-management-section .admin-table td:nth-child(4) {
     width: 10%;
     text-align: center;
 }
 
+/* 5. Coluna Ações (Espaço para botões) */
 .user-management-section .admin-table th:nth-child(5),
 .user-management-section .admin-table td:nth-child(5) {
-    width: 15.5%;
+    width: 25%;
     text-align: center;
     white-space: nowrap;
+}
+
+/* --- Definição de Largura das Colunas da Tabela de Logs (AJUSTADO) --- */
+
+/* 1. Data/Hora (15%) - Espaço suficiente para dd/mm/aaaa hh:mm */
+.activity-logs-section .admin-table th:nth-child(1),
+.activity-logs-section .admin-table td:nth-child(1) {
+    width: 15%;
+    white-space: nowrap;
+}
+
+/* 2. Usuário (15%) - Se for longo, corta com "..." */
+.activity-logs-section .admin-table th:nth-child(2),
+.activity-logs-section .admin-table td:nth-child(2) {
+    width: 15%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 3. Ação (15%) */
+.activity-logs-section .admin-table th:nth-child(3),
+.activity-logs-section .admin-table td:nth-child(3) {
+    width: 15%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 4. Detalhes (25%) - A maior coluna, para descrição do material */
+.activity-logs-section .admin-table th:nth-child(4),
+.activity-logs-section .admin-table td:nth-child(4) {
+    width: 25%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 5. Pontos (10%) - Centralizado e destacado */
+.activity-logs-section .admin-table th:nth-child(5),
+.activity-logs-section .admin-table td:nth-child(5) {
+    width: 10%;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* 6. Empresa (20%) - Espaço final */
+.activity-logs-section .admin-table th:nth-child(6),
+.activity-logs-section .admin-table td:nth-child(6) {
+    width: 20%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ==========================================================================

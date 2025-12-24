@@ -48,14 +48,33 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     initChart();
 
+// ===================================================================
+    // 2. DADOS DO USUÁRIO (ATUALIZADO COM MEMBRO DESDE)
+    // ===================================================================
     const loadUserData = () => {
-        const simData = { name: "Sofia Terra", email: "terradasofia@ecologica.com", points: 500, address: "Rua das Flores, 123" };
+        // Tenta carregar usuário real do localStorage (sincronia com Admin)
+        const storedUsers = JSON.parse(localStorage.getItem('ecoLogica_Users')) || [];
+        
+        // Procura o usuário logado (Simulando ID 1 - Sofia Terra)
+        let user = storedUsers.find(u => u.id === 1) || {
+            name: "Sofia Terra",
+            email: "terradasofia@ecologica.com",
+            points: 500,
+            address: "Rua Jardins, 789, Nações, Indaial-SC",
+            memberSince: "17/11/2025" // Data padrão simulada
+        };
+
+        // Garante que o campo exista (caso venha do Admin sem essa info)
+        if (!user.memberSince) user.memberSince = "15/03/2024";
+
         const setText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
-        setText('user-name', simData.name);
-        setText('user-email', simData.email);
-        setText('user-address', simData.address);
-        setText('user-points-value', simData.points);
-        setText('modal-user-points', simData.points);
+        
+        setText('user-name', user.name);
+        setText('user-email', user.email);
+        setText('user-member-since', user.memberSince); // <--- Preenche a data
+        setText('user-address', user.address || "Rua das Flores, 123");
+        setText('user-points-value', user.points);
+        setText('modal-user-points', user.points);
     };
     loadUserData();
 
@@ -200,12 +219,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Limpa o lightbox quando fecha
+        // Limpa o lightbox quando fecha E REABRE O MENU ANTERIOR
         const lightboxModalEl = document.getElementById('imageLightboxModal');
         if(lightboxModalEl) {
             lightboxModalEl.addEventListener('hidden.bs.modal', function () {
+                 // 1. Limpa a imagem para não piscar a antiga na próxima vez
                  const lightboxImg = document.getElementById('lightboxImage');
                  if(lightboxImg) lightboxImg.src = '';
+
+                 // 2. Reabre o modal de lista de recompensas
+                 // Verifica se a instância existe e manda mostrar novamente
+                 const redeemModalInstance = bootstrap.Modal.getInstance(redeemModalEl);
+                 if (redeemModalInstance) {
+                     redeemModalInstance.show();
+                 }
             });
         }
     }
