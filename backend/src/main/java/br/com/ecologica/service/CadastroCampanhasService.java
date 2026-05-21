@@ -43,6 +43,8 @@ public class CadastroCampanhasService {
         campanha.setDescricao(request.getDescricao());
         campanha.setDataInicio(request.getDataInicio());
         campanha.setDataFim(request.getDataFim());
+        campanha.setImagemUrl(request.getImagemUrl());
+        campanha.setPontosExtras(request.getPontosExtras());
         campanha.setEmpresaApoiadora(apoiadora);
 
         return repository.save(campanha);
@@ -59,6 +61,8 @@ public class CadastroCampanhasService {
         campanhaExistente.setDescricao(request.getDescricao());
         campanhaExistente.setDataInicio(request.getDataInicio());
         campanhaExistente.setDataFim(request.getDataFim());
+        campanhaExistente.setImagemUrl(request.getImagemUrl());
+        campanhaExistente.setPontosExtras(request.getPontosExtras());
         campanhaExistente.setEmpresaApoiadora(apoiadora);
 
         return repository.save(campanhaExistente);

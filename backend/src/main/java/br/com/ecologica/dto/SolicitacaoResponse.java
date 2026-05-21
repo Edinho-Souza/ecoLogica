@@ -11,6 +11,8 @@ public class SolicitacaoResponse {
     private String descricao;
     private StatusSolicitacao status;
     private LocalDateTime dataSolicitacao;
+    private Long idUsuario;
+    private Long idRecicladora;
     private String nomeUsuario;
     private String nomeRecicladora;
 
@@ -22,10 +24,14 @@ public class SolicitacaoResponse {
         response.setDataSolicitacao(s.getDataSolicitacao());
         
         if (s.getUsuario() != null) {
+            response.setIdUsuario(s.getUsuario().getId());
             response.setNomeUsuario(s.getUsuario().getNome());
         }
-        if (s.getEmpresaRecicladora() != null && s.getEmpresaRecicladora().getUsuario() != null) {
-            response.setNomeRecicladora(s.getEmpresaRecicladora().getUsuario().getNome());
+        if (s.getEmpresaRecicladora() != null) {
+            response.setIdRecicladora(s.getEmpresaRecicladora().getId());
+            if (s.getEmpresaRecicladora().getUsuario() != null) {
+                response.setNomeRecicladora(s.getEmpresaRecicladora().getUsuario().getNome());
+            }
         }
         
         return response;

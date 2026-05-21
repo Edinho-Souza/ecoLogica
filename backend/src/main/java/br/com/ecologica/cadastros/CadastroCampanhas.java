@@ -26,6 +26,12 @@ public class CadastroCampanhas {
     @Column(name = "data_fim")
     private LocalDate dataFim;
 
+    @Column(name = "imagem_url", length = 500)
+    private String imagemUrl;
+
+    @Column(name = "pontos_extras")
+    private Integer pontosExtras;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_apoiadora")
     private CadastroEmpresasApoiadoras empresaApoiadora;

@@ -7,6 +7,21 @@
  * 4. Chama scripts específicos da página (como mapa), se existirem.
  */
 
+(() => {
+if (window.__ecoLogicaMainInitialized) {
+    console.warn('main.js ja inicializado; carregamento duplicado ignorado.');
+    return;
+}
+window.__ecoLogicaMainInitialized = true;
+
+document.addEventListener('click', (event) => {
+    const logoutButton = event.target.closest('.js-logout-button');
+    if (!logoutButton) return;
+
+    event.preventDefault();
+    logout();
+});
+
 document.addEventListener("DOMContentLoaded", function () {
 
     // ===================================================================
@@ -213,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         event.preventDefault();
                         event.stopPropagation();
                         console.log("[DEBUG] Header Logado: Redirecionando...");
-                        window.location.href = 'usuario.html';
+                        redirectByRole(localStorage.getItem('user_role'));
                     } else {
                         console.log("[DEBUG] Header Não Logado: Abrindo modal...");
                         authModal.style.display = 'flex';
@@ -237,12 +252,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         if (offcanvasInstance) {
                             offcanvasElement.addEventListener('hidden.bs.offcanvas', () => {
                                 console.log("[DEBUG] Offcanvas Logado: Evento hidden disparado. Redirecionando.");
-                                window.location.href = 'usuario.html';
+                                redirectByRole(localStorage.getItem('user_role'));
                             }, { once: true });
                             offcanvasInstance.hide();
                         } else {
                             console.warn("[DEBUG] Offcanvas Logado: Instância não encontrada. Redirecionando direto.");
-                            window.location.href = 'usuario.html';
+                            redirectByRole(localStorage.getItem('user_role'));
                         }
                     } else {
                         console.log("[DEBUG] Offcanvas Não Logado: Fechando e abrindo modal...");
@@ -311,6 +326,72 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (loginForm) loginForm.classList.add('active');
                     if (loginTab) loginTab.classList.add('active');
                     if (registerTab) registerTab.classList.remove('active');
+                });
+            }
+            const showFeedback = (id, message, isError = false) => {
+                const element = document.getElementById(id);
+                if (!element) return;
+                element.textContent = message;
+                element.style.color = isError ? '#b42318' : '#2c5836';
+            };
+
+            const loginFormElement = document.getElementById('loginForm');
+            if (loginFormElement) {
+                loginFormElement.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    showFeedback('loginFeedback', 'Entrando...');
+                    try {
+                        const loginResponse = await apiFetch('/login', 'POST', {
+                            email: document.getElementById('loginEmail').value.trim(),
+                            senha: document.getElementById('loginPassword').value
+                        }, { skipAuth: true, skipAuthRedirect: true });
+                        saveSession(loginResponse);
+                        redirectByRole(loginResponse.tipoUsuario);
+                    } catch (error) {
+                        showFeedback('loginFeedback', error.message, true);
+                    }
+                });
+            }
+
+            const registerFormElement = document.getElementById('registerForm');
+            if (registerFormElement) {
+                registerFormElement.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    showFeedback('registerFeedback', 'Criando conta...');
+                    const payload = {
+                        nome: document.getElementById('registerName').value.trim(),
+                        cpf: document.getElementById('registerCpf').value.trim(),
+                        email: document.getElementById('registerEmail').value.trim(),
+                        senha: document.getElementById('registerPassword').value,
+                        tipoUsuario: 'cidadao'
+                    };
+
+                    try {
+                        await apiFetch('/usuarios', 'POST', payload, { skipAuth: true, skipAuthRedirect: true });
+                        const loginResponse = await apiFetch('/login', 'POST', {
+                            email: payload.email,
+                            senha: payload.senha
+                        }, { skipAuth: true, skipAuthRedirect: true });
+                        saveSession(loginResponse);
+                        redirectByRole(loginResponse.tipoUsuario);
+                    } catch (error) {
+                        showFeedback('registerFeedback', error.message, true);
+                    }
+                });
+            }
+
+            if (recoverForm) {
+                recoverForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    showFeedback('recoverFeedback', 'Enviando...');
+                    try {
+                        await apiFetch('/recuperar-senha/solicitar', 'POST', {
+                            email: document.getElementById('recoverEmail').value.trim()
+                        }, { skipAuth: true, skipAuthRedirect: true });
+                        showFeedback('recoverFeedback', 'Se o e-mail existir, as instrucoes foram registradas.');
+                    } catch (error) {
+                        showFeedback('recoverFeedback', error.message, true);
+                    }
                 });
             }
             // --- Fim da Lógica Interna do Modal ---
@@ -442,6 +523,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Espera TODAS as partes serem carregadas e SÓ ENTÃO inicializa tudo
     Promise.all(todasAsPartes).then(() => {
+        loadSiteAnnouncement();
         inicializarComponentes();
     });
 
@@ -450,15 +532,52 @@ document.addEventListener("DOMContentLoaded", function () {
 // ===================================================================
 // FUNÇÃO: CARREGAR ANÚNCIO GLOBAL (Integrado com Admin)
 // ===================================================================
-const loadSiteAnnouncement = () => {
+const loadSiteAnnouncement = async () => {
     const container = document.getElementById('site-announcement-container');
     if (!container) return;
+
+    try {
+        const activeAnnouncement = await apiFetch('/avisos/ativo', 'GET', null, { skipAuth: true, skipAuthRedirect: true });
+        if (!activeAnnouncement || !activeAnnouncement.ativo) {
+            container.innerHTML = '';
+            return;
+        }
+
+        let alertClass = 'alert-info';
+        let icon = 'fa-info-circle';
+        if (activeAnnouncement.tipo === 'warning') {
+            alertClass = 'alert-warning';
+            icon = 'fa-exclamation-triangle';
+        } else if (activeAnnouncement.tipo === 'success') {
+            alertClass = 'alert-success';
+            icon = 'fa-check-circle';
+        }
+
+        container.innerHTML = `
+            <div class="alert ${alertClass} alert-dismissible fade show mb-0 text-center rounded-0" role="alert" style="border: none; border-bottom: 1px solid rgba(0,0,0,0.1);">
+                <div class="container">
+                    <i class="fas ${icon} me-2"></i>
+                    <strong>${activeAnnouncement.texto}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+        return;
+    } catch (error) {
+        console.warn('Nao foi possivel carregar aviso do backend. Tentando cache local.', error);
+    }
 
     // 1. Lê os dados salvos pelo Admin
     const announcementData = localStorage.getItem('ecoLogica_CurrentAnnouncement');
 
     if (announcementData) {
-        const announcement = JSON.parse(announcementData);
+        let announcement;
+        try {
+            announcement = JSON.parse(announcementData);
+        } catch (error) {
+            console.warn('Anuncio salvo no localStorage esta invalido.', error);
+            return;
+        }
 
         // Verifica se o anúncio está ativo
         if (announcement.active) {
@@ -489,39 +608,6 @@ const loadSiteAnnouncement = () => {
     }
 };
 
-// Adicione a chamada no final do seu DOMContentLoaded ou script
-document.addEventListener('DOMContentLoaded', () => {
-    // ... outros scripts
-    loadSiteAnnouncement();
-});
-
-// Função para carregar anúncios do Admin
-document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('site-announcement-container');
-    const announcementData = localStorage.getItem('ecoLogica_CurrentAnnouncement');
-
-    if (container && announcementData) {
-        const data = JSON.parse(announcementData);
-
-        // Define a cor baseada no tipo
-        let alertClass = 'alert-info';
-        let icon = 'fa-info-circle';
-
-        if (data.type === 'warning') { alertClass = 'alert-warning'; icon = 'fa-exclamation-triangle'; }
-        if (data.type === 'success') { alertClass = 'alert-success'; icon = 'fa-check-circle'; }
-
-        container.innerHTML = `
-            <div class="alert ${alertClass} alert-dismissible fade show mb-0 text-center rounded-0 border-0" role="alert">
-                <div class="container">
-                    <i class="fas ${icon} me-2"></i>
-                    <strong>${data.text}</strong>
-                    <small class="ms-2 text-muted">(${data.date})</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            </div>
-        `;
-    }
-});
 
 // ===================================================================
 // FUNÇÃO: CARREGAR BANNERS (FADE 10s + BARRAS FINAS + ALTURA MENOR)
@@ -590,3 +676,5 @@ const loadSiteAdBanner = () => {
         }
     }
 };
+
+})();

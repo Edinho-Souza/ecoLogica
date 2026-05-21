@@ -1,173 +1,87 @@
-/**
- * @file emp-map.js
- * Gerencia o mapa de solicitações de coleta e a lista de coletas
- * no painel da empresa recicladora.
- */
-
-document.addEventListener('DOMContentLoaded', () => {
-
-    // --- VERIFICA SE ESTAMOS NA PÁGINA CORRETA ---
+document.addEventListener('DOMContentLoaded', async () => {
     const mapElement = document.getElementById('collectionMap');
-    if (!mapElement) {
-        // Não estamos na página do dashboard da empresa ou o elemento do mapa não existe.
-        return; 
-    }
+    const listContainer = document.getElementById('collection-requests-list');
+    const placeholder = document.getElementById('requests-placeholder');
+    if (!mapElement || !listContainer) return;
 
-    console.log("emp-map.js: Mapa de Coletas iniciado.");
-
-    // --- 1. DADOS SIMULADOS (com coordenadas) ---
-    // (Coordenadas fictícias ao redor de Blumenau/SC)
-    const simRequests = [
-        {
-            id: 1,
-            userName: "Ana Silva",
-            date: "27/10/2025",
-            materials: "Plástico, Papel",
-            details: "Aprox. 2 sacolas",
-            address: "Rua das Flores, 123, Bairro Jardim",
-            lat: -26.9183,
-            lng: -49.0691
-        },
-        {
-            id: 2,
-            userName: "Bruno Costa",
-            date: "26/10/2025",
-            materials: "Vidro, Metal",
-            details: "Aprox. 1 caixa",
-            address: "Av. Central, 789, Centro",
-            lat: -26.9110,
-            lng: -49.0662
-        },
-        {
-            id: 3,
-            userName: "Carla Mendes",
-            date: "26/10/2025",
-            materials: "Óleo de Cozinha",
-            details: "5 garrafas PET",
-            address: "Rua das Palmeiras, 456, Itoupava",
-            lat: -26.8520,
-            lng: -49.1015
-        },
-        {
-            id: 4,
-            userName: "Daniel Moreira",
-            date: "25/10/2025",
-            materials: "Eletrônicos",
-            details: "1 monitor antigo, 2 celulares",
-            address: "Travessa dos Pinheiros, 10, Velha",
-            lat: -26.9244,
-            lng: -49.0918
-        }
-    ];
+    const session = requireLogin();
+    if (!session) return;
 
     let map;
-    const markers = {}; // Objeto para guardar os marcadores por ID
 
-    /**
-     * --- 2. INICIALIZA O MAPA LEAFLET ---
-     */
     const initCollectionMap = () => {
-        try {
-            // Inicializa o mapa, centrado em Blumenau
-            map = L.map('collectionMap').setView([-26.9110, -49.0662], 13);
-
-            // Adiciona o "fundo" do mapa (OpenStreetMap)
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            // Adiciona os marcadores
-            simRequests.forEach(request => {
-                const marker = L.marker([request.lat, request.lng]).addTo(map);
-                
-                // Conteúdo do popup
-                marker.bindPopup(`
-                    <strong>${request.userName}</strong><br>
-                    ${request.address}<br>
-                    <strong>Materiais:</strong> ${request.materials}
-                `);
-                
-                // Guarda o marcador para referência futura
-                markers[request.id] = marker;
-            });
-
-        } catch (error) {
-            console.error("Erro ao inicializar o mapa Leaflet:", error);
-            mapElement.innerHTML = '<p class="text-danger text-center">Erro ao carregar o mapa. Verifique a conexão e a biblioteca Leaflet.</p>';
+        if (typeof L === 'undefined') {
+            mapElement.innerHTML = '<p class="text-danger text-center p-3">Mapa indisponivel.</p>';
+            return;
         }
+
+        map = L.map('collectionMap').setView([-26.9110, -49.0662], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
     };
 
-    /**
-     * --- 3. PREENCHE A LISTA DE SOLICITAÇÕES ---
-     * (E adiciona os listeners para interagir com o mapa)
-     */
-    const populateRequestList = () => {
-        const listContainer = document.getElementById('collection-requests-list');
-        const placeholder = document.getElementById('requests-placeholder');
-        
-        if (!listContainer || !placeholder) {
-            console.warn("Elementos da lista de solicitações não encontrados.");
+    const statusBadge = (status) => {
+        if (status === 'concluida') return 'bg-success';
+        if (status === 'andamento') return 'bg-warning text-dark';
+        return 'bg-secondary';
+    };
+
+    const renderRequests = (requests) => {
+        if (placeholder) placeholder.style.display = 'none';
+        listContainer.innerHTML = '';
+
+        if (!requests.length) {
+            listContainer.innerHTML = '<p class="text-center text-muted mt-3">Nenhuma solicitacao de coleta no momento.</p>';
             return;
         }
 
-        // Limpa o placeholder
-        placeholder.style.display = 'none';
-        listContainer.innerHTML = ''; 
-
-        if (simRequests.length === 0) {
-            placeholder.textContent = "Nenhuma solicitação de coleta no momento.";
-            placeholder.style.display = 'block';
-            return;
-        }
-
-        // Preenche a lista com os dados
-        simRequests.forEach(request => {
-            const requestCardHTML = `
-                <div class="request-item">
-                    <div class="request-item-header">
-                        <strong>${request.userName}</strong>
-                        <span class="request-item-date">${request.date}</span>
-                    </div>
-                    <div class="request-item-body">
-                        <p class="mb-1">
-                            <strong>Materiais:</strong> ${request.materials} <em>(${request.details})</em>
-                        </p>
-                        <p class="mb-2">
-                            <strong>Endereço:</strong> ${request.address}
-                        </p>
-                    </div>
-                    <button class="btn btn-sm btn-success w-100" data-request-id="${request.id}">
-                        <i class="fas fa-map-marker-alt me-1"></i> Ver no Mapa
-                    </button>
+        requests.forEach(request => {
+            const item = document.createElement('div');
+            item.className = 'request-item';
+            item.innerHTML = `
+                <div class="request-item-header">
+                    <strong>${request.nomeUsuario || 'Usuario'}</strong>
+                    <span class="badge ${statusBadge(request.status)}">${request.status || 'pendente'}</span>
+                </div>
+                <div class="request-item-body">
+                    <p class="mb-2">${request.descricao || 'Sem descricao'}</p>
+                    <small class="text-muted">${request.dataSolicitacao ? new Date(request.dataSolicitacao).toLocaleString('pt-BR') : ''}</small>
+                </div>
+                <div class="d-flex gap-2 mt-2">
+                    <button class="btn btn-sm btn-outline-primary flex-fill" data-status="andamento" data-request-id="${request.id}">Em andamento</button>
+                    <button class="btn btn-sm btn-success flex-fill" data-status="concluida" data-request-id="${request.id}">Concluir</button>
                 </div>
             `;
-            listContainer.innerHTML += requestCardHTML;
-        });
-        
-        // --- 4. ADICIONA OS LISTENERS DE CLIQUE ---
-        listContainer.querySelectorAll('.btn-success').forEach(button => {
-            button.addEventListener('click', (event) => {
-                const requestId = event.currentTarget.getAttribute('data-request-id');
-                
-                console.log(`Clicou em Ver no Mapa para a solicitação ID: ${requestId}`);
-                
-                const targetMarker = markers[requestId];
-                
-                if (map && targetMarker) {
-                    // Centraliza o mapa no marcador
-                    map.flyTo(targetMarker.getLatLng(), 15); // Zoom mais próximo (nível 15)
-                    
-                    // Abre o popup do marcador
-                    targetMarker.openPopup();
-                } else {
-                    alert(`Erro: Marcador para a solicitação ${requestId} não encontrado.`);
-                }
+
+            item.querySelectorAll('button[data-status]').forEach(button => {
+                button.addEventListener('click', async () => {
+                    button.disabled = true;
+                    try {
+                        await apiFetch(`/solicitacoes/${button.dataset.requestId}/status`, 'PATCH', {
+                            status: button.dataset.status
+                        });
+                        await loadRequests();
+                    } catch (error) {
+                        alert(error.message);
+                        button.disabled = false;
+                    }
+                });
             });
+
+            listContainer.appendChild(item);
         });
     };
 
-    // --- 5. EXECUÇÃO ---
-    initCollectionMap();
-    populateRequestList();
+    async function loadRequests() {
+        try {
+            const requests = await apiFetch(`/solicitacoes/recicladora/${session.id}`);
+            renderRequests(requests);
+        } catch (error) {
+            listContainer.innerHTML = `<p class="text-danger text-center mt-3">${error.message}</p>`;
+        }
+    }
 
+    initCollectionMap();
+    await loadRequests();
 });

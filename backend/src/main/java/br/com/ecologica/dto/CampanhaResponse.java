@@ -1,9 +1,8 @@
 package br.com.ecologica.dto;
 
+import br.com.ecologica.cadastros.CadastroCampanhas;
 import lombok.Data;
 import java.time.LocalDate;
-
-import br.com.ecologica.cadastros.CadastroCampanhas;
 
 @Data
 public class CampanhaResponse {
@@ -12,7 +11,10 @@ public class CampanhaResponse {
     private String descricao;
     private LocalDate dataInicio;
     private LocalDate dataFim;
+    private Long idApoiadora;
     private String nomeEmpresaApoiadora;
+    private String imagemUrl;
+    private Integer pontosExtras;
 
     public static CampanhaResponse fromEntity(CadastroCampanhas campanha) {
         CampanhaResponse response = new CampanhaResponse();
@@ -21,10 +23,14 @@ public class CampanhaResponse {
         response.setDescricao(campanha.getDescricao());
         response.setDataInicio(campanha.getDataInicio());
         response.setDataFim(campanha.getDataFim());
+        response.setImagemUrl(campanha.getImagemUrl());
+        response.setPontosExtras(campanha.getPontosExtras());
 
-        if (campanha.getEmpresaApoiadora() != null && 
-            campanha.getEmpresaApoiadora().getUsuario() != null) {
-            response.setNomeEmpresaApoiadora(campanha.getEmpresaApoiadora().getUsuario().getNome());
+        if (campanha.getEmpresaApoiadora() != null) {
+            response.setIdApoiadora(campanha.getEmpresaApoiadora().getId());
+            if (campanha.getEmpresaApoiadora().getUsuario() != null) {
+                response.setNomeEmpresaApoiadora(campanha.getEmpresaApoiadora().getUsuario().getNome());
+            }
         }
         return response;
     }

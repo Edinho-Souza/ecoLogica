@@ -35,7 +35,10 @@ public class PontuacaoService {
         ExibicaoRanking ranking = rankingRepository.findByUsuario_Id(request.getIdUsuario())
                 .orElse(new ExibicaoRanking(usuario));
         
-        ranking.setPontos(ranking.getPontos() + request.getPontos());
+        int pontosAntes = ranking.getPontos();
+        int pontosDepois = Math.max(pontosAntes + request.getPontos(), 0);
+        int pontosAplicados = pontosDepois - pontosAntes;
+        ranking.setPontos(pontosDepois);
         ExibicaoRanking rankingSalvo = rankingRepository.save(ranking);
         
         HistoricoPontuacao historico = new HistoricoPontuacao();
@@ -43,7 +46,7 @@ public class PontuacaoService {
         
         // Salva os pontos e a descrição em campos separados
         historico.setDescricao(request.getAtividade());
-        historico.setPontos(request.getPontos());
+        historico.setPontos(pontosAplicados);
         historico.setExpirado(false); // Marca como não expirado
         
         historicoRepository.save(historico);

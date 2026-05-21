@@ -15,6 +15,7 @@ import br.com.ecologica.repository.CadastroTipoMateriaisRepository;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,13 +38,22 @@ public class CadastroLocaisColetaService {
 				&& usuarioAutenticado.getTipoUsuario() != TipoUsuario.admin) {
 			throw new AccessDeniedException("Usuário não tem permissão para criar locais de coleta.");
 		}
-		Long idRecicladora = usuarioAutenticado.getId();
+		Long idRecicladora = usuarioAutenticado.getTipoUsuario() == TipoUsuario.admin
+				? request.getIdRecicladora()
+				: usuarioAutenticado.getId();
+		if (idRecicladora == null) {
+			throw new IllegalArgumentException("Informe a empresa recicladora responsavel pelo ponto de coleta.");
+		}
 		CadastroEmpresasRecicladoras recicladora = recicladoraRepository.findById(idRecicladora)
 				.orElseThrow(() -> new RuntimeException("Empresa Recicladora não encontrada para o usuário logado"));
 		CadastroLocaisColeta local = new CadastroLocaisColeta();
 		local.setNome(request.getNome());
 		local.setEndereco(request.getEndereco());
+		local.setCidade(request.getCidade());
+		local.setLatitude(request.getLatitude());
+		local.setLongitude(request.getLongitude());
 		local.setEmpresaRecicladora(recicladora);
+		local.setTiposMateriaisAceitos(buscarTiposMateriais(request.getTiposMateriaisIds()));
 		return repository.save(local);
 	}
 
@@ -52,11 +62,26 @@ public class CadastroLocaisColetaService {
 		return repository.findById(id).map(local -> {
 			checarPropriedadeOuAdmin(local, usuarioAutenticado);
 			CadastroEmpresasRecicladoras recicladora = local.getEmpresaRecicladora();
+			if (usuarioAutenticado.getTipoUsuario() == TipoUsuario.admin && request.getIdRecicladora() != null) {
+				recicladora = recicladoraRepository.findById(request.getIdRecicladora())
+						.orElseThrow(() -> new RuntimeException("Empresa Recicladora nao encontrada."));
+			}
 			local.setNome(request.getNome());
 			local.setEndereco(request.getEndereco());
+			local.setCidade(request.getCidade());
+			local.setLatitude(request.getLatitude());
+			local.setLongitude(request.getLongitude());
 			local.setEmpresaRecicladora(recicladora);
+			local.setTiposMateriaisAceitos(buscarTiposMateriais(request.getTiposMateriaisIds()));
 			return repository.save(local);
 		});
+	}
+
+	private List<CadastroTipoMateriais> buscarTiposMateriais(List<Long> ids) {
+		if (ids == null || ids.isEmpty()) {
+			return new ArrayList<>();
+		}
+		return new ArrayList<>(tipoMaterialRepository.findAllById(ids));
 	}
 
 	public List<CadastroLocaisColeta> listarTodos() {

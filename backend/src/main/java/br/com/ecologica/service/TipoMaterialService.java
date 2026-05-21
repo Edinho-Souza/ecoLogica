@@ -2,10 +2,12 @@ package br.com.ecologica.service;
 
 import br.com.ecologica.cadastros.CadastroTipoMateriais;
 import br.com.ecologica.dto.TipoMateriaisRequest;
+import br.com.ecologica.repository.CadastroLocaisColetaRepository;
 import br.com.ecologica.repository.CadastroTipoMateriaisRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +15,8 @@ import java.util.Optional;
 public class TipoMaterialService {
     @Autowired
     private CadastroTipoMateriaisRepository repository;
+    @Autowired
+    private CadastroLocaisColetaRepository locaisColetaRepository;
     
     public List<CadastroTipoMateriais> listarTodos() {
         return repository.findAll();
@@ -40,10 +44,16 @@ public class TipoMaterialService {
         return repository.save(existente);
     }
     
+    @Transactional
     public void deletar(Long id) {
-        if (!repository.existsById(id)) {
-             throw new RuntimeException("Tipo de Material não encontrado");
-        }
-        repository.deleteById(id);
+        CadastroTipoMateriais tipo = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tipo de Material nao encontrado"));
+
+        locaisColetaRepository.findAll().forEach(local -> {
+            if (local.getTiposMateriaisAceitos() != null && local.getTiposMateriaisAceitos().remove(tipo)) {
+                locaisColetaRepository.save(local);
+            }
+        });
+        repository.delete(tipo);
     }
 }

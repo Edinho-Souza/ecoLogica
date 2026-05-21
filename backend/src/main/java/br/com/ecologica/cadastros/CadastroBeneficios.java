@@ -22,4 +22,11 @@ public class CadastroBeneficios {
 	@Column(name = "pontos_necessarios", nullable = false)
 	private int pontosNecessarios;
 
+	@Lob
+	@Column(name = "imagem_url", columnDefinition = "LONGTEXT")
+	private String imagemUrl;
+
+	@Column(name = "estoque")
+	private Integer estoque;
+
 }

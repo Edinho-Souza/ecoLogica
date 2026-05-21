@@ -1,6 +1,7 @@
 package br.com.ecologica.login.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.ecologica.service.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,52 +21,69 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import br.com.ecologica.service.CustomUserDetailsService;
-
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final String allowedOrigins;
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            CustomUserDetailsService customUserDetailsService,
+            @Value("${app.cors.allowed-origins}") String allowedOrigins) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.customUserDetailsService = customUserDetailsService;
+        this.allowedOrigins = allowedOrigins;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Configuração CORS explícita
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
-                // Rotas Públicas
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/login/**", "/api/recuperar-senha/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Cadastro
-                .requestMatchers(HttpMethod.GET, 
-                    "/api/campanhas/ativas", 
-                    "/api/noticias/**", 
+                .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
+                .requestMatchers(HttpMethod.GET,
+                    "/api/campanhas/ativas",
+                    "/api/noticias/**",
                     "/api/ranking",
-                    "/api/beneficios", 
-                    "/api/locais-coleta/**", 
+                    "/api/beneficios",
+                    "/api/beneficios/**",
+                    "/api/locais-coleta/**",
                     "/api/tipos-materiais",
-                    "/api/orientacoes/ativas").permitAll()
+                    "/api/tipos-materiais/**",
+                    "/api/avisos/ativo",
+                    "/api/orientacoes/ativas",
+                    "/api/empresas-recicladoras/**",
+                    "/api/empresas-apoiadoras/aprovadas").permitAll()
 
-                // Rotas Admin
-                .requestMatchers("/api/admin/**", "/api/conteudo/**", "/api/estatisticas/**").hasAuthority("admin")
+                .requestMatchers(HttpMethod.GET, "/api/usuarios/me").authenticated()
+                .requestMatchers(HttpMethod.PUT, "/api/usuarios/me").authenticated()
+
+                .requestMatchers("/api/admin/**").hasAuthority("admin")
+                .requestMatchers(HttpMethod.GET, "/api/usuarios/**").hasAuthority("admin")
+                .requestMatchers(HttpMethod.PUT, "/api/usuarios/**").hasAuthority("admin")
+                .requestMatchers(HttpMethod.DELETE, "/api/usuarios/**").hasAuthority("admin")
+                .requestMatchers("/api/conteudo/**", "/api/estatisticas/**").hasAuthority("admin")
+                .requestMatchers(HttpMethod.POST, "/api/avisos").hasAuthority("admin")
+                .requestMatchers(HttpMethod.DELETE, "/api/avisos/**").hasAuthority("admin")
                 .requestMatchers(HttpMethod.POST, "/api/campanhas", "/api/noticias", "/api/beneficios", "/api/tipos-materiais", "/api/orientacoes").hasAuthority("admin")
                 .requestMatchers(HttpMethod.PUT, "/api/campanhas/**", "/api/noticias/**", "/api/beneficios/**", "/api/tipos-materiais/**", "/api/orientacoes/**").hasAuthority("admin")
-                .requestMatchers(HttpMethod.DELETE, "/api/**").hasAuthority("admin") 
-
-                // Rotas Recicladora e Admin
                 .requestMatchers("/api/locais-coleta/**", "/api/dias-horarios/**", "/api/materiais/**").hasAnyAuthority("admin", "recicladora")
-                
-                // Rotas Autenticadas (Todas as outras)
+                .requestMatchers("/api/solicitacoes/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/pontuacao/atribuir").hasAnyAuthority("admin", "recicladora")
+                .requestMatchers("/api/pontuacao/**").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/**").hasAuthority("admin")
+
                 .anyRequest().authenticated()
             );
 
@@ -93,11 +111,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:3000")); // Adicione as URLs do seu front
+        configuration.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isBlank())
+                .toList());
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

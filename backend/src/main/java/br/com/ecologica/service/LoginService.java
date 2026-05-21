@@ -1,34 +1,40 @@
 package br.com.ecologica.service;
 
+import br.com.ecologica.dto.LoginResponse;
+import br.com.ecologica.login.security.CustomUserDetails;
 import br.com.ecologica.login.security.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.ecologica.model.Usuario;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LoginService {
 
-    @Autowired
-    private AuthenticationManager authenticationManager; 
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
-    
-    @Autowired
-    private JwtUtil jwtUtil;
-    
-    @Autowired
-    private PasswordEncoder passwordEncoder; 
+    public LoginService(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+    }
 
-    public String autenticar(String email, String senha) {
-        authenticationManager.authenticate(
+    public LoginResponse autenticar(String email, String senha) {
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, senha)
         );
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-                return jwtUtil.gerarToken(userDetails);
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Usuario usuario = userDetails.getUsuario();
+        String token = jwtUtil.gerarToken(userDetails);
+
+        return new LoginResponse(
+                token,
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getTipoUsuario()
+        );
     }
 }

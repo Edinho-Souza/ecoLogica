@@ -24,6 +24,15 @@ public class CadastroLocaisColeta {
     @Column(length = 200)
     private String endereco;
 
+    @Column(length = 80)
+    private String cidade;
+
+    @Column(precision = 10)
+    private Double latitude;
+
+    @Column(precision = 10)
+    private Double longitude;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_recicladora")
     @ToString.Exclude // Evita loop infinito no log

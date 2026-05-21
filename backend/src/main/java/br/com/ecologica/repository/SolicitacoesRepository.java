@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface SolicitacoesRepository extends JpaRepository<VisualizacaoSolicitacoes, Long> {
     List<VisualizacaoSolicitacoes> findByUsuarioId(Long usuarioId);
+    List<VisualizacaoSolicitacoes> findByEmpresaRecicladora_Id(Long recicladoraId);
 }

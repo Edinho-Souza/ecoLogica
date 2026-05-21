@@ -288,6 +288,18 @@
   align-items: center;
 }
 
+.profile-v2-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.profile-v2-actions .btn {
+  white-space: nowrap;
+}
+
 /* --- Orientações V2 (Accordion, usado por ambos) --- */
 .guidelines-section-v2 h2 {
   margin-bottom: 1.5rem;

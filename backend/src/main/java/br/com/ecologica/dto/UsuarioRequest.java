@@ -4,30 +4,28 @@ import br.com.ecologica.model.TipoUsuario;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
 public class UsuarioRequest {
 
-	@NotBlank(message = "O nome é obrigatório")
-	private String nome;
+    @NotBlank(message = "O nome e obrigatorio")
+    private String nome;
 
-	@NotBlank(message = "O CPF é obrigatório")
-	@Pattern(regexp = "\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}", message = "O CPF deve estar no formato 000.000.000-00")
-	private String cpf;
+    // CPF e obrigatorio apenas para cidadao; empresas usam CNPJ.
+    private String cpf;
 
-	@Email(message = "E-mail inválido")
-	@NotBlank(message = "O e-mail é obrigatório")
-	private String email;
+    @Email(message = "E-mail invalido")
+    @NotBlank(message = "O e-mail e obrigatorio")
+    private String email;
 
-	@NotBlank(message = "A senha é obrigatória")
-	private String senha;
+    @NotBlank(message = "A senha e obrigatoria")
+    private String senha;
 
-	@NotNull(message = "O tipo de usuário é obrigatório")
-	private TipoUsuario tipoUsuario;
+    @NotNull(message = "O tipo de usuario e obrigatorio")
+    private TipoUsuario tipoUsuario;
 
-	private String cnpj;
-	private String endereco;
-	private String telefone;
+    private String cnpj;
+    private String endereco;
+    private String telefone;
 }

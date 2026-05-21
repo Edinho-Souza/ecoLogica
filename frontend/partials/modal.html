@@ -20,8 +20,8 @@
       </div>
 
       <form id="loginForm" class="modal-form active">
-        <input type="email" placeholder="Email" required>
-        <input type="password" placeholder="Senha" required>
+        <input id="loginEmail" type="email" placeholder="Email" required>
+        <input id="loginPassword" type="password" placeholder="Senha" required>
         <div class="form-extra">
           <label>
             <input type="checkbox"> Manter conectado
@@ -29,26 +29,30 @@
           <a href="#" class="recover-link">Recuperar senha?</a>
         </div>
         <button type="submit" class="btn-custom">Entrar</button>
+        <p id="loginFeedback" class="form-description" aria-live="polite"></p>
       </form>
 
       <form id="registerForm" class="modal-form">
-        <input type="text" placeholder="Nome completo" required>
-        <input type="email" placeholder="Email" required>
-        <input type="password" placeholder="Senha" required>
+        <input id="registerName" type="text" placeholder="Nome completo" required>
+        <input id="registerCpf" type="text" placeholder="CPF (somente numeros)" required>
+        <input id="registerEmail" type="email" placeholder="Email" required>
+        <input id="registerPassword" type="password" placeholder="Senha" required>
         <div class="form-extra">
           <label>
             <input type="checkbox"> Manter conectado
           </label>
         </div>
         <button type="submit" class="btn-custom">Cadastrar</button>
+        <p id="registerFeedback" class="form-description" aria-live="polite"></p>
       </form>
 
       <form id="recoverForm" class="modal-form">
         <h3 class="form-title">Recuperar Senha</h3>
         <p class="form-description">Insira seu e-mail abaixo para receber as instruções de como criar uma nova senha.
         </p>
-        <input type="email" placeholder="Email" required>
+        <input id="recoverEmail" type="email" placeholder="Email" required>
         <button type="submit" class="btn-custom">Enviar link</button>
+        <p id="recoverFeedback" class="form-description" aria-live="polite"></p>
         <a href="#" class="back-to-login-link">Voltar para o login</a>
       </form>
 

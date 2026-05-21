@@ -82,8 +82,14 @@ $RECYCLE.BIN/
 hs_err_pid*
 replay_pid*
 
-# Exemplo para Node.js (se usar)
-/node_modules
+# Node.js
+node_modules/
+**/node_modules/
+.npm-cache/
+**/.npm-cache/
+
+# Maven local cache usado para builds isolados
+**/.mvn-local/
 
 ### Python (se usar) ###
 __pycache__/

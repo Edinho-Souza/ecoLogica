@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/beneficios")
-@CrossOrigin(origins = "*")
 public class CadastroBeneficiosController {
 
 	@Autowired
@@ -39,6 +38,8 @@ public class CadastroBeneficiosController {
 		novoBeneficio.setTitulo(request.getTitulo());
 		novoBeneficio.setDescricao(request.getDescricao());
 		novoBeneficio.setPontosNecessarios(request.getPontosNecessarios());
+		novoBeneficio.setImagemUrl(request.getImagemUrl());
+		novoBeneficio.setEstoque(request.getEstoque());
 
 		CadastroBeneficios beneficioSalvo = service.salvar(novoBeneficio);
 
@@ -52,6 +53,8 @@ public class CadastroBeneficiosController {
 			beneficioExistente.setTitulo(request.getTitulo());
 			beneficioExistente.setDescricao(request.getDescricao());
 			beneficioExistente.setPontosNecessarios(request.getPontosNecessarios());
+			beneficioExistente.setImagemUrl(request.getImagemUrl());
+			beneficioExistente.setEstoque(request.getEstoque());
 
 			CadastroBeneficios beneficioAtualizado = service.salvar(beneficioExistente);
 

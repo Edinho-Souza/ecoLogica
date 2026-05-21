@@ -51,10 +51,15 @@
                                 <p><strong>Email:</strong> <span id="admin-email-display">admin@ecologica.com</span></p>
                             </div>
 
-                            <button class="btn btn-sm btn-outline-secondary profile-v2-edit-btn" data-bs-toggle="modal"
-                                data-bs-target="#editAdminProfileModal">
-                                <i class="fas fa-pencil-alt me-1"></i> Editar Perfil
-                            </button>
+                            <div class="profile-v2-actions">
+                                <button class="btn btn-sm btn-outline-secondary profile-v2-edit-btn" data-bs-toggle="modal"
+                                    data-bs-target="#editAdminProfileModal">
+                                    <i class="fas fa-pencil-alt me-1"></i> Editar Perfil
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger js-logout-button">
+                                    <i class="fas fa-sign-out-alt me-1"></i> Sair
+                                </button>
+                            </div>
                         </div>
                     </section>
 
@@ -264,6 +269,12 @@
                                 <label for="campaignTitle" class="form-label">Título da Campanha</label>
                                 <input type="text" class="form-control" id="campaignTitle" required>
                             </div>
+                            <div class="mb-3">
+                                <label for="campaignSupporterSelect" class="form-label">Empresa Apoiadora</label>
+                                <select class="form-select" id="campaignSupporterSelect" required>
+                                    <option value="" selected disabled>Selecione uma apoiadora...</option>
+                                </select>
+                            </div>
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label for="campaignStartDate" class="form-label">Data de Início</label>
@@ -307,7 +318,8 @@
                             style="height: 150px; background-color: #eee; border-radius: 4px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: #999;">
                             (Preview Mapa)</div>
 
-                        <button class="btn btn-sm btn-info w-100 mb-2"><i class="fas fa-map-marked-alt me-1"></i> Abrir
+                        <button class="btn btn-sm btn-info w-100 mb-2" id="btnOpenMapEditor" data-bs-toggle="modal"
+                            data-bs-target="#mapEditorModal"><i class="fas fa-map-marked-alt me-1"></i> Abrir
                             Editor de Mapa</button>
                         <div class="list-group list-group-flush company-list-scrollable" style="max-height: 150px;">
                             <a href="#"
@@ -318,6 +330,38 @@
                                 class="list-group-item list-group-item-action py-1 px-2 d-flex justify-content-between align-items-center">
                                 Recicla Eletrônicos Velha <span class="badge bg-secondary rounded-pill"><i
                                         class="fas fa-pencil-alt fa-xs"></i></span> </a>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-section material-types-management-section mb-4">
+                        <h3>Materiais Coletados</h3>
+                        <form id="materialTypeForm" class="mb-3">
+                            <input type="hidden" id="materialTypeId">
+                            <div class="mb-2">
+                                <label for="materialTypeName" class="form-label">Nome do Material</label>
+                                <input type="text" class="form-control form-control-sm" id="materialTypeName"
+                                    placeholder="Ex: Plástico, Vidro, Eletrônicos" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="materialTypeDescription" class="form-label">Descrição</label>
+                                <textarea class="form-control form-control-sm" id="materialTypeDescription" rows="2"
+                                    placeholder="Detalhes do material aceito"></textarea>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="materialTypeActive"
+                                    checked>
+                                <label class="form-check-label small" for="materialTypeActive">Material ativo</label>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-sm btn-success flex-grow-1"
+                                    id="saveMaterialTypeButton">Salvar Material</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    id="cancelMaterialTypeEditButton">Limpar</button>
+                            </div>
+                        </form>
+                        <div class="list-group list-group-flush company-list-scrollable" id="material-types-list"
+                            style="max-height: 220px;">
+                            <p class="text-muted small text-center mt-3">Carregando materiais...</p>
                         </div>
                     </section>
 
@@ -365,9 +409,9 @@
                         <hr>
                         <h6>Ajuste Manual</h6>
                         <div class="input-group input-group-sm mb-1" id="manualAdjustGroup">
-                            <input type="email" class="form-control" placeholder="Email do usuário">
-                            <input type="number" class="form-control" placeholder="Pontos (+/-)">
-                            <button class="btn btn-outline-secondary" type="button">Aplicar</button>
+                            <input type="email" class="form-control" id="manualAdjustEmail" placeholder="Email do usuário">
+                            <input type="number" class="form-control" id="manualAdjustPoints" placeholder="Pontos (+/-)">
+                            <button class="btn btn-outline-secondary" type="button" id="manualAdjustApplyButton">Aplicar</button>
                         </div>
                     </section>
 
@@ -857,6 +901,13 @@
                                     <input type="hidden" id="pointLng" required>
 
                                     <div class="mb-2">
+                                        <label for="pointRecyclerSelect" class="form-label small">Empresa Recicladora ResponsÃ¡vel</label>
+                                        <select class="form-select form-select-sm" id="pointRecyclerSelect" required>
+                                            <option value="" selected disabled>Selecione uma recicladora...</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-2">
                                         <label for="pointName" class="form-label small">Nome do Ponto (Ex: Ecoponto
                                             Centro)</label>
                                         <input type="text" class="form-control form-control-sm" id="pointName" required>
@@ -960,6 +1011,14 @@
                             <input type="email" class="form-control" id="userEmailInput" required>
                         </div>
                         <div class="mb-3">
+                            <label for="userCpfInput" class="form-label">CPF</label>
+                            <input type="text" class="form-control" id="userCpfInput" placeholder="Somente numeros" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userPasswordInput" class="form-label">Senha inicial</label>
+                            <input type="password" class="form-control" id="userPasswordInput" value="123456789">
+                        </div>
+                        <div class="mb-3">
                             <label for="userInitialPoints" class="form-label">Pontos Iniciais</label>
                             <input type="number" class="form-control" id="userInitialPoints" value="0">
                         </div>
@@ -1046,6 +1105,12 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="rewardDescription" class="form-label">DescriÃ§Ã£o</label>
+                            <textarea class="form-control" id="rewardDescription" rows="2"
+                                placeholder="Detalhes da recompensa"></textarea>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="rewardCost" class="form-label">Custo em Pontos</label>
                             <div class="input-group">
                                 <input type="number" class="form-control" id="rewardCost" placeholder="Ex: 50" required>
@@ -1057,6 +1122,14 @@
                             <label for="rewardStock" class="form-label">Estoque Disponível (Opcional)</label>
                             <input type="number" class="form-control" id="rewardStock" placeholder="Ex: 100"
                                 value="100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="rewardImage" class="form-label">Imagem da Recompensa</label>
+                            <input type="file" class="form-control" id="rewardImage" accept="image/png, image/jpeg, image/webp">
+                            <small class="text-muted">A imagem sera salva junto ao cadastro da recompensa.</small>
+                            <img id="rewardImagePreview" class="img-fluid rounded border mt-2 d-none" alt="Preview da recompensa"
+                                style="max-height: 140px; object-fit: contain;">
                         </div>
 
                         <button type="submit" class="btn btn-success w-100">Salvar Recompensa</button>

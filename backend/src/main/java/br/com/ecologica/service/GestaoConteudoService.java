@@ -30,4 +30,25 @@ public class GestaoConteudoService {
     public void deletar(Long id) {
         repository.deleteById(id);
     }
+
+    public Optional<GestaoConteudo> buscarAvisoAtivo() {
+        return repository.findFirstByTipoConteudoAndPublicadoTrueOrderByIdDesc("AVISO");
+    }
+
+    public GestaoConteudo publicarAviso(String texto, String tipo) {
+        removerAvisosAtivos();
+
+        GestaoConteudo aviso = new GestaoConteudo();
+        aviso.setTipoConteudo("AVISO");
+        aviso.setTitulo(tipo);
+        aviso.setDescricao(texto);
+        aviso.setPublicado(true);
+        return repository.save(aviso);
+    }
+
+    public void removerAvisosAtivos() {
+        List<GestaoConteudo> avisosAtivos = repository.findByTipoConteudoAndPublicadoTrue("AVISO");
+        avisosAtivos.forEach(aviso -> aviso.setPublicado(false));
+        repository.saveAll(avisosAtivos);
+    }
 }

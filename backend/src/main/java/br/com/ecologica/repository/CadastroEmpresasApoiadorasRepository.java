@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface CadastroEmpresasApoiadorasRepository extends JpaRepository<CadastroEmpresasApoiadoras, Long> {
     List<CadastroEmpresasApoiadoras> findByUsuario_Status(StatusUsuario status);
+    boolean existsByCnpj(String cnpj);
 }

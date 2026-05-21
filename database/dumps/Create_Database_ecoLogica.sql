@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   `tipo_usuario` VARCHAR(255) NOT NULL,
   `data_cadastro` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `status` VARCHAR(255) NOT NULL,
+  `foto_perfil` LONGTEXT NULL DEFAULT NULL,
   PRIMARY KEY (`id_usuario`),
   INDEX `idx_usuario_email` (`email` ASC) VISIBLE
 ) ENGINE=InnoDB;
@@ -58,6 +59,8 @@ CREATE TABLE IF NOT EXISTS `beneficio` (
   `titulo` VARCHAR(100) NOT NULL,
   `descricao` TEXT NULL DEFAULT NULL,
   `pontos_necessarios` INT NOT NULL,
+  `imagem_url` LONGTEXT NULL DEFAULT NULL,
+  `estoque` INT NULL DEFAULT 0,
   PRIMARY KEY (`id_beneficio`)
 ) ENGINE=InnoDB;
 
@@ -71,6 +74,8 @@ CREATE TABLE IF NOT EXISTS `campanha` (
   `data_inicio` DATE NULL DEFAULT NULL,
   `data_fim` DATE NULL DEFAULT NULL,
   `id_apoiadora` BIGINT NULL DEFAULT NULL,
+  `imagem_url` VARCHAR(500) NULL DEFAULT NULL,
+  `pontos_extras` INT NULL DEFAULT 0,
   PRIMARY KEY (`id_campanha`),
   INDEX `idx_campanha_datas` (`data_inicio` ASC, `data_fim` ASC) VISIBLE,
   INDEX `fk_campanha_apoiadora_idx` (`id_apoiadora` ASC) VISIBLE,
@@ -119,6 +124,9 @@ CREATE TABLE IF NOT EXISTS `localcoleta` (
   `id_local` BIGINT NOT NULL AUTO_INCREMENT,
   `nome` VARCHAR(100) NULL DEFAULT NULL,
   `endereco` VARCHAR(200) NULL DEFAULT NULL,
+  `cidade` VARCHAR(80) NULL DEFAULT NULL,
+  `latitude` DOUBLE NULL DEFAULT NULL,
+  `longitude` DOUBLE NULL DEFAULT NULL,
   `id_recicladora` BIGINT NULL DEFAULT NULL,
   PRIMARY KEY (`id_local`),
   INDEX `fk_localcoleta_recicladora_idx` (`id_recicladora` ASC) VISIBLE,
@@ -301,9 +309,9 @@ CREATE TABLE IF NOT EXISTS `localcoleta_tipos_materiais` (
 -- -----------------------------------------------------
 LOCK TABLES `usuario` WRITE;
 INSERT INTO `usuario` (`id_usuario`, `nome`, `cpf`, `email`, `senha`, `tipo_usuario`, `data_cadastro`, `status`) VALUES
-(1, 'Admin Geral', '000.000.000-00', 'admin@sistema.com', '123456789', 'admin', '2025-09-14 22:57:28', 'ATIVO'),
-(2, 'Recicladora Verde', '111.111.111-11', 'contato@verde.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'recicladora', '2025-09-14 22:58:50', 'ATIVO'),
-(3, 'Apoiadora Eco', '222.222.222-22', 'eco@apoio.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'apoiadora', '2025-09-14 22:59:59', 'ATIVO');
+(1, 'Admin Geral', '00000000000', 'admin@sistema.com', '$2a$10$58eAXNXrHxY/d7qzzLK0ce4Kvp1A6EZqRNrC.vuxoTuOu74M0NMNS', 'admin', '2025-09-14 22:57:28', 'ATIVO'),
+(2, 'Recicladora Verde', '12345678000199', 'contato@verde.com', '$2a$10$58eAXNXrHxY/d7qzzLK0ce4Kvp1A6EZqRNrC.vuxoTuOu74M0NMNS', 'recicladora', '2025-09-14 22:58:50', 'ATIVO'),
+(3, 'Apoiadora Eco', '98765432000111', 'eco@apoio.com', '$2a$10$58eAXNXrHxY/d7qzzLK0ce4Kvp1A6EZqRNrC.vuxoTuOu74M0NMNS', 'apoiadora', '2025-09-14 22:59:59', 'ATIVO');
 UNLOCK TABLES;
 
 LOCK TABLES `empresarecicladora` WRITE;
@@ -312,4 +320,30 @@ UNLOCK TABLES;
 
 LOCK TABLES `empresaapoiadora` WRITE;
 INSERT INTO `empresaapoiadora` VALUES (3,'98.765.432/0001-11','Av. Sustentável, 200','(11) 98888-7777');
+UNLOCK TABLES;
+LOCK TABLES `tipos_materiais` WRITE;
+INSERT INTO `tipos_materiais` (`id`, `nome_tipo`, `descricao`, `ativo`) VALUES
+(1, 'Plastico', 'Embalagens plasticas limpas e secas', 1),
+(2, 'Papel', 'Papel, papelao e similares', 1),
+(3, 'Vidro', 'Garrafas, potes e frascos de vidro', 1),
+(4, 'Metal', 'Latas e itens metalicos reciclaveis', 1),
+(5, 'Eletronicos', 'Pequenos equipamentos eletronicos', 1),
+(6, 'Oleo', 'Oleo de cozinha usado armazenado em garrafa PET', 1);
+UNLOCK TABLES;
+
+LOCK TABLES `beneficio` WRITE;
+INSERT INTO `beneficio` (`id_beneficio`, `titulo`, `descricao`, `pontos_necessarios`, `imagem_url`, `estoque`) VALUES
+(1, 'Ecobag ecoLogica', 'Sacola reutilizavel para compras sustentaveis', 50, 'img/recompensas/ecobag.png', 100),
+(2, 'Garrafa ecoLogica', 'Garrafa reutilizavel para o dia a dia', 75, 'img/recompensas/garrafa.png', 100),
+(3, 'Caixa de sementes', 'Kit com sementes para plantio domestico', 30, 'img/recompensas/caixa-sementes.png', 100);
+UNLOCK TABLES;
+
+LOCK TABLES `localcoleta` WRITE;
+INSERT INTO `localcoleta` (`id_local`, `nome`, `endereco`, `cidade`, `latitude`, `longitude`, `id_recicladora`) VALUES
+(1, 'Recicladora Verde - Centro', 'Rua das Arvores, 100', 'Blumenau', -26.9183, -49.0691, 2);
+UNLOCK TABLES;
+
+LOCK TABLES `localcoleta_tipos_materiais` WRITE;
+INSERT INTO `localcoleta_tipos_materiais` (`local_id`, `tipo_id`) VALUES
+(1, 1), (1, 2), (1, 3), (1, 4);
 UNLOCK TABLES;

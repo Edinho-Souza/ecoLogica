@@ -7,7 +7,11 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node scripts/start-local.js",
+    "backend": "cd backend && mvnw.cmd spring-boot:run",
+    "frontend": "cd frontend && npm start",
+    "db": "docker compose up -d mysql",
+    "test": "cd backend && mvnw.cmd test"
   },
   "repository": {
     "type": "git",

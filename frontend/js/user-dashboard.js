@@ -1,250 +1,454 @@
-/**
- * @file user-dashboard.js
- * Versão Final Corrigida - Com Lightbox de Imagem nas Recompensas
- */
+document.addEventListener('DOMContentLoaded', async () => {
+    const dashboardRoot = document.querySelector('.user-dashboard');
+    if (!dashboardRoot) return;
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log(">>> User Dashboard Iniciado");
+    const session = requireLogin();
+    if (!session) return;
 
-    // ===================================================================
-    // 1. GRÁFICO E DADOS INICIAIS
-    // ===================================================================
-    const initChart = () => {
-        const ctx = document.getElementById('disposalHistoryChart');
-        if (ctx && typeof Chart !== 'undefined') {
-            const screenW = window.innerWidth;
-            let labels = ['Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro'];
-            let data = [6.0, 6.6, 6.8, 9.0, 8.0, 10.6];
-            if (screenW < 768) { labels = labels.slice(-4); data = data.slice(-4); }
-
-            const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 250);
-            gradient.addColorStop(0, 'rgba(72, 143, 88, 0.6)');
-            gradient.addColorStop(1, 'rgba(72, 143, 88, 0.05)');
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Reciclado (Kg)',
-                        data: data,
-                        fill: true,
-                        backgroundColor: gradient,
-                        borderColor: '#2c5836',
-                        borderWidth: 2.5,
-                        tension: 0.3,
-                        pointRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    aspectRatio: screenW < 768 ? 1.5 : 2.5,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true }, x: { grid: { display: false } } }
-                }
-            });
-        }
+    const state = {
+        user: null,
+        points: 0,
+        selectedReward: null
     };
-    initChart();
 
-    const loadUserData = () => {
-        const simData = { name: "Sofia Terra", email: "terradasofia@ecologica.com", points: 500, address: "Rua das Flores, 123" };
-        const setText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
-        setText('user-name', simData.name);
-        setText('user-email', simData.email);
-        setText('user-address', simData.address);
-        setText('user-points-value', simData.points);
-        setText('modal-user-points', simData.points);
+    const setText = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
     };
-    loadUserData();
 
-    // ===================================================================
-    // 2. MODAL DE RESGATE (COM LIGHTBOX)
-    // ===================================================================
-    
-    // Helper de Imagem
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    }[char]));
+
+    const formatDistance = (meters) => {
+        if (meters < 1000) return `${Math.round(meters)} m`;
+        return `${(meters / 1000).toFixed(1).replace('.', ',')} km`;
+    };
+
+    const distanceInMeters = (origin, target) => {
+        const toRad = value => (value * Math.PI) / 180;
+        const earthRadius = 6371000;
+        const dLat = toRad(target.lat - origin.lat);
+        const dLng = toRad(target.lng - origin.lng);
+        const lat1 = toRad(origin.lat);
+        const lat2 = toRad(target.lat);
+        const a = Math.sin(dLat / 2) ** 2
+            + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+        return 2 * earthRadius * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    };
+
+    const readFileAsDataUrl = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+
+    const updateAvatarImages = (src) => {
+        const avatarSrc = src || 'img/avatar/avatar-user.png';
+        document.querySelectorAll('.profile-v2-avatar, #edit-profile-avatar-img').forEach(image => {
+            if (image) image.src = avatarSrc;
+        });
+    };
+
     const getRewardImg = (name) => {
-        if(!name) return 'img/geral-site/logo-aba-navegador.png';
-        const n = name.toLowerCase();
-        if(n.includes('ecobag')) return 'img/recompensas/ecobag.png';
-        if(n.includes('garrafa')) return 'img/recompensas/garrafa.png';
-        if(n.includes('semente')) return 'img/recompensas/caixa-sementes.png';
-        if(n.includes('cupom')) return 'img/recompensas/cupom-desconto.png';
+        const normalized = (name || '').toLowerCase();
+        if (normalized.includes('ecobag')) return 'img/recompensas/ecobag.png';
+        if (normalized.includes('garrafa')) return 'img/recompensas/garrafa.png';
+        if (normalized.includes('semente')) return 'img/recompensas/caixa-sementes.png';
+        if (normalized.includes('cupom')) return 'img/recompensas/cupom-desconto.png';
         return 'img/geral-site/logo-aba-navegador.png';
     };
 
-    const redeemModalEl = document.getElementById('redeemModal');
+    const initChart = (historico = []) => {
+        const ctx = document.getElementById('disposalHistoryChart');
+        if (!ctx || typeof Chart === 'undefined') return;
 
-    if (redeemModalEl) {
-        const confirmBtn = document.getElementById('confirmRedeemButton');
+        const grouped = historico.reduce((acc, item) => {
+            const date = item.data ? new Date(item.data) : new Date();
+            const label = date.toLocaleDateString('pt-BR', { month: 'short' });
+            acc[label] = (acc[label] || 0) + Math.max(item.pontos || 0, 0);
+            return acc;
+        }, {});
+
+        const labels = Object.keys(grouped).slice(-6);
+        const values = labels.map(label => grouped[label]);
+        const fallbackLabels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'];
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels.length ? labels : fallbackLabels,
+                datasets: [{
+                    label: 'Pontos gerados',
+                    data: values.length ? values : [0, 0, 0, 0, 0, 0],
+                    fill: true,
+                    backgroundColor: 'rgba(72, 143, 88, 0.15)',
+                    borderColor: '#2c5836',
+                    borderWidth: 2,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true }, x: { grid: { display: false } } }
+            }
+        });
+    };
+
+    const loadUser = async () => {
+        state.user = await apiFetch('/usuarios/me');
+        const pontos = await apiFetch(`/pontuacao/usuario/${state.user.id}`);
+        state.points = pontos.pontosTotal || 0;
+
+        setText('user-name', state.user.nome);
+        setText('user-email', state.user.email);
+        setText('user-address', localStorage.getItem('user_address') || '[Endereco nao cadastrado]');
+        setText('user-points-value', state.points);
+        setText('modal-user-points', state.points);
+        updateAvatarImages(state.user.fotoPerfil || localStorage.getItem(`user_avatar_${state.user.id}`));
+
+        localStorage.setItem('user_id', state.user.id);
+        localStorage.setItem('username', state.user.nome);
+        localStorage.setItem('user_email', state.user.email);
+
+        try {
+            const historico = await apiFetch(`/historico/usuario/${state.user.id}`);
+            initChart(historico);
+        } catch {
+            initChart([]);
+        }
+    };
+
+    const renderRewards = async () => {
+        const container = document.getElementById('redeem-list-container');
+        const confirmButton = document.getElementById('confirmRedeemButton');
         const feedback = document.getElementById('redeem-feedback');
-        let selectedItem = null;
+        if (!container) return;
 
-        // --- FUNÇÃO DE RENDERIZAR (COM LINK PARA LIGHTBOX) ---
-        const renderList = () => {
-            const container = document.getElementById('redeem-list-container');
-            if (!container) return;
+        state.selectedReward = null;
+        if (confirmButton) confirmButton.disabled = true;
+        if (feedback) feedback.textContent = '';
+
+        try {
+            const rewards = await apiFetch('/beneficios');
+            container.innerHTML = '';
+
+            if (!rewards.length) {
+                container.innerHTML = '<div class="text-muted text-center p-3">Nenhum beneficio disponivel.</div>';
+                return;
+            }
+
+            rewards.forEach(reward => {
+                const canAfford = state.points >= reward.pontosNecessarios;
+                const imageSrc = reward.imagemUrl || getRewardImg(reward.titulo);
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'list-group-item list-group-item-action d-flex align-items-center p-2';
+                item.innerHTML = `
+                    <a href="#" class="redeem-item-image-link me-3 flex-shrink-0"
+                       data-bs-toggle="modal"
+                       data-bs-target="#imageLightboxModal"
+                       data-image-src="${imageSrc}"
+                       data-image-title="${reward.titulo}"
+                       style="width:50px; height:50px; display:block;">
+                        <img src="${imageSrc}" style="width:100%; height:100%; object-fit:contain;" alt="${reward.titulo}">
+                    </a>
+                    <div class="flex-grow-1 text-start overflow-hidden">
+                        <div class="fw-bold text-truncate">${reward.titulo}</div>
+                        <small class="text-muted">${reward.descricao || 'Beneficio ecoLogica'}</small>
+                    </div>
+                    <span class="badge rounded-pill ${canAfford ? 'bg-success' : 'bg-secondary'} ms-2">${reward.pontosNecessarios} pts</span>
+                `;
+
+                item.addEventListener('click', (event) => {
+                    if (event.target.closest('.redeem-item-image-link')) return;
+                    container.querySelectorAll('button.list-group-item').forEach(button => button.classList.remove('active'));
+
+                    if (!canAfford) {
+                        if (feedback) feedback.textContent = 'Pontos insuficientes.';
+                        if (confirmButton) confirmButton.disabled = true;
+                        state.selectedReward = null;
+                        return;
+                    }
+
+                    item.classList.add('active');
+                    state.selectedReward = reward;
+                    if (feedback) feedback.textContent = '';
+                    if (confirmButton) confirmButton.disabled = false;
+                });
+
+                container.appendChild(item);
+            });
+        } catch (error) {
+            container.innerHTML = `<div class="text-danger text-center p-3 small">${error.message}</div>`;
+        }
+    };
+
+    const setupRedeemModal = () => {
+        const redeemModal = document.getElementById('redeemModal');
+        const confirmButton = document.getElementById('confirmRedeemButton');
+        const feedback = document.getElementById('redeem-feedback');
+
+        if (redeemModal) {
+            redeemModal.addEventListener('show.bs.modal', renderRewards);
+            redeemModal.addEventListener('click', (event) => {
+                const imageLink = event.target.closest('.redeem-item-image-link');
+                if (!imageLink) return;
+                const lightboxImg = document.getElementById('lightboxImage');
+                const lightboxLabel = document.getElementById('imageLightboxModalLabel');
+                if (lightboxImg) lightboxImg.src = imageLink.dataset.imageSrc;
+                if (lightboxLabel) lightboxLabel.textContent = imageLink.dataset.imageTitle;
+            });
+        }
+
+        if (confirmButton) {
+            confirmButton.addEventListener('click', async () => {
+                if (!state.selectedReward) return;
+                confirmButton.disabled = true;
+                try {
+                    const updated = await apiFetch('/pontuacao/resgatar', 'POST', {
+                        idUsuario: state.user.id,
+                        idBeneficio: state.selectedReward.id
+                    });
+                    state.points = updated.pontos || 0;
+                    setText('user-points-value', state.points);
+                    setText('modal-user-points', state.points);
+                    if (feedback) feedback.textContent = 'Beneficio resgatado com sucesso.';
+                } catch (error) {
+                    if (feedback) feedback.textContent = error.message;
+                }
+            });
+        }
+    };
+
+    const setupMaterialRequest = () => {
+        const form = document.getElementById('registerMaterialForm');
+        const backButton = document.getElementById('back-to-material-form');
+        if (!form) return;
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const material = document.getElementById('materialType').value;
+            const quantity = document.getElementById('materialQuantity').value.trim();
+            const list = document.getElementById('company-results-list');
+            const subtitle = document.getElementById('results-subtitle');
+
+            document.getElementById('material-form-step').style.display = 'none';
+            document.getElementById('material-results-step').style.display = 'block';
+            if (subtitle) subtitle.textContent = `Para coletar ${material}...`;
+            if (list) list.innerHTML = '<p class="text-center text-muted">Buscando empresas...</p>';
 
             try {
-                container.innerHTML = '';
-                const stored = localStorage.getItem('ecoLogica_Rewards');
-                let rewards = stored ? JSON.parse(stored) : [{ id: 999, name: "Item Padrão", cost: 10, stock: 10 }];
-
-                if (!Array.isArray(rewards) || rewards.length === 0) {
-                    container.innerHTML = '<div class="text-muted text-center p-3">Nenhuma recompensa disponível.</div>';
+                const companies = await apiFetch('/empresas-recicladoras', 'GET', null, { skipAuth: true });
+                if (!companies.length) {
+                    list.innerHTML = '<p class="text-center text-muted">Nenhuma recicladora cadastrada.</p>';
                     return;
                 }
 
-                const ptsEl = document.getElementById('user-points-value');
-                const currentPoints = ptsEl ? parseInt(ptsEl.textContent) : 0;
-
-                rewards.forEach(r => {
-                    const stock = parseInt(r.stock) || 0;
-                    const noStock = stock <= 0;
-                    const canAfford = currentPoints >= r.cost;
-                    const imgSrc = getRewardImg(r.name);
-
-                    const btn = document.createElement('button');
-                    btn.className = `list-group-item list-group-item-action d-flex align-items-center p-2 ${noStock ? 'disabled bg-light' : ''}`;
-                    
-                    // AQUI ESTÁ A MUDANÇA: A imagem agora é um link <a> que abre o modal
-                    btn.innerHTML = `
-                        <a href="#" class="redeem-item-image-link me-3 flex-shrink-0" 
-                           data-bs-toggle="modal" 
-                           data-bs-target="#imageLightboxModal"
-                           data-image-src="${imgSrc}"
-                           data-image-title="${r.name}"
-                           style="width:50px; height:50px; display:block;">
-                            <img src="${imgSrc}" style="width:100%; height:100%; object-fit:contain;" alt="${r.name}">
-                        </a>
-                        <div class="flex-grow-1 text-start overflow-hidden">
-                            <div class="fw-bold text-truncate">${r.name}</div>
-                            <small class="text-muted">${noStock ? 'Esgotado' : 'Estoque: ' + stock}</small>
-                        </div>
-                        <span class="badge rounded-pill ${canAfford ? 'bg-success' : 'bg-secondary'} ms-2">${r.cost} pts</span>
+                list.innerHTML = '';
+                companies.forEach(company => {
+                    const item = document.createElement('div');
+                    item.className = 'border p-2 rounded bg-light mb-2';
+                    item.innerHTML = `
+                        <strong>${company.nomeEmpresa || company.nome || 'Recicladora'}</strong><br>
+                        <small>${company.endereco || 'Endereco nao informado'}</small>
+                        <button class="btn btn-sm btn-success float-end" data-company-id="${company.id}">Solicitar</button>
                     `;
-
-                    btn.addEventListener('click', (e) => {
-                        // SE CLICOU NA IMAGEM, NÃO SELECIONA O ITEM (Deixa o lightbox abrir)
-                        if (e.target.closest('.redeem-item-image-link')) return;
-
-                        if(noStock) return;
-                        container.querySelectorAll('button.list-group-item').forEach(b => b.classList.remove('active'));
-                        
-                        if (!canAfford) {
-                            if(feedback) {
-                                feedback.textContent = `Faltam pontos.`;
-                                feedback.className = 'mt-2 text-center text-danger small';
-                            }
-                            if(confirmBtn) confirmBtn.disabled = true;
-                            selectedItem = null;
-                        } else {
-                            btn.classList.add('active');
-                            if(feedback) feedback.textContent = "";
-                            if(confirmBtn) confirmBtn.disabled = false;
-                            selectedItem = r;
+                    item.querySelector('button').addEventListener('click', async (clickEvent) => {
+                        const button = clickEvent.currentTarget;
+                        button.disabled = true;
+                        button.textContent = 'Enviando...';
+                        try {
+                            await apiFetch('/solicitacoes', 'POST', {
+                                idUsuario: state.user.id,
+                                idRecicladora: Number(button.dataset.companyId),
+                                descricao: `Material: ${material}. Quantidade: ${quantity || 'nao informada'}.`
+                            });
+                            button.textContent = 'Solicitado';
+                        } catch (error) {
+                            button.disabled = false;
+                            button.textContent = 'Solicitar';
+                            alert(error.message);
                         }
                     });
-
-                    container.appendChild(btn);
+                    list.appendChild(item);
                 });
-
-            } catch (err) {
-                console.error("Erro render:", err);
-                container.innerHTML = '<div class="text-danger text-center p-3 small">Erro ao carregar.</div>';
-            }
-        };
-
-        redeemModalEl.addEventListener('show.bs.modal', () => {
-            selectedItem = null;
-            if(confirmBtn) confirmBtn.disabled = true;
-            if(feedback) feedback.textContent = "";
-            renderList();
-        });
-
-        if (confirmBtn) {
-            confirmBtn.addEventListener('click', () => {
-                if (!selectedItem) return;
-                confirmBtn.disabled = true;
-                // Lógica simplificada de débito (visualmente)
-                let ptsEl = document.getElementById('user-points-value');
-                let currentPts = parseInt(ptsEl.textContent) || 0;
-                currentPts -= selectedItem.cost;
-                ptsEl.textContent = currentPts;
-                document.getElementById('modal-user-points').textContent = currentPts;
-                
-                if(feedback) {
-                    feedback.textContent = "Resgatado!";
-                    feedback.className = "mt-2 text-center text-success fw-bold";
-                }
-                setTimeout(() => bootstrap.Modal.getInstance(redeemModalEl).hide(), 1000);
-            });
-        }
-
-        // --- LÓGICA DO LIGHTBOX ---
-        // houve um clique no modal de resgate
-        redeemModalEl.addEventListener('click', function (event) {
-            // verifica se o clique foi em um link de imagem
-            const imageLink = event.target.closest('.redeem-item-image-link');
-            if (imageLink) {
-                // Pega os dados da imagem clicada
-                const imageUrl = imageLink.getAttribute('data-image-src');
-                const imageTitle = imageLink.getAttribute('data-image-title');
-                
-                // Preenche o modal de lightbox
-                const lightboxImg = document.getElementById('lightboxImage');
-                const lightboxLabel = document.getElementById('imageLightboxModalLabel');
-                if(lightboxImg) lightboxImg.src = imageUrl;
-                if(lightboxLabel) lightboxLabel.textContent = imageTitle;
+            } catch (error) {
+                list.innerHTML = `<p class="text-danger text-center">${error.message}</p>`;
             }
         });
 
-        // Limpa o lightbox quando fecha
-        const lightboxModalEl = document.getElementById('imageLightboxModal');
-        if(lightboxModalEl) {
-            lightboxModalEl.addEventListener('hidden.bs.modal', function () {
-                 const lightboxImg = document.getElementById('lightboxImage');
-                 if(lightboxImg) lightboxImg.src = '';
-            });
-        }
-    }
-
-    // ===================================================================
-    // 3. OUTRAS FUNÇÕES (Cadastro Material, etc)
-    // ===================================================================
-    try {
-        const matForm = document.getElementById('registerMaterialForm');
-        if(matForm) {
-            matForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                document.getElementById('material-form-step').style.display = 'none';
-                const resDiv = document.getElementById('material-results-step');
-                resDiv.style.display = 'block';
-                const list = document.getElementById('company-results-list');
-                if(list) {
-                    list.innerHTML = '<p class="text-center text-muted">Buscando...</p>';
-                    setTimeout(() => {
-                        list.innerHTML = `
-                            <div class="border p-2 rounded bg-light mb-2">
-                                <strong>Recicladora Exemplo</strong><br><small>Coleta em 2 dias</small>
-                                <button class="btn btn-sm btn-success float-end">Solicitar</button>
-                            </div>`;
-                    }, 800);
-                }
-            });
-            document.getElementById('back-to-material-form')?.addEventListener('click', () => {
+        if (backButton) {
+            backButton.addEventListener('click', () => {
                 document.getElementById('material-results-step').style.display = 'none';
                 document.getElementById('material-form-step').style.display = 'block';
             });
         }
+    };
 
-        document.querySelectorAll('.guideline-header').forEach(h => {
-            h.addEventListener('click', () => {
-                const body = h.nextElementSibling;
-                h.closest('.guideline-card').classList.toggle('active');
-                body.style.maxHeight = body.style.maxHeight ? null : '200px';
-            });
+    const setupProfileModal = () => {
+        const modal = document.getElementById('editProfileModal');
+        const saveButton = document.getElementById('saveProfileChangesButton');
+        const avatarInput = document.getElementById('avatarUpload');
+        const avatarPreview = document.getElementById('edit-profile-avatar-img');
+        if (!modal || !saveButton) return;
+        let pendingAvatar = '';
+
+        modal.addEventListener('show.bs.modal', () => {
+            document.getElementById('edit-user-name').value = state.user.nome || '';
+            document.getElementById('edit-user-email').value = state.user.email || '';
+            document.getElementById('edit-user-address').value = localStorage.getItem('user_address') || '';
+            document.getElementById('edit-current-password').value = '';
+            document.getElementById('edit-new-password').value = '';
+            document.getElementById('edit-confirm-password').value = '';
+            document.getElementById('edit-profile-feedback').textContent = '';
+            pendingAvatar = state.user.fotoPerfil || localStorage.getItem(`user_avatar_${state.user.id}`) || '';
+            if (avatarPreview) avatarPreview.src = pendingAvatar || 'img/avatar/avatar-user.png';
         });
-    } catch(e) { console.error("Erro extras:", e); }
+
+        if (avatarInput && !avatarInput.dataset.listenerAdded) {
+            avatarInput.addEventListener('change', async () => {
+                const file = avatarInput.files?.[0];
+                if (!file) return;
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Selecione uma imagem de ate 2MB.');
+                    avatarInput.value = '';
+                    return;
+                }
+                pendingAvatar = await readFileAsDataUrl(file);
+                if (avatarPreview) avatarPreview.src = pendingAvatar;
+            });
+            avatarInput.dataset.listenerAdded = 'true';
+        }
+
+        saveButton.addEventListener('click', async () => {
+            const newPassword = document.getElementById('edit-new-password').value;
+            const confirmPassword = document.getElementById('edit-confirm-password').value;
+            const feedback = document.getElementById('edit-profile-feedback');
+
+            if (newPassword && newPassword !== confirmPassword) {
+                feedback.textContent = 'As novas senhas nao coincidem.';
+                feedback.className = 'mt-3 text-center text-danger';
+                return;
+            }
+
+            try {
+                const payload = {
+                    nome: document.getElementById('edit-user-name').value.trim(),
+                    email: document.getElementById('edit-user-email').value.trim()
+                };
+                if (newPassword) payload.senha = newPassword;
+                if (pendingAvatar) payload.fotoPerfil = pendingAvatar;
+
+                state.user = await apiFetch('/usuarios/me', 'PUT', payload);
+                localStorage.setItem('user_address', document.getElementById('edit-user-address').value.trim());
+                if (pendingAvatar) localStorage.setItem(`user_avatar_${state.user.id}`, pendingAvatar);
+                await loadUser();
+                feedback.textContent = 'Perfil atualizado.';
+                feedback.className = 'mt-3 text-center text-success';
+            } catch (error) {
+                feedback.textContent = error.message;
+                feedback.className = 'mt-3 text-center text-danger';
+            }
+        });
+    };
+
+    const resolveAddressToCoordinates = async (query) => {
+        let lookup = query.trim();
+        const cep = lookup.replace(/\D/g, '');
+        if (cep.length === 8) {
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await response.json();
+                if (!data.erro) {
+                    lookup = `${data.logradouro}, ${data.bairro}, ${data.localidade}, ${data.uf}, Brasil`;
+                }
+            } catch {
+                // Continua com o texto original se o servico de CEP estiver indisponivel.
+            }
+        }
+
+        const params = new URLSearchParams({
+            format: 'json',
+            limit: '1',
+            countrycodes: 'br',
+            q: lookup
+        });
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`);
+        const results = await response.json();
+        if (!Array.isArray(results) || !results.length) {
+            throw new Error('Nao foi possivel localizar esse endereco ou CEP.');
+        }
+        return {
+            lat: Number(results[0].lat),
+            lng: Number(results[0].lon),
+            label: results[0].display_name
+        };
+    };
+
+    const setupCollectionPointSearch = () => {
+        const form = document.getElementById('collectionPointSearchForm');
+        if (!form) return;
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const query = document.getElementById('userAddress').value.trim();
+            const results = document.getElementById('collection-point-results');
+            if (!query) {
+                results.innerHTML = '<p class="text-danger small">Informe um endereco ou CEP.</p>';
+                return;
+            }
+
+            results.innerHTML = '<p class="text-muted small">Buscando ponto de coleta mais proximo...</p>';
+            try {
+                const origin = await resolveAddressToCoordinates(query);
+                const points = await apiFetch('/locais-coleta', 'GET', null, { skipAuth: true });
+                const ranked = points
+                    .filter(point => point.latitude && point.longitude)
+                    .map(point => ({
+                        ...point,
+                        distance: distanceInMeters(origin, { lat: Number(point.latitude), lng: Number(point.longitude) })
+                    }))
+                    .sort((a, b) => a.distance - b.distance);
+
+                if (!ranked.length) {
+                    results.innerHTML = '<p class="text-muted small">Nenhum ponto de coleta com localizacao cadastrada.</p>';
+                    return;
+                }
+
+                const nearest = ranked[0];
+                results.innerHTML = `
+                    <div class="border rounded p-3 bg-light">
+                        <div class="fw-bold">${escapeHtml(nearest.nome)}</div>
+                        <div class="small text-muted">${escapeHtml(nearest.endereco || nearest.cidade || '')}</div>
+                        <div class="mt-2"><span class="badge bg-success">${formatDistance(nearest.distance)}</span> de distancia do endereco informado.</div>
+                        <div class="small mt-2">${escapeHtml(nearest.tiposMateriaisAceitos?.join(', ') || 'Materiais nao informados')}</div>
+                        <a class="btn btn-sm btn-outline-secondary mt-3" href="pontosColeta.html">Abrir mapa completo</a>
+                    </div>
+                `;
+            } catch (error) {
+                results.innerHTML = `<p class="text-danger small">${escapeHtml(error.message)}</p>`;
+            }
+        });
+    };
+
+    document.querySelectorAll('.guideline-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const body = header.nextElementSibling;
+            header.closest('.guideline-card').classList.toggle('active');
+            body.style.maxHeight = body.style.maxHeight ? null : '200px';
+        });
+    });
+
+    setupRedeemModal();
+    setupMaterialRequest();
+    setupProfileModal();
+    setupCollectionPointSearch();
+    await loadUser();
 });

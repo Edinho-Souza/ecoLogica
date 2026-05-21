@@ -38,4 +38,8 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private StatusUsuario status;
+
+    @Lob
+    @Column(name = "foto_perfil", columnDefinition = "LONGTEXT")
+    private String fotoPerfil;
 }

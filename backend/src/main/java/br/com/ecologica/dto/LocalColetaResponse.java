@@ -12,8 +12,12 @@ public class LocalColetaResponse {
     private Long id;
     private String nome;
     private String endereco;
+    private String cidade;
+    private Double latitude;
+    private Double longitude;
     private Long idRecicladora;
     private String nomeRecicladora;
+    private List<Long> tiposMateriaisIds;
     private List<String> tiposMateriaisAceitos; 
 
     public static LocalColetaResponse fromEntity(CadastroLocaisColeta local) {
@@ -21,6 +25,9 @@ public class LocalColetaResponse {
         response.setId(local.getId());
         response.setNome(local.getNome());
         response.setEndereco(local.getEndereco());
+        response.setCidade(local.getCidade());
+        response.setLatitude(local.getLatitude());
+        response.setLongitude(local.getLongitude());
         if (local.getEmpresaRecicladora() != null) {
             response.setIdRecicladora(local.getEmpresaRecicladora().getId());
             if (local.getEmpresaRecicladora().getUsuario() != null) {
@@ -29,6 +36,11 @@ public class LocalColetaResponse {
         }
         // Mapeia os nomes dos tipos de materiais
         if (local.getTiposMateriaisAceitos() != null) {
+            response.setTiposMateriaisIds(
+                local.getTiposMateriaisAceitos().stream()
+                    .map(CadastroTipoMateriais::getId)
+                    .collect(Collectors.toList())
+            );
             response.setTiposMateriaisAceitos(
                 local.getTiposMateriaisAceitos().stream()
                     .map(CadastroTipoMateriais::getNomeTipo)
